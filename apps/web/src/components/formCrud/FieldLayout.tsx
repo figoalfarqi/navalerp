@@ -90,33 +90,37 @@ const FieldLayout = ({
       // );
 
       if (!ready) {
-        return RenderField({
-          field: {
-            ...field,
-            disabled: true,
-            placeholder: `Pilih ${GetDependsOnLabel(
-              field.options.dependsOn,
-            )} terlebih dahulu`,
-          },
-          formData,
-          authToken,
-          setFormData,
-          errorForm,
-          optionsMap: filteredDynamicOptionsMap,
-          loading: false,
-        });
+        return (
+          <RenderField
+            field={{
+              ...field,
+              disabled: true,
+              placeholder: `Pilih ${GetDependsOnLabel(
+                field.options.dependsOn,
+              )} terlebih dahulu`,
+            }}
+            formData={formData}
+            authToken={authToken}
+            setFormData={setFormData}
+            errorForm={errorForm}
+            optionsMap={filteredDynamicOptionsMap}
+            loading={false}
+          />
+        );
       }
     }
 
-    return RenderField({
-      field,
-      formData,
-      authToken,
-      setFormData,
-      errorForm,
-      optionsMap: filteredDynamicOptionsMap,
-      loading: isLoadingDynamicOptions[field.name],
-    });
+    return (
+      <RenderField
+        field={field}
+        formData={formData}
+        authToken={authToken}
+        setFormData={setFormData}
+        errorForm={errorForm}
+        optionsMap={filteredDynamicOptionsMap}
+        loading={isLoadingDynamicOptions[field.name]}
+      />
+    );
   };
 
   const renderFieldList = (list: FormField[]) => (

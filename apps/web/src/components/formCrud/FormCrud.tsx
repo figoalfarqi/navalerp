@@ -136,11 +136,13 @@ export interface FormCrudProps {
   parentFormData?: FormDataObject;
 }
 
+const EMPTY_INITIAL_DATA: FormDataObject = {};
+
 export default function FormCrud({
   title,
   url,
   mode,
-  initialData = {},
+  initialData = EMPTY_INITIAL_DATA,
   fields,
   hideSubmit,
   onSuccess,
@@ -159,12 +161,6 @@ export default function FormCrud({
   const { postAPI, putAPI } = useFetchAPI();
   const [formData, setFormData] = useState<FormDataObject>(initialData || {});
   const [errorForm, setErrorForm] = useState<{ [key: string]: string }>({});
-
-  useEffect(() => {
-    if (initialData && typeof initialData === "object" && Object.keys(initialData).length > 0) {
-      setFormData(initialData);
-    }
-  }, [initialData]);
 
   const [loadingSumbit, setLoadingSumbit] = useState(false);
 
@@ -310,18 +306,29 @@ export default function FormCrud({
   }, [tablesDependsOn, formData]);
 
   const didInitRef = useRef(false);
+  const prevInitialDataRef = useRef<any>(initialData);
 
   useEffect(() => {
-    // if (formCrudFor !== "detail") return;
+    if (formCrudFor === "detail") {
+      if (!didInitRef.current) {
+        didInitRef.current = true;
+        setFormData(initialData);
+        return;
+      }
 
-    if (!didInitRef.current) {
-      didInitRef.current = true;
-      setFormData(initialData);
+      if (JSON.stringify(formData) !== JSON.stringify(initialData)) {
+        setFormData(initialData);
+      }
       return;
     }
 
-    if (JSON.stringify(formData) !== JSON.stringify(initialData)) {
-      setFormData(initialData);
+    // Normal forms: only update formData if initialData actually changed from outside (e.g. async fetch)
+    const prev = prevInitialDataRef.current;
+    if (JSON.stringify(prev) !== JSON.stringify(initialData)) {
+      prevInitialDataRef.current = initialData;
+      if (initialData && typeof initialData === "object" && Object.keys(initialData).length > 0) {
+        setFormData(initialData);
+      }
     }
   }, [initialData, resetKey, formCrudFor]);
 

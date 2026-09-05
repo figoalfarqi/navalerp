@@ -99,7 +99,7 @@ const RenderField = ({
         required={field.required}
         disabled={field.disabled}
         value={(formData[field.name] as string) ?? ""}
-        onChange={(val) => setFormData({ ...formData, [field.name]: val })}
+        onChange={(val) => setFormData((prev) => ({ ...prev, [field.name]: val }))}
         id={""}
         label={field.label}
         error={errorForm[field.name]}
@@ -115,7 +115,7 @@ const RenderField = ({
         required={field.required}
         disabled={field.disabled}
         value={(formData[field.name] as string) ?? ""}
-        onChange={(val) => setFormData({ ...formData, [field.name]: val })}
+        onChange={(val) => setFormData((prev) => ({ ...prev, [field.name]: val }))}
         id={""}
         label={field.label}
         error={errorForm[field.name]}
@@ -131,7 +131,7 @@ const RenderField = ({
         required={field.required}
         disabled={field.disabled}
         value={(formData[field.name] as string) ?? ""}
-        onChange={(val) => setFormData({ ...formData, [field.name]: val })}
+        onChange={(val) => setFormData((prev) => ({ ...prev, [field.name]: val }))}
         id={""}
         label={field.label}
         error={errorForm[field.name]}
@@ -147,7 +147,7 @@ const RenderField = ({
         required={field.required}
         disabled={field.disabled}
         value={(formData[field.name] as string | number) ?? ""}
-        onChange={(val) => setFormData({ ...formData, [field.name]: val })}
+        onChange={(val) => setFormData((prev) => ({ ...prev, [field.name]: val }))}
         id={""}
         label={field.label}
         error={errorForm[field.name]}
@@ -165,7 +165,7 @@ const RenderField = ({
         required={field.required}
         disabled={field.disabled}
         value={(formData[field.name] as string) ?? ""}
-        onChange={(val) => setFormData({ ...formData, [field.name]: val })}
+        onChange={(val) => setFormData((prev) => ({ ...prev, [field.name]: val }))}
         id={""}
         label={field.label}
         error={errorForm[field.name]}
@@ -181,7 +181,7 @@ const RenderField = ({
         required={field.required}
         disabled={field.disabled}
         value={(formData[field.name] as number) ?? ""}
-        onChange={(val) => setFormData({ ...formData, [field.name]: val })}
+        onChange={(val) => setFormData((prev) => ({ ...prev, [field.name]: val }))}
         id={""}
         label={field.label}
         error={errorForm[field.name]}
@@ -213,12 +213,12 @@ const RenderField = ({
             ]),
           );
 
-          setFormData({
-            ...formData,
+          setFormData((prev) => ({
+            ...prev,
             ...clearedValues,
             [field.name]: val,
             ...extraValues,
-          });
+          }));
         }}
         valueKey={field.name}
         labelKey={
@@ -296,7 +296,7 @@ const RenderField = ({
               ? 0
               : 0
         }
-        onChange={(val) => setFormData({ ...formData, [field.name]: val === 1 })}
+        onChange={(val) => setFormData((prev) => ({ ...prev, [field.name]: val === 1 }))}
         id={field.name}
         label={field.label}
         error={""}
@@ -311,10 +311,10 @@ const RenderField = ({
         allowedTypes={["image", "document"]}
         maxSizeMB={10}
         onUploaded={(url) => {
-          setFormData({
-            ...formData,
+          setFormData((prev) => ({
+            ...prev,
             [field.name]: url,
-          });
+          }));
         }}
         value={(formData[field.name] as string) ?? ""}
         id={""}
