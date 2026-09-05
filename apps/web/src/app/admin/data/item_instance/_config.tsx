@@ -24,6 +24,7 @@ export const filterFields: FilterField[] = [
 export const formFields = (mode: string): FormField[] => [
     {
     name: "warehouse_id",
+    col: "left",
     label: "Nama Gudang",
     fieldType: "select",
     options: {
@@ -36,6 +37,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "location_id",
+    col: "right",
     label: "Location Id",
     fieldType: "text",
     required: false,
@@ -43,6 +45,7 @@ export const formFields = (mode: string): FormField[] => [
   },
     {
     name: "material_id",
+    col: "left",
     label: "Material",
     fieldType: "select",
     options: {
@@ -55,6 +58,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "batch_number",
+    col: "right",
     label: "Batch Number",
     fieldType: "text",
     required: false,
@@ -62,6 +66,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "serial_number",
+    col: "left",
     label: "Serial Number",
     fieldType: "text",
     required: false,
@@ -69,6 +74,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "lot_number",
+    col: "right",
     label: "Lot Number",
     fieldType: "text",
     required: false,
@@ -76,6 +82,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "expiry_date",
+    col: "left",
     label: "Expiry Date",
     fieldType: "date",
     required: false,
@@ -83,6 +90,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "manufactured_date",
+    col: "right",
     label: "Manufactured Date",
     fieldType: "date",
     required: false,
@@ -90,6 +98,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "condition",
+    col: "left",
     label: "Condition",
     fieldType: "text",
     required: false,
@@ -97,6 +106,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "inspection_due_date",
+    col: "right",
     label: "Inspection Due Date",
     fieldType: "date",
     required: false,
@@ -104,6 +114,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "quantity",
+    col: "left",
     label: "Quantity",
     fieldType: "number",
     required: false,

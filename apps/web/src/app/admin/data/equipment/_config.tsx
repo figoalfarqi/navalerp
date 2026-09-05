@@ -24,6 +24,7 @@ export const filterFields: FilterField[] = [
 export const formFields = (mode: string): FormField[] => [
     {
     name: "system_id",
+    col: "left",
     label: "Sistem Kapal",
     fieldType: "select",
     options: {
@@ -36,6 +37,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "serial_number",
+    col: "right",
     label: "Serial Number",
     fieldType: "text",
     required: true,
@@ -43,6 +45,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "equipment_tag",
+    col: "left",
     label: "Equipment Tag",
     fieldType: "text",
     required: false,
@@ -50,6 +53,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "equipment_name",
+    col: "right",
     label: "Equipment Name",
     fieldType: "text",
     required: true,
@@ -57,6 +61,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "manufacturer",
+    col: "left",
     label: "Manufacturer",
     fieldType: "text",
     required: false,
@@ -64,6 +69,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "model_number",
+    col: "right",
     label: "Model Number",
     fieldType: "text",
     required: false,
@@ -71,6 +77,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "country_of_origin",
+    col: "left",
     label: "Country Of Origin",
     fieldType: "text",
     required: false,
@@ -78,6 +85,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "installation_date",
+    col: "right",
     label: "Installation Date",
     fieldType: "date",
     required: false,
@@ -85,6 +93,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "total_operating_hours",
+    col: "left",
     label: "Total Operating Hours",
     fieldType: "number",
     required: false,
@@ -92,6 +101,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "design_life_hours",
+    col: "right",
     label: "Design Life Hours",
     fieldType: "number",
     required: false,
@@ -99,6 +109,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "criticality_level",
+    col: "left",
     label: "Criticality Level",
     fieldType: "text",
     required: false,
@@ -106,6 +117,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "health_status",
+    col: "right",
     label: "Health Status",
     fieldType: "text",
     required: false,

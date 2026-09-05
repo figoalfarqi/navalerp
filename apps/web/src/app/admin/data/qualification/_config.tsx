@@ -24,6 +24,7 @@ export const filterFields: FilterField[] = [
 export const formFields = (mode: string): FormField[] => [
   {
     name: "qualification_code",
+    col: "left",
     label: "Qualification Code",
     fieldType: "text",
     required: true,
@@ -31,6 +32,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "qualification_name",
+    col: "right",
     label: "Qualification Name",
     fieldType: "text",
     required: true,
@@ -38,6 +40,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "qualification_category",
+    col: "left",
     label: "Qualification Category",
     fieldType: "text",
     required: true,
@@ -45,6 +48,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "issuing_institution",
+    col: "right",
     label: "Issuing Institution",
     fieldType: "text",
     required: true,
@@ -52,6 +56,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "validity_years",
+    col: "left",
     label: "Validity Years",
     fieldType: "number",
     required: false,
@@ -59,6 +64,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "description",
+    col: "right",
     label: "Description",
     fieldType: "textarea",
     required: false,

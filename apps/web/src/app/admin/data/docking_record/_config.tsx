@@ -24,6 +24,7 @@ export const filterFields: FilterField[] = [
 export const formFields = (mode: string): FormField[] => [
     {
     name: "ship_id",
+    col: "left",
     label: "Kapal KRI",
     fieldType: "select",
     options: {
@@ -36,6 +37,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "shipyard_name",
+    col: "right",
     label: "Shipyard Name",
     fieldType: "text",
     required: true,
@@ -43,6 +45,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "docking_type",
+    col: "left",
     label: "Docking Type",
     fieldType: "text",
     required: true,
@@ -50,6 +53,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "entry_date",
+    col: "right",
     label: "Entry Date",
     fieldType: "date",
     required: true,
@@ -57,6 +61,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "scheduled_exit_date",
+    col: "left",
     label: "Scheduled Exit Date",
     fieldType: "date",
     required: true,
@@ -64,6 +69,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "actual_exit_date",
+    col: "right",
     label: "Actual Exit Date",
     fieldType: "date",
     required: false,
@@ -71,6 +77,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "sea_trial_passed",
+    col: "left",
     label: "Sea Trial Passed",
     fieldType: "boolean",
     required: false,
@@ -78,6 +85,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "classification_surveyor",
+    col: "right",
     label: "Classification Surveyor",
     fieldType: "text",
     required: false,
@@ -85,6 +93,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "certificate_number",
+    col: "left",
     label: "Certificate Number",
     fieldType: "text",
     required: false,
@@ -92,6 +101,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "total_docking_cost",
+    col: "right",
     label: "Total Docking Cost",
     fieldType: "number",
     required: false,
@@ -99,6 +109,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "docking_summary",
+    col: "left",
     label: "Docking Summary",
     fieldType: "textarea",
     required: false,

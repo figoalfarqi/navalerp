@@ -24,6 +24,7 @@ export const filterFields: FilterField[] = [
 export const formFields = (mode: string): FormField[] => [
   {
     name: "document_number",
+    col: "left",
     label: "Document Number",
     fieldType: "text",
     required: true,
@@ -31,6 +32,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "title",
+    col: "right",
     label: "Title",
     fieldType: "text",
     required: true,
@@ -38,6 +40,7 @@ export const formFields = (mode: string): FormField[] => [
   },
     {
     name: "category_id",
+    col: "left",
     label: "Kategori Dokumen",
     fieldType: "select",
     options: {
@@ -50,6 +53,7 @@ export const formFields = (mode: string): FormField[] => [
   },
     {
     name: "originating_unit_id",
+    col: "right",
     label: "Satuan Asal",
     fieldType: "select",
     options: {
@@ -62,6 +66,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "classification_level",
+    col: "left",
     label: "Classification Level",
     fieldType: "text",
     required: false,
@@ -69,6 +74,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "effective_date",
+    col: "right",
     label: "Effective Date",
     fieldType: "date",
     required: true,
@@ -76,6 +82,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "expiry_date",
+    col: "left",
     label: "Expiry Date",
     fieldType: "date",
     required: false,
@@ -83,6 +90,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "status",
+    col: "right",
     label: "Status",
     fieldType: "text",
     required: false,
@@ -90,6 +98,7 @@ export const formFields = (mode: string): FormField[] => [
   },
     {
     name: "approved_by_user_id",
+    col: "left",
     label: "Disetujui Oleh",
     fieldType: "select",
     options: {

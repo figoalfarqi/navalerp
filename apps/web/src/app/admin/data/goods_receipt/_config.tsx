@@ -24,6 +24,7 @@ export const filterFields: FilterField[] = [
 export const formFields = (mode: string): FormField[] => [
   {
     name: "receipt_number",
+    col: "left",
     label: "Receipt Number",
     fieldType: "text",
     required: true,
@@ -31,6 +32,7 @@ export const formFields = (mode: string): FormField[] => [
   },
     {
     name: "po_id",
+    col: "right",
     label: "No. PO",
     fieldType: "select",
     options: {
@@ -43,6 +45,7 @@ export const formFields = (mode: string): FormField[] => [
   },
     {
     name: "warehouse_id",
+    col: "left",
     label: "Nama Gudang",
     fieldType: "select",
     options: {
@@ -55,6 +58,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "received_date",
+    col: "right",
     label: "Received Date",
     fieldType: "date",
     required: true,
@@ -62,6 +66,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "delivery_order_number",
+    col: "left",
     label: "Delivery Order Number",
     fieldType: "text",
     required: false,
@@ -69,6 +74,7 @@ export const formFields = (mode: string): FormField[] => [
   },
     {
     name: "inspected_by_user_id",
+    col: "right",
     label: "Inspektur",
     fieldType: "select",
     options: {
@@ -81,6 +87,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "inspection_passed",
+    col: "left",
     label: "Inspection Passed",
     fieldType: "boolean",
     required: false,
@@ -88,6 +95,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "remarks",
+    col: "right",
     label: "Remarks",
     fieldType: "textarea",
     required: false,

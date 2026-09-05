@@ -24,6 +24,7 @@ export const filterFields: FilterField[] = [
 export const formFields = (mode: string): FormField[] => [
   {
     name: "rank_code",
+    col: "left",
     label: "Rank Code",
     fieldType: "text",
     required: true,
@@ -31,6 +32,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "rank_name",
+    col: "right",
     label: "Rank Name",
     fieldType: "text",
     required: true,
@@ -38,6 +40,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "rank_category",
+    col: "left",
     label: "Rank Category",
     fieldType: "text",
     required: true,
@@ -45,6 +48,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "nato_rank_code",
+    col: "right",
     label: "Nato Rank Code",
     fieldType: "text",
     required: false,
@@ -52,6 +56,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "seniority_order",
+    col: "left",
     label: "Seniority Order",
     fieldType: "number",
     required: true,
@@ -59,6 +64,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "is_active",
+    col: "right",
     label: "Is Active",
     fieldType: "boolean",
     required: false,

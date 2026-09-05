@@ -24,6 +24,7 @@ export const filterFields: FilterField[] = [
 export const formFields = (mode: string): FormField[] => [
     {
     name: "ship_id",
+    col: "left",
     label: "Kapal KRI",
     fieldType: "select",
     options: {
@@ -36,6 +37,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "fiscal_year",
+    col: "right",
     label: "Fiscal Year",
     fieldType: "number",
     required: true,
@@ -43,6 +45,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "acquisition_amortization",
+    col: "left",
     label: "Acquisition Amortization",
     fieldType: "number",
     required: false,
@@ -50,6 +53,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "fuel_lube_cost",
+    col: "right",
     label: "Fuel Lube Cost",
     fieldType: "number",
     required: false,
@@ -57,6 +61,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "mro_spareparts_cost",
+    col: "left",
     label: "Mro Spareparts Cost",
     fieldType: "number",
     required: false,
@@ -64,6 +69,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "docking_services_cost",
+    col: "right",
     label: "Docking Services Cost",
     fieldType: "number",
     required: false,
@@ -71,6 +77,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "crew_payroll_allowances",
+    col: "left",
     label: "Crew Payroll Allowances",
     fieldType: "number",
     required: false,
@@ -78,6 +85,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "modernization_upgrades_cost",
+    col: "right",
     label: "Modernization Upgrades Cost",
     fieldType: "number",
     required: false,
@@ -85,6 +93,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "operating_hours_sea",
+    col: "left",
     label: "Operating Hours Sea",
     fieldType: "number",
     required: false,
@@ -92,6 +101,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "cost_per_operating_hour",
+    col: "right",
     label: "Cost Per Operating Hour",
     fieldType: "number",
     required: false,
@@ -99,6 +109,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "remarks",
+    col: "left",
     label: "Remarks",
     fieldType: "textarea",
     required: false,

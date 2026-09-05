@@ -24,6 +24,7 @@ export const filterFields: FilterField[] = [
 export const formFields = (mode: string): FormField[] => [
     {
     name: "warehouse_id",
+    col: "left",
     label: "Nama Gudang",
     fieldType: "select",
     options: {
@@ -36,6 +37,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "adjustment_number",
+    col: "right",
     label: "Adjustment Number",
     fieldType: "text",
     required: true,
@@ -43,6 +45,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "adjustment_date",
+    col: "left",
     label: "Adjustment Date",
     fieldType: "date",
     required: true,
@@ -50,6 +53,7 @@ export const formFields = (mode: string): FormField[] => [
   },
     {
     name: "conducted_by_user_id",
+    col: "right",
     label: "Pelaksana Stock Take",
     fieldType: "select",
     options: {
@@ -62,6 +66,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "reason",
+    col: "left",
     label: "Reason",
     fieldType: "text",
     required: true,
@@ -69,6 +74,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "status",
+    col: "right",
     label: "Status",
     fieldType: "text",
     required: false,
@@ -76,6 +82,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "remarks",
+    col: "left",
     label: "Remarks",
     fieldType: "textarea",
     required: false,

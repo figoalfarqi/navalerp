@@ -24,6 +24,7 @@ export const filterFields: FilterField[] = [
 export const formFields = (mode: string): FormField[] => [
     {
     name: "facility_id",
+    col: "left",
     label: "Fasilitas Pangkalan",
     fieldType: "select",
     options: {
@@ -36,6 +37,7 @@ export const formFields = (mode: string): FormField[] => [
   },
     {
     name: "ship_id",
+    col: "right",
     label: "Kapal KRI",
     fieldType: "select",
     options: {
@@ -48,6 +50,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "booking_purpose",
+    col: "left",
     label: "Booking Purpose",
     fieldType: "text",
     required: true,
@@ -55,6 +58,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "eta",
+    col: "right",
     label: "Eta",
     fieldType: "date",
     required: true,
@@ -62,6 +66,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "etd",
+    col: "left",
     label: "Etd",
     fieldType: "date",
     required: true,
@@ -69,6 +74,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "actual_berth_time",
+    col: "right",
     label: "Actual Berth Time",
     fieldType: "date",
     required: false,
@@ -76,6 +82,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "actual_unberth_time",
+    col: "left",
     label: "Actual Unberth Time",
     fieldType: "date",
     required: false,
@@ -83,6 +90,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "shore_power_kwh_used",
+    col: "right",
     label: "Shore Power Kwh Used",
     fieldType: "number",
     required: false,
@@ -90,6 +98,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "fresh_water_ton_used",
+    col: "left",
     label: "Fresh Water Ton Used",
     fieldType: "number",
     required: false,
@@ -97,6 +106,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "status",
+    col: "right",
     label: "Status",
     fieldType: "text",
     required: false,
@@ -104,6 +114,7 @@ export const formFields = (mode: string): FormField[] => [
   },
     {
     name: "approved_by_user_id",
+    col: "left",
     label: "Disetujui Oleh",
     fieldType: "select",
     options: {
@@ -116,6 +127,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "remarks",
+    col: "right",
     label: "Remarks",
     fieldType: "textarea",
     required: false,

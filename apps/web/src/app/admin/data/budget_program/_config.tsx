@@ -24,6 +24,7 @@ export const filterFields: FilterField[] = [
 export const formFields = (mode: string): FormField[] => [
   {
     name: "fiscal_year",
+    col: "left",
     label: "Fiscal Year",
     fieldType: "number",
     required: true,
@@ -31,6 +32,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "dipa_number",
+    col: "right",
     label: "Dipa Number",
     fieldType: "text",
     required: true,
@@ -38,6 +40,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "program_code",
+    col: "left",
     label: "Program Code",
     fieldType: "text",
     required: true,
@@ -45,6 +48,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "program_name",
+    col: "right",
     label: "Program Name",
     fieldType: "text",
     required: true,
@@ -52,6 +56,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "total_budget",
+    col: "left",
     label: "Total Budget",
     fieldType: "number",
     required: true,
@@ -59,6 +64,7 @@ export const formFields = (mode: string): FormField[] => [
   },
     {
     name: "responsible_unit_id",
+    col: "right",
     label: "Satuan Penanggung Jawab",
     fieldType: "select",
     options: {
@@ -71,6 +77,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "status",
+    col: "left",
     label: "Status",
     fieldType: "text",
     required: false,

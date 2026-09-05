@@ -24,6 +24,7 @@ export const filterFields: FilterField[] = [
 export const formFields = (mode: string): FormField[] => [
   {
     name: "unit_code",
+    col: "left",
     label: "Unit Code",
     fieldType: "text",
     required: true,
@@ -31,6 +32,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "unit_name",
+    col: "right",
     label: "Unit Name",
     fieldType: "text",
     required: true,
@@ -38,6 +40,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "transport_type",
+    col: "left",
     label: "Transport Type",
     fieldType: "text",
     required: true,
@@ -45,6 +48,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "cargo_capacity_tons",
+    col: "right",
     label: "Cargo Capacity Tons",
     fieldType: "number",
     required: true,
@@ -52,6 +56,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "fuel_capacity_liters",
+    col: "left",
     label: "Fuel Capacity Liters",
     fieldType: "number",
     required: false,
@@ -59,6 +64,7 @@ export const formFields = (mode: string): FormField[] => [
   },
     {
     name: "operating_unit_id",
+    col: "right",
     label: "Satuan Operasi",
     fieldType: "select",
     options: {
@@ -71,6 +77,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "status",
+    col: "left",
     label: "Status",
     fieldType: "text",
     required: false,

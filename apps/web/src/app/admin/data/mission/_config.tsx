@@ -24,6 +24,7 @@ export const filterFields: FilterField[] = [
 export const formFields = (mode: string): FormField[] => [
     {
     name: "theater_id",
+    col: "left",
     label: "Teater Operasi",
     fieldType: "select",
     options: {
@@ -36,6 +37,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "mission_code",
+    col: "right",
     label: "Mission Code",
     fieldType: "text",
     required: true,
@@ -43,6 +45,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "mission_name",
+    col: "left",
     label: "Mission Name",
     fieldType: "text",
     required: true,
@@ -50,6 +53,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "mission_type",
+    col: "right",
     label: "Mission Type",
     fieldType: "text",
     required: true,
@@ -57,6 +61,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "start_date",
+    col: "left",
     label: "Start Date",
     fieldType: "date",
     required: true,
@@ -64,6 +69,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "end_date",
+    col: "right",
     label: "End Date",
     fieldType: "date",
     required: false,
@@ -71,6 +77,7 @@ export const formFields = (mode: string): FormField[] => [
   },
     {
     name: "commanding_officer_user_id",
+    col: "left",
     label: "Komandan Operasi",
     fieldType: "select",
     options: {
@@ -83,6 +90,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "mission_status",
+    col: "right",
     label: "Mission Status",
     fieldType: "text",
     required: false,

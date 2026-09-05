@@ -24,6 +24,7 @@ export const filterFields: FilterField[] = [
 export const formFields = (mode: string): FormField[] => [
     {
     name: "tender_id",
+    col: "left",
     label: "No. Tender",
     fieldType: "select",
     options: {
@@ -36,6 +37,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "contract_number",
+    col: "right",
     label: "Contract Number",
     fieldType: "text",
     required: true,
@@ -43,6 +45,7 @@ export const formFields = (mode: string): FormField[] => [
   },
     {
     name: "vendor_id",
+    col: "left",
     label: "Vendor",
     fieldType: "select",
     options: {
@@ -55,6 +58,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "contract_title",
+    col: "right",
     label: "Contract Title",
     fieldType: "text",
     required: true,
@@ -62,6 +66,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "contract_value",
+    col: "left",
     label: "Contract Value",
     fieldType: "number",
     required: true,
@@ -69,6 +74,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "currency",
+    col: "right",
     label: "Currency",
     fieldType: "text",
     required: false,
@@ -76,6 +82,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "start_date",
+    col: "left",
     label: "Start Date",
     fieldType: "date",
     required: true,
@@ -83,6 +90,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "end_date",
+    col: "right",
     label: "End Date",
     fieldType: "date",
     required: true,
@@ -90,6 +98,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "procurement_method",
+    col: "left",
     label: "Procurement Method",
     fieldType: "text",
     required: false,
@@ -97,6 +106,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "warranty_period_months",
+    col: "right",
     label: "Warranty Period Months",
     fieldType: "number",
     required: false,
@@ -104,6 +114,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "tot_clause_summary",
+    col: "left",
     label: "Tot Clause Summary",
     fieldType: "textarea",
     required: false,
@@ -111,6 +122,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "status",
+    col: "right",
     label: "Status",
     fieldType: "text",
     required: false,

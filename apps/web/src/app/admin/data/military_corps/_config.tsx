@@ -22,6 +22,7 @@ export const filterFields: FilterField[] = [
 export const formFields = (mode: string): FormField[] => [
   {
     name: "corps_code",
+    col: "left",
     label: "Corps Code",
     fieldType: "text",
     required: true,
@@ -29,6 +30,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "corps_name",
+    col: "right",
     label: "Corps Name",
     fieldType: "text",
     required: true,
@@ -36,6 +38,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "description",
+    col: "left",
     label: "Description",
     fieldType: "textarea",
     required: false,

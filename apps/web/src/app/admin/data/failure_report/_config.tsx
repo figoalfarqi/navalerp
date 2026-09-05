@@ -24,6 +24,7 @@ export const filterFields: FilterField[] = [
 export const formFields = (mode: string): FormField[] => [
     {
     name: "equipment_id",
+    col: "left",
     label: "Peralatan",
     fieldType: "select",
     options: {
@@ -36,6 +37,7 @@ export const formFields = (mode: string): FormField[] => [
   },
     {
     name: "reported_by_user_id",
+    col: "right",
     label: "Pelapor",
     fieldType: "select",
     options: {
@@ -48,6 +50,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "report_number",
+    col: "left",
     label: "Report Number",
     fieldType: "text",
     required: true,
@@ -55,6 +58,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "incident_date",
+    col: "right",
     label: "Incident Date",
     fieldType: "date",
     required: true,
@@ -62,6 +66,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "severity",
+    col: "left",
     label: "Severity",
     fieldType: "text",
     required: true,
@@ -69,6 +74,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "failure_mode",
+    col: "right",
     label: "Failure Mode",
     fieldType: "text",
     required: false,
@@ -76,6 +82,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "description",
+    col: "left",
     label: "Description",
     fieldType: "textarea",
     required: true,
@@ -83,6 +90,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "operational_impact",
+    col: "right",
     label: "Operational Impact",
     fieldType: "textarea",
     required: false,
@@ -90,6 +98,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "immediate_action_taken",
+    col: "left",
     label: "Immediate Action Taken",
     fieldType: "textarea",
     required: false,
@@ -97,6 +106,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "status",
+    col: "right",
     label: "Status",
     fieldType: "text",
     required: false,

@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useFetchAPI } from "@/hooks/useFetchAPI";
+import { useAuth } from "@/context/AuthContext";
 import type { AdminCrudMode } from "./adminCrud";
 
 type UnknownRecord = Record<string, unknown>;
@@ -31,14 +32,16 @@ export function useAdminRecord({
   normalize,
 }: UseAdminRecordOptions) {
   const { getAPI } = useFetchAPI();
-  const getAPIRef = useRef(getAPI);
+  const { adminToken, tokenLoaded } = useAuth();
   const [record, setRecord] = useState<UnknownRecord | null>(null);
   const [error, setError] = useState("");
 
   useEffect(() => {
+    if (!endpoint || !id) return;
+    if (!tokenLoaded && adminToken === null) return;
+
     let active = true;
-    void getAPIRef
-      .current<unknown>(`${endpoint}/${id}`, { authToken: "admin" })
+    void getAPI<unknown>(`${endpoint}/${id}`, { authToken: "admin" })
       .then((response) => {
         if (!active) return;
         if (response.code < 200 || response.code >= 300) {
@@ -53,12 +56,16 @@ export function useAdminRecord({
         const next = normalize ? normalize(unwrapped) : unwrapped;
         if (mode === "copy") delete next[primaryKey];
         setRecord(next);
+      })
+      .catch((err) => {
+        if (!active) return;
+        setError(err?.message || "Data gagal dimuat.");
       });
 
     return () => {
       active = false;
     };
-  }, [endpoint, id, mode, normalize, primaryKey]);
+  }, [endpoint, id, mode, normalize, primaryKey, getAPI, adminToken, tokenLoaded]);
 
   return { record, error };
 }

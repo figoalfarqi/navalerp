@@ -160,6 +160,12 @@ export default function FormCrud({
   const [formData, setFormData] = useState<FormDataObject>(initialData || {});
   const [errorForm, setErrorForm] = useState<{ [key: string]: string }>({});
 
+  useEffect(() => {
+    if (initialData && typeof initialData === "object" && Object.keys(initialData).length > 0) {
+      setFormData(initialData);
+    }
+  }, [initialData]);
+
   const [loadingSumbit, setLoadingSumbit] = useState(false);
 
   const isForDetail = formCrudFor === "detail";

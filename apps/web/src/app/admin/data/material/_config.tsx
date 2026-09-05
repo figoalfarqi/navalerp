@@ -24,6 +24,7 @@ export const filterFields: FilterField[] = [
 export const formFields = (mode: string): FormField[] => [
   {
     name: "material_code",
+    col: "left",
     label: "Material Code",
     fieldType: "text",
     required: true,
@@ -31,6 +32,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "nsn",
+    col: "right",
     label: "Nsn",
     fieldType: "text",
     required: false,
@@ -38,6 +40,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "part_number",
+    col: "left",
     label: "Part Number",
     fieldType: "text",
     required: false,
@@ -45,6 +48,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "oem_name",
+    col: "right",
     label: "Oem Name",
     fieldType: "text",
     required: false,
@@ -52,6 +56,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "material_name",
+    col: "left",
     label: "Material Name",
     fieldType: "text",
     required: true,
@@ -59,6 +64,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "category",
+    col: "right",
     label: "Category",
     fieldType: "text",
     required: true,
@@ -66,6 +72,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "uom",
+    col: "left",
     label: "Uom",
     fieldType: "text",
     required: true,
@@ -73,6 +80,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "weight_kg",
+    col: "right",
     label: "Weight Kg",
     fieldType: "number",
     required: false,
@@ -80,6 +88,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "min_stock_level",
+    col: "left",
     label: "Min Stock Level",
     fieldType: "number",
     required: false,
@@ -87,6 +96,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "max_stock_level",
+    col: "right",
     label: "Max Stock Level",
     fieldType: "number",
     required: false,
@@ -94,6 +104,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "reorder_point",
+    col: "left",
     label: "Reorder Point",
     fieldType: "number",
     required: false,
@@ -101,6 +112,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "safety_stock",
+    col: "right",
     label: "Safety Stock",
     fieldType: "number",
     required: false,
@@ -108,6 +120,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "shelf_life_days",
+    col: "left",
     label: "Shelf Life Days",
     fieldType: "number",
     required: false,
@@ -115,6 +128,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "is_controlled_item",
+    col: "right",
     label: "Is Controlled Item",
     fieldType: "boolean",
     required: false,
@@ -122,6 +136,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "unit_price_idr",
+    col: "left",
     label: "Unit Price Idr",
     fieldType: "number",
     required: false,

@@ -24,6 +24,7 @@ export const filterFields: FilterField[] = [
 export const formFields = (mode: string): FormField[] => [
     {
     name: "user_id",
+    col: "left",
     label: "Pengguna",
     fieldType: "select",
     options: {
@@ -36,6 +37,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "action",
+    col: "right",
     label: "Action",
     fieldType: "text",
     required: true,
@@ -43,6 +45,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "entity_table",
+    col: "left",
     label: "Entity Table",
     fieldType: "text",
     required: true,
@@ -50,6 +53,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "entity_id",
+    col: "right",
     label: "Entity Id",
     fieldType: "text",
     required: false,
@@ -57,6 +61,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "old_values",
+    col: "left",
     label: "Old Values",
     fieldType: "text",
     required: false,
@@ -64,6 +69,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "new_values",
+    col: "right",
     label: "New Values",
     fieldType: "text",
     required: false,
@@ -71,6 +77,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "ip_address",
+    col: "left",
     label: "Ip Address",
     fieldType: "text",
     required: false,
@@ -78,6 +85,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "user_agent",
+    col: "right",
     label: "User Agent",
     fieldType: "textarea",
     required: false,

@@ -177,10 +177,39 @@ const FieldLayout = ({
     return renderFieldList(fields);
   }
 
+  const leftFields: FormField[] = [];
+  const rightFields: FormField[] = [];
+
+  const hasExplicitCol = fields.some((f) => f.col === "left" || f.col === "right");
+
+  if (hasExplicitCol) {
+    fields.forEach((field) => {
+      if (field.col === "left") {
+        leftFields.push(field);
+      } else if (field.col === "right") {
+        rightFields.push(field);
+      } else {
+        if (leftFields.length <= rightFields.length) {
+          leftFields.push(field);
+        } else {
+          rightFields.push(field);
+        }
+      }
+    });
+  } else {
+    fields.forEach((field, index) => {
+      if (index % 2 === 0) {
+        leftFields.push(field);
+      } else {
+        rightFields.push(field);
+      }
+    });
+  }
+
   return (
     <>
-      {renderFieldList(fields.filter((f) => f.col === "left"))}
-      {renderFieldList(fields.filter((f) => f.col === "right"))}
+      {renderFieldList(leftFields)}
+      {renderFieldList(rightFields)}
     </>
   );
 };

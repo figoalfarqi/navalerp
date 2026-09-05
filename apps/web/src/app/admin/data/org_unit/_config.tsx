@@ -24,6 +24,7 @@ export const filterFields: FilterField[] = [
 export const formFields = (mode: string): FormField[] => [
     {
     name: "parent_unit_id",
+    col: "left",
     label: "Satuan Induk",
     fieldType: "select",
     options: {
@@ -36,6 +37,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "unit_code",
+    col: "right",
     label: "Unit Code",
     fieldType: "text",
     required: true,
@@ -43,6 +45,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "unit_name",
+    col: "left",
     label: "Unit Name",
     fieldType: "text",
     required: true,
@@ -50,6 +53,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "unit_type",
+    col: "right",
     label: "Unit Type",
     fieldType: "text",
     required: true,
@@ -57,6 +61,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "description",
+    col: "left",
     label: "Description",
     fieldType: "textarea",
     required: false,
@@ -64,6 +69,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "command_level",
+    col: "right",
     label: "Command Level",
     fieldType: "number",
     required: false,
@@ -71,6 +77,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "latitude",
+    col: "left",
     label: "Latitude",
     fieldType: "number",
     required: false,
@@ -78,6 +85,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "longitude",
+    col: "right",
     label: "Longitude",
     fieldType: "number",
     required: false,
@@ -85,6 +93,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "address",
+    col: "left",
     label: "Address",
     fieldType: "textarea",
     required: false,
@@ -92,6 +101,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "phone",
+    col: "right",
     label: "Phone",
     fieldType: "text",
     required: false,
@@ -99,6 +109,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "is_active",
+    col: "left",
     label: "Is Active",
     fieldType: "boolean",
     required: false,

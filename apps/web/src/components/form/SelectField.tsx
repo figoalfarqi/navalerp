@@ -273,7 +273,9 @@ export default function SelectField({
               </div>
             )}
             {value ? (
-              options.find((opt) => opt.value === value)?.label
+              options.find((opt) => String(opt.value) === String(value))?.label || (
+                <div className="text-gray-400">{placeholder}</div>
+              )
             ) : (
               <div className="text-gray-400">{placeholder}</div>
             )}

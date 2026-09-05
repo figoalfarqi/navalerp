@@ -24,6 +24,7 @@ export const filterFields: FilterField[] = [
 export const formFields = (mode: string): FormField[] => [
     {
     name: "base_unit_id",
+    col: "left",
     label: "Satuan Pangkalan",
     fieldType: "select",
     options: {
@@ -36,6 +37,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "facility_code",
+    col: "right",
     label: "Facility Code",
     fieldType: "text",
     required: true,
@@ -43,6 +45,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "facility_name",
+    col: "left",
     label: "Facility Name",
     fieldType: "text",
     required: true,
@@ -50,6 +53,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "facility_type",
+    col: "right",
     label: "Facility Type",
     fieldType: "text",
     required: true,
@@ -57,6 +61,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "length_meters",
+    col: "left",
     label: "Length Meters",
     fieldType: "number",
     required: false,
@@ -64,6 +69,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "draft_depth_meters",
+    col: "right",
     label: "Draft Depth Meters",
     fieldType: "number",
     required: false,
@@ -71,6 +77,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "max_displacement_tonnage",
+    col: "left",
     label: "Max Displacement Tonnage",
     fieldType: "number",
     required: false,
@@ -78,6 +85,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "has_shore_power",
+    col: "right",
     label: "Has Shore Power",
     fieldType: "boolean",
     required: false,
@@ -85,6 +93,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "has_fresh_water",
+    col: "left",
     label: "Has Fresh Water",
     fieldType: "boolean",
     required: false,
@@ -92,6 +101,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "has_fuel_bunker_line",
+    col: "right",
     label: "Has Fuel Bunker Line",
     fieldType: "boolean",
     required: false,
@@ -99,6 +109,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "status",
+    col: "left",
     label: "Status",
     fieldType: "text",
     required: false,

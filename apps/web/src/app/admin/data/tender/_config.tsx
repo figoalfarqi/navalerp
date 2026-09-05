@@ -24,6 +24,7 @@ export const filterFields: FilterField[] = [
 export const formFields = (mode: string): FormField[] => [
   {
     name: "tender_number",
+    col: "left",
     label: "Tender Number",
     fieldType: "text",
     required: true,
@@ -31,6 +32,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "title",
+    col: "right",
     label: "Title",
     fieldType: "text",
     required: true,
@@ -38,6 +40,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "procurement_category",
+    col: "left",
     label: "Procurement Category",
     fieldType: "text",
     required: true,
@@ -45,6 +48,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "estimated_budget",
+    col: "right",
     label: "Estimated Budget",
     fieldType: "number",
     required: true,
@@ -52,6 +56,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "procurement_method",
+    col: "left",
     label: "Procurement Method",
     fieldType: "text",
     required: true,
@@ -59,6 +64,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "start_date",
+    col: "right",
     label: "Start Date",
     fieldType: "date",
     required: true,
@@ -66,6 +72,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "closing_date",
+    col: "left",
     label: "Closing Date",
     fieldType: "date",
     required: true,
@@ -73,6 +80,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "status",
+    col: "right",
     label: "Status",
     fieldType: "text",
     required: false,
@@ -80,6 +88,7 @@ export const formFields = (mode: string): FormField[] => [
   },
     {
     name: "winner_vendor_id",
+    col: "left",
     label: "Pemenang Tender",
     fieldType: "select",
     options: {

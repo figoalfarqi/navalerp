@@ -24,6 +24,7 @@ export const filterFields: FilterField[] = [
 export const formFields = (mode: string): FormField[] => [
   {
     name: "nrp",
+    col: "left",
     label: "Nrp",
     fieldType: "text",
     required: true,
@@ -31,6 +32,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "full_name",
+    col: "right",
     label: "Full Name",
     fieldType: "text",
     required: true,
@@ -38,6 +40,7 @@ export const formFields = (mode: string): FormField[] => [
   },
     {
     name: "rank_id",
+    col: "left",
     label: "Pangkat",
     fieldType: "select",
     options: {
@@ -50,6 +53,7 @@ export const formFields = (mode: string): FormField[] => [
   },
     {
     name: "corps_id",
+    col: "right",
     label: "Korps",
     fieldType: "select",
     options: {
@@ -62,6 +66,7 @@ export const formFields = (mode: string): FormField[] => [
   },
     {
     name: "current_unit_id",
+    col: "left",
     label: "Satuan Sekarang",
     fieldType: "select",
     options: {
@@ -74,6 +79,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "current_position",
+    col: "right",
     label: "Current Position",
     fieldType: "text",
     required: true,
@@ -81,6 +87,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "birth_place",
+    col: "left",
     label: "Birth Place",
     fieldType: "text",
     required: false,
@@ -88,6 +95,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "birth_date",
+    col: "right",
     label: "Birth Date",
     fieldType: "date",
     required: true,
@@ -95,6 +103,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "gender",
+    col: "left",
     label: "Gender",
     fieldType: "text",
     required: false,
@@ -102,6 +111,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "blood_type",
+    col: "right",
     label: "Blood Type",
     fieldType: "text",
     required: false,
@@ -109,6 +119,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "religion",
+    col: "left",
     label: "Religion",
     fieldType: "text",
     required: false,
@@ -116,6 +127,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "education_level",
+    col: "right",
     label: "Education Level",
     fieldType: "text",
     required: false,
@@ -123,6 +135,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "service_entry_date",
+    col: "left",
     label: "Service Entry Date",
     fieldType: "date",
     required: true,
@@ -130,6 +143,7 @@ export const formFields = (mode: string): FormField[] => [
   },
     {
     name: "user_id",
+    col: "right",
     label: "Pengguna",
     fieldType: "select",
     options: {
@@ -142,6 +156,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "status",
+    col: "left",
     label: "Status",
     fieldType: "text",
     required: false,

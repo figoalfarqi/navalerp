@@ -24,6 +24,7 @@ export const filterFields: FilterField[] = [
 export const formFields = (mode: string): FormField[] => [
   {
     name: "class_code",
+    col: "left",
     label: "Class Code",
     fieldType: "text",
     required: true,
@@ -31,6 +32,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "class_name",
+    col: "right",
     label: "Class Name",
     fieldType: "text",
     required: true,
@@ -38,6 +40,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "category",
+    col: "left",
     label: "Category",
     fieldType: "text",
     required: true,
@@ -45,6 +48,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "specifications",
+    col: "right",
     label: "Specifications",
     fieldType: "text",
     required: false,
@@ -52,6 +56,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "builder",
+    col: "left",
     label: "Builder",
     fieldType: "text",
     required: false,
@@ -59,6 +64,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "total_built",
+    col: "right",
     label: "Total Built",
     fieldType: "number",
     required: false,

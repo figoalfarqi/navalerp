@@ -24,6 +24,7 @@ export const filterFields: FilterField[] = [
 export const formFields = (mode: string): FormField[] => [
   {
     name: "route_code",
+    col: "left",
     label: "Route Code",
     fieldType: "text",
     required: true,
@@ -31,6 +32,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "route_name",
+    col: "right",
     label: "Route Name",
     fieldType: "text",
     required: true,
@@ -38,6 +40,7 @@ export const formFields = (mode: string): FormField[] => [
   },
     {
     name: "origin_facility_id",
+    col: "left",
     label: "Fasilitas Asal",
     fieldType: "select",
     options: {
@@ -50,6 +53,7 @@ export const formFields = (mode: string): FormField[] => [
   },
     {
     name: "destination_facility_id",
+    col: "right",
     label: "Fasilitas Tujuan",
     fieldType: "select",
     options: {
@@ -62,6 +66,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "distance_nautical_miles",
+    col: "left",
     label: "Distance Nautical Miles",
     fieldType: "number",
     required: true,
@@ -69,6 +74,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "estimated_transit_hours",
+    col: "right",
     label: "Estimated Transit Hours",
     fieldType: "number",
     required: true,
@@ -76,6 +82,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "risk_level",
+    col: "left",
     label: "Risk Level",
     fieldType: "text",
     required: false,

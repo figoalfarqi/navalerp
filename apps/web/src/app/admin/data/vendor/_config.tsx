@@ -24,6 +24,7 @@ export const filterFields: FilterField[] = [
 export const formFields = (mode: string): FormField[] => [
   {
     name: "vendor_code",
+    col: "left",
     label: "Vendor Code",
     fieldType: "text",
     required: true,
@@ -31,6 +32,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "vendor_name",
+    col: "right",
     label: "Vendor Name",
     fieldType: "text",
     required: true,
@@ -38,6 +40,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "tax_number",
+    col: "left",
     label: "Tax Number",
     fieldType: "text",
     required: false,
@@ -45,6 +48,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "security_clearance_level",
+    col: "right",
     label: "Security Clearance Level",
     fieldType: "text",
     required: false,
@@ -52,6 +56,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "defence_industry_license_no",
+    col: "left",
     label: "Defence Industry License No",
     fieldType: "text",
     required: false,
@@ -59,6 +64,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "country",
+    col: "right",
     label: "Country",
     fieldType: "text",
     required: false,
@@ -66,6 +72,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "contact_person",
+    col: "left",
     label: "Contact Person",
     fieldType: "text",
     required: false,
@@ -73,6 +80,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "email",
+    col: "right",
     label: "Email",
     fieldType: "text",
     required: false,
@@ -80,6 +88,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "phone",
+    col: "left",
     label: "Phone",
     fieldType: "text",
     required: false,
@@ -87,6 +96,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "bank_account_name",
+    col: "right",
     label: "Bank Account Name",
     fieldType: "text",
     required: false,
@@ -94,6 +104,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "bank_account_no",
+    col: "left",
     label: "Bank Account No",
     fieldType: "text",
     required: false,
@@ -101,6 +112,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "bank_name",
+    col: "right",
     label: "Bank Name",
     fieldType: "text",
     required: false,
@@ -108,6 +120,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "performance_rating",
+    col: "left",
     label: "Performance Rating",
     fieldType: "number",
     required: false,
@@ -115,6 +128,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "is_approved",
+    col: "right",
     label: "Is Approved",
     fieldType: "boolean",
     required: false,

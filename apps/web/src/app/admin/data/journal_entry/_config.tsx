@@ -24,6 +24,7 @@ export const filterFields: FilterField[] = [
 export const formFields = (mode: string): FormField[] => [
   {
     name: "entry_number",
+    col: "left",
     label: "Entry Number",
     fieldType: "text",
     required: true,
@@ -31,6 +32,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "entry_date",
+    col: "right",
     label: "Entry Date",
     fieldType: "date",
     required: true,
@@ -38,6 +40,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "description",
+    col: "left",
     label: "Description",
     fieldType: "textarea",
     required: true,
@@ -45,6 +48,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "source_module",
+    col: "right",
     label: "Source Module",
     fieldType: "text",
     required: true,
@@ -52,6 +56,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "source_reference_id",
+    col: "left",
     label: "Source Reference Id",
     fieldType: "text",
     required: false,
@@ -59,6 +64,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "is_posted",
+    col: "right",
     label: "Is Posted",
     fieldType: "boolean",
     required: false,

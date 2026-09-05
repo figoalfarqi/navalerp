@@ -24,6 +24,7 @@ export const filterFields: FilterField[] = [
 export const formFields = (mode: string): FormField[] => [
     {
     name: "ship_id",
+    col: "left",
     label: "Kapal KRI",
     fieldType: "select",
     options: {
@@ -36,6 +37,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "log_date",
+    col: "right",
     label: "Log Date",
     fieldType: "date",
     required: true,
@@ -43,6 +45,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "latitude",
+    col: "left",
     label: "Latitude",
     fieldType: "number",
     required: true,
@@ -50,6 +53,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "longitude",
+    col: "right",
     label: "Longitude",
     fieldType: "number",
     required: true,
@@ -57,6 +61,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "heading_degrees",
+    col: "left",
     label: "Heading Degrees",
     fieldType: "number",
     required: false,
@@ -64,6 +69,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "speed_knots",
+    col: "right",
     label: "Speed Knots",
     fieldType: "number",
     required: true,
@@ -71,6 +77,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "sea_state",
+    col: "left",
     label: "Sea State",
     fieldType: "number",
     required: false,
@@ -78,6 +85,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "weather_condition",
+    col: "right",
     label: "Weather Condition",
     fieldType: "text",
     required: false,
@@ -85,6 +93,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "fuel_remaining_liters",
+    col: "left",
     label: "Fuel Remaining Liters",
     fieldType: "number",
     required: true,
@@ -92,6 +101,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "fresh_water_remaining_tons",
+    col: "right",
     label: "Fresh Water Remaining Tons",
     fieldType: "number",
     required: true,
@@ -99,6 +109,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "tactical_summary",
+    col: "left",
     label: "Tactical Summary",
     fieldType: "textarea",
     required: false,
@@ -106,6 +117,7 @@ export const formFields = (mode: string): FormField[] => [
   },
     {
     name: "logged_by_user_id",
+    col: "right",
     label: "Petugas Jurnal",
     fieldType: "select",
     options: {

@@ -24,6 +24,7 @@ export const filterFields: FilterField[] = [
 export const formFields = (mode: string): FormField[] => [
     {
     name: "ship_id",
+    col: "left",
     label: "Kapal KRI",
     fieldType: "select",
     options: {
@@ -36,6 +37,7 @@ export const formFields = (mode: string): FormField[] => [
   },
     {
     name: "equipment_id",
+    col: "right",
     label: "Peralatan",
     fieldType: "select",
     options: {
@@ -48,6 +50,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "severity",
+    col: "left",
     label: "Severity",
     fieldType: "text",
     required: true,
@@ -55,6 +58,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "alert_type",
+    col: "right",
     label: "Alert Type",
     fieldType: "text",
     required: true,
@@ -62,6 +66,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "alert_message",
+    col: "left",
     label: "Alert Message",
     fieldType: "textarea",
     required: true,
@@ -69,6 +74,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "is_acknowledged",
+    col: "right",
     label: "Is Acknowledged",
     fieldType: "boolean",
     required: false,
@@ -76,6 +82,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "acknowledged_by_user_id",
+    col: "left",
     label: "Acknowledged By User Id",
     fieldType: "text",
     required: false,
@@ -83,6 +90,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "acknowledged_at",
+    col: "right",
     label: "Acknowledged At",
     fieldType: "date",
     required: false,

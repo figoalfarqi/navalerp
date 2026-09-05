@@ -24,6 +24,7 @@ export const filterFields: FilterField[] = [
 export const formFields = (mode: string): FormField[] => [
   {
     name: "payment_reference_no",
+    col: "left",
     label: "Payment Reference No",
     fieldType: "text",
     required: true,
@@ -31,6 +32,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "spp_number",
+    col: "right",
     label: "Spp Number",
     fieldType: "text",
     required: false,
@@ -38,6 +40,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "spm_number",
+    col: "left",
     label: "Spm Number",
     fieldType: "text",
     required: false,
@@ -45,6 +48,7 @@ export const formFields = (mode: string): FormField[] => [
   },
     {
     name: "invoice_id",
+    col: "right",
     label: "No. Invoice",
     fieldType: "select",
     options: {
@@ -57,6 +61,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "payment_date",
+    col: "left",
     label: "Payment Date",
     fieldType: "date",
     required: true,
@@ -64,6 +69,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "amount_paid",
+    col: "right",
     label: "Amount Paid",
     fieldType: "number",
     required: true,
@@ -71,6 +77,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "payment_method",
+    col: "left",
     label: "Payment Method",
     fieldType: "text",
     required: false,
@@ -78,6 +85,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "bank_source_account",
+    col: "right",
     label: "Bank Source Account",
     fieldType: "text",
     required: false,
@@ -85,6 +93,7 @@ export const formFields = (mode: string): FormField[] => [
   },
     {
     name: "authorised_by_user_id",
+    col: "left",
     label: "Diotorisasi Oleh",
     fieldType: "select",
     options: {

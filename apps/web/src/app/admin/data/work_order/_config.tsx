@@ -24,6 +24,7 @@ export const filterFields: FilterField[] = [
 export const formFields = (mode: string): FormField[] => [
     {
     name: "failure_report_id",
+    col: "left",
     label: "Laporan Kerusakan",
     fieldType: "select",
     options: {
@@ -36,6 +37,7 @@ export const formFields = (mode: string): FormField[] => [
   },
     {
     name: "pm_schedule_id",
+    col: "right",
     label: "Jadwal PM",
     fieldType: "select",
     options: {
@@ -48,6 +50,7 @@ export const formFields = (mode: string): FormField[] => [
   },
     {
     name: "equipment_id",
+    col: "left",
     label: "Peralatan",
     fieldType: "select",
     options: {
@@ -60,6 +63,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "work_order_number",
+    col: "right",
     label: "Work Order Number",
     fieldType: "text",
     required: true,
@@ -67,6 +71,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "work_order_type",
+    col: "left",
     label: "Work Order Type",
     fieldType: "text",
     required: true,
@@ -74,6 +79,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "priority",
+    col: "right",
     label: "Priority",
     fieldType: "text",
     required: true,
@@ -81,6 +87,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "scheduled_start_date",
+    col: "left",
     label: "Scheduled Start Date",
     fieldType: "date",
     required: false,
@@ -88,6 +95,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "scheduled_end_date",
+    col: "right",
     label: "Scheduled End Date",
     fieldType: "date",
     required: false,
@@ -95,6 +103,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "actual_start_date",
+    col: "left",
     label: "Actual Start Date",
     fieldType: "date",
     required: false,
@@ -102,6 +111,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "actual_end_date",
+    col: "right",
     label: "Actual End Date",
     fieldType: "date",
     required: false,
@@ -109,6 +119,7 @@ export const formFields = (mode: string): FormField[] => [
   },
     {
     name: "lead_engineer_user_id",
+    col: "left",
     label: "Insinyur Utama",
     fieldType: "select",
     options: {
@@ -121,6 +132,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "assigned_facility",
+    col: "right",
     label: "Assigned Facility",
     fieldType: "text",
     required: false,
@@ -128,6 +140,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "status",
+    col: "left",
     label: "Status",
     fieldType: "text",
     required: false,
@@ -135,6 +148,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "total_labor_hours",
+    col: "right",
     label: "Total Labor Hours",
     fieldType: "number",
     required: false,
@@ -142,6 +156,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "estimated_cost",
+    col: "left",
     label: "Estimated Cost",
     fieldType: "number",
     required: false,
@@ -149,6 +164,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "actual_cost",
+    col: "right",
     label: "Actual Cost",
     fieldType: "number",
     required: false,
@@ -156,6 +172,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "completion_notes",
+    col: "left",
     label: "Completion Notes",
     fieldType: "textarea",
     required: false,

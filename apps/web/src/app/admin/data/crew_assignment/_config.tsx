@@ -24,6 +24,7 @@ export const filterFields: FilterField[] = [
 export const formFields = (mode: string): FormField[] => [
     {
     name: "ship_id",
+    col: "left",
     label: "Kapal KRI",
     fieldType: "select",
     options: {
@@ -36,6 +37,7 @@ export const formFields = (mode: string): FormField[] => [
   },
     {
     name: "personnel_id",
+    col: "right",
     label: "Nama Personel",
     fieldType: "select",
     options: {
@@ -48,6 +50,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "crew_role",
+    col: "left",
     label: "Crew Role",
     fieldType: "text",
     required: true,
@@ -55,6 +58,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "department",
+    col: "right",
     label: "Department",
     fieldType: "text",
     required: true,
@@ -62,6 +66,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "watch_bill_duty",
+    col: "left",
     label: "Watch Bill Duty",
     fieldType: "text",
     required: false,
@@ -69,6 +74,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "assigned_date",
+    col: "right",
     label: "Assigned Date",
     fieldType: "date",
     required: true,
@@ -76,6 +82,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "relieved_date",
+    col: "left",
     label: "Relieved Date",
     fieldType: "date",
     required: false,
@@ -83,6 +90,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "is_active",
+    col: "right",
     label: "Is Active",
     fieldType: "boolean",
     required: false,

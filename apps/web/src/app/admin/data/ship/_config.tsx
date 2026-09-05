@@ -24,6 +24,7 @@ export const filterFields: FilterField[] = [
 export const formFields = (mode: string): FormField[] => [
     {
     name: "class_id",
+    col: "left",
     label: "Kelas Kapal",
     fieldType: "select",
     options: {
@@ -36,6 +37,7 @@ export const formFields = (mode: string): FormField[] => [
   },
     {
     name: "assigned_unit_id",
+    col: "right",
     label: "Satuan / Pangkalan",
     fieldType: "select",
     options: {
@@ -48,6 +50,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "hull_number",
+    col: "left",
     label: "Hull Number",
     fieldType: "text",
     required: true,
@@ -55,6 +58,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "ship_name",
+    col: "right",
     label: "Ship Name",
     fieldType: "text",
     required: true,
@@ -62,6 +66,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "call_sign",
+    col: "left",
     label: "Call Sign",
     fieldType: "text",
     required: false,
@@ -69,6 +74,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "commission_date",
+    col: "right",
     label: "Commission Date",
     fieldType: "date",
     required: false,
@@ -76,6 +82,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "home_port",
+    col: "left",
     label: "Home Port",
     fieldType: "text",
     required: false,
@@ -83,6 +90,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "length_m",
+    col: "right",
     label: "Length M",
     fieldType: "number",
     required: false,
@@ -90,6 +98,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "beam_m",
+    col: "left",
     label: "Beam M",
     fieldType: "number",
     required: false,
@@ -97,6 +106,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "draft_m",
+    col: "right",
     label: "Draft M",
     fieldType: "number",
     required: false,
@@ -104,6 +114,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "displacement_tons",
+    col: "left",
     label: "Displacement Tons",
     fieldType: "number",
     required: false,
@@ -111,6 +122,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "max_speed_knots",
+    col: "right",
     label: "Max Speed Knots",
     fieldType: "number",
     required: false,
@@ -118,6 +130,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "cruise_range_nm",
+    col: "left",
     label: "Cruise Range Nm",
     fieldType: "number",
     required: false,
@@ -125,6 +138,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "crew_capacity",
+    col: "right",
     label: "Crew Capacity",
     fieldType: "number",
     required: false,
@@ -132,6 +146,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "fuel_capacity_liters",
+    col: "left",
     label: "Fuel Capacity Liters",
     fieldType: "number",
     required: false,
@@ -139,6 +154,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "fresh_water_capacity_liters",
+    col: "right",
     label: "Fresh Water Capacity Liters",
     fieldType: "number",
     required: false,
@@ -146,6 +162,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "status",
+    col: "left",
     label: "Status",
     fieldType: "text",
     required: false,
@@ -153,6 +170,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "current_readiness_status",
+    col: "right",
     label: "Current Readiness Status",
     fieldType: "text",
     required: false,

@@ -24,6 +24,7 @@ export const filterFields: FilterField[] = [
 export const formFields = (mode: string): FormField[] => [
   {
     name: "category_code",
+    col: "left",
     label: "Category Code",
     fieldType: "text",
     required: true,
@@ -31,6 +32,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "category_name",
+    col: "right",
     label: "Category Name",
     fieldType: "text",
     required: true,
@@ -38,6 +40,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "retention_years",
+    col: "left",
     label: "Retention Years",
     fieldType: "number",
     required: false,
@@ -45,6 +48,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "confidentiality_level",
+    col: "right",
     label: "Confidentiality Level",
     fieldType: "text",
     required: false,
@@ -52,6 +56,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "description",
+    col: "left",
     label: "Description",
     fieldType: "textarea",
     required: false,

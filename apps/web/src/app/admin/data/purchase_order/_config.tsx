@@ -24,6 +24,7 @@ export const filterFields: FilterField[] = [
 export const formFields = (mode: string): FormField[] => [
   {
     name: "po_number",
+    col: "left",
     label: "Po Number",
     fieldType: "text",
     required: true,
@@ -31,6 +32,7 @@ export const formFields = (mode: string): FormField[] => [
   },
     {
     name: "contract_id",
+    col: "right",
     label: "No. Kontrak",
     fieldType: "select",
     options: {
@@ -43,6 +45,7 @@ export const formFields = (mode: string): FormField[] => [
   },
     {
     name: "vendor_id",
+    col: "left",
     label: "Vendor",
     fieldType: "select",
     options: {
@@ -55,6 +58,7 @@ export const formFields = (mode: string): FormField[] => [
   },
     {
     name: "issuing_unit_id",
+    col: "right",
     label: "Satuan Penerbit",
     fieldType: "select",
     options: {
@@ -67,6 +71,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "order_date",
+    col: "left",
     label: "Order Date",
     fieldType: "date",
     required: true,
@@ -74,6 +79,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "delivery_deadline",
+    col: "right",
     label: "Delivery Deadline",
     fieldType: "date",
     required: false,
@@ -81,6 +87,7 @@ export const formFields = (mode: string): FormField[] => [
   },
     {
     name: "destination_warehouse_id",
+    col: "left",
     label: "Gudang Tujuan",
     fieldType: "select",
     options: {
@@ -93,6 +100,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "total_amount",
+    col: "right",
     label: "Total Amount",
     fieldType: "number",
     required: true,
@@ -100,6 +108,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "tax_amount",
+    col: "left",
     label: "Tax Amount",
     fieldType: "number",
     required: false,
@@ -107,6 +116,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "status",
+    col: "right",
     label: "Status",
     fieldType: "text",
     required: false,

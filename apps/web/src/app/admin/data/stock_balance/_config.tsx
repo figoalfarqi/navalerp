@@ -24,6 +24,7 @@ export const filterFields: FilterField[] = [
 export const formFields = (mode: string): FormField[] => [
     {
     name: "warehouse_id",
+    col: "left",
     label: "Nama Gudang",
     fieldType: "select",
     options: {
@@ -36,6 +37,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "location_id",
+    col: "right",
     label: "Location Id",
     fieldType: "text",
     required: false,
@@ -43,6 +45,7 @@ export const formFields = (mode: string): FormField[] => [
   },
     {
     name: "material_id",
+    col: "left",
     label: "Material",
     fieldType: "select",
     options: {
@@ -55,6 +58,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "quantity_on_hand",
+    col: "right",
     label: "Quantity On Hand",
     fieldType: "number",
     required: false,
@@ -62,6 +66,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "quantity_reserved",
+    col: "left",
     label: "Quantity Reserved",
     fieldType: "number",
     required: false,
@@ -69,6 +74,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "quantity_in_transit",
+    col: "right",
     label: "Quantity In Transit",
     fieldType: "number",
     required: false,
@@ -76,6 +82,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "last_count_date",
+    col: "left",
     label: "Last Count Date",
     fieldType: "date",
     required: false,

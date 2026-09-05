@@ -24,6 +24,7 @@ export const filterFields: FilterField[] = [
 export const formFields = (mode: string): FormField[] => [
   {
     name: "invoice_number",
+    col: "left",
     label: "Invoice Number",
     fieldType: "text",
     required: true,
@@ -31,6 +32,7 @@ export const formFields = (mode: string): FormField[] => [
   },
     {
     name: "vendor_id",
+    col: "right",
     label: "Vendor",
     fieldType: "select",
     options: {
@@ -43,6 +45,7 @@ export const formFields = (mode: string): FormField[] => [
   },
     {
     name: "contract_id",
+    col: "left",
     label: "No. Kontrak",
     fieldType: "select",
     options: {
@@ -55,6 +58,7 @@ export const formFields = (mode: string): FormField[] => [
   },
     {
     name: "po_id",
+    col: "right",
     label: "No. PO",
     fieldType: "select",
     options: {
@@ -67,6 +71,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "invoice_date",
+    col: "left",
     label: "Invoice Date",
     fieldType: "date",
     required: true,
@@ -74,6 +79,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "due_date",
+    col: "right",
     label: "Due Date",
     fieldType: "date",
     required: true,
@@ -81,6 +87,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "tax_invoice_number",
+    col: "left",
     label: "Tax Invoice Number",
     fieldType: "text",
     required: false,
@@ -88,6 +95,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "subtotal",
+    col: "right",
     label: "Subtotal",
     fieldType: "number",
     required: true,
@@ -95,6 +103,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "tax_amount",
+    col: "left",
     label: "Tax Amount",
     fieldType: "number",
     required: false,
@@ -102,6 +111,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "verification_status",
+    col: "right",
     label: "Verification Status",
     fieldType: "text",
     required: false,
@@ -109,6 +119,7 @@ export const formFields = (mode: string): FormField[] => [
   },
     {
     name: "verified_by_user_id",
+    col: "left",
     label: "Diverifikasi Oleh",
     fieldType: "select",
     options: {
@@ -121,6 +132,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "payment_status",
+    col: "right",
     label: "Payment Status",
     fieldType: "text",
     required: false,

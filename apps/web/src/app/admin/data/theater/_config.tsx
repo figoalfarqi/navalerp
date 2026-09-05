@@ -24,6 +24,7 @@ export const filterFields: FilterField[] = [
 export const formFields = (mode: string): FormField[] => [
   {
     name: "theater_code",
+    col: "left",
     label: "Theater Code",
     fieldType: "text",
     required: true,
@@ -31,6 +32,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "theater_name",
+    col: "right",
     label: "Theater Name",
     fieldType: "text",
     required: true,
@@ -38,6 +40,7 @@ export const formFields = (mode: string): FormField[] => [
   },
     {
     name: "responsible_command_unit_id",
+    col: "left",
     label: "Komando Pengendali",
     fieldType: "select",
     options: {
@@ -50,6 +53,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "threat_level",
+    col: "right",
     label: "Threat Level",
     fieldType: "text",
     required: false,
@@ -57,6 +61,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "description",
+    col: "left",
     label: "Description",
     fieldType: "textarea",
     required: false,

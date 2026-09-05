@@ -24,6 +24,7 @@ export const filterFields: FilterField[] = [
 export const formFields = (mode: string): FormField[] => [
   {
     name: "transfer_number",
+    col: "left",
     label: "Transfer Number",
     fieldType: "text",
     required: true,
@@ -31,6 +32,7 @@ export const formFields = (mode: string): FormField[] => [
   },
     {
     name: "from_warehouse_id",
+    col: "right",
     label: "Gudang Asal",
     fieldType: "select",
     options: {
@@ -43,6 +45,7 @@ export const formFields = (mode: string): FormField[] => [
   },
     {
     name: "to_warehouse_id",
+    col: "left",
     label: "Gudang Tujuan",
     fieldType: "select",
     options: {
@@ -55,6 +58,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "movement_type",
+    col: "right",
     label: "Movement Type",
     fieldType: "text",
     required: true,
@@ -62,6 +66,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "scheduled_departure",
+    col: "left",
     label: "Scheduled Departure",
     fieldType: "date",
     required: false,
@@ -69,6 +74,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "actual_departure",
+    col: "right",
     label: "Actual Departure",
     fieldType: "date",
     required: false,
@@ -76,6 +82,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "scheduled_arrival",
+    col: "left",
     label: "Scheduled Arrival",
     fieldType: "date",
     required: false,
@@ -83,6 +90,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "actual_arrival",
+    col: "right",
     label: "Actual Arrival",
     fieldType: "date",
     required: false,
@@ -90,6 +98,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "transporter_unit",
+    col: "left",
     label: "Transporter Unit",
     fieldType: "text",
     required: false,
@@ -97,6 +106,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "status",
+    col: "right",
     label: "Status",
     fieldType: "text",
     required: false,

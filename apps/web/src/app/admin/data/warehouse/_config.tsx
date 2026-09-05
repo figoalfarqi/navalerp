@@ -24,6 +24,7 @@ export const filterFields: FilterField[] = [
 export const formFields = (mode: string): FormField[] => [
     {
     name: "unit_id",
+    col: "left",
     label: "Satuan / Unit",
     fieldType: "select",
     options: {
@@ -36,6 +37,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "warehouse_code",
+    col: "right",
     label: "Warehouse Code",
     fieldType: "text",
     required: true,
@@ -43,6 +45,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "warehouse_name",
+    col: "left",
     label: "Warehouse Name",
     fieldType: "text",
     required: true,
@@ -50,6 +53,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "warehouse_type",
+    col: "right",
     label: "Warehouse Type",
     fieldType: "text",
     required: true,
@@ -57,6 +61,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "capacity_m3",
+    col: "left",
     label: "Capacity M3",
     fieldType: "number",
     required: false,
@@ -64,6 +69,7 @@ export const formFields = (mode: string): FormField[] => [
   },
     {
     name: "manager_user_id",
+    col: "right",
     label: "Manajer Gudang",
     fieldType: "select",
     options: {
@@ -76,6 +82,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "location_address",
+    col: "left",
     label: "Location Address",
     fieldType: "textarea",
     required: false,
@@ -83,6 +90,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "is_active",
+    col: "right",
     label: "Is Active",
     fieldType: "boolean",
     required: false,

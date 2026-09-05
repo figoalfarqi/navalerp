@@ -24,6 +24,7 @@ export const filterFields: FilterField[] = [
 export const formFields = (mode: string): FormField[] => [
   {
     name: "requisition_number",
+    col: "left",
     label: "Requisition Number",
     fieldType: "text",
     required: true,
@@ -31,6 +32,7 @@ export const formFields = (mode: string): FormField[] => [
   },
     {
     name: "origin_unit_id",
+    col: "right",
     label: "Satuan Pengaju",
     fieldType: "select",
     options: {
@@ -43,6 +45,7 @@ export const formFields = (mode: string): FormField[] => [
   },
     {
     name: "work_order_id",
+    col: "left",
     label: "Perintah Kerja (WO)",
     fieldType: "select",
     options: {
@@ -55,6 +58,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "priority",
+    col: "right",
     label: "Priority",
     fieldType: "text",
     required: true,
@@ -62,6 +66,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "requested_date",
+    col: "left",
     label: "Requested Date",
     fieldType: "date",
     required: true,
@@ -69,6 +74,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "required_by_date",
+    col: "right",
     label: "Required By Date",
     fieldType: "date",
     required: false,
@@ -76,6 +82,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "approval_status",
+    col: "left",
     label: "Approval Status",
     fieldType: "text",
     required: false,
@@ -83,6 +90,7 @@ export const formFields = (mode: string): FormField[] => [
   },
     {
     name: "approved_by_user_id",
+    col: "right",
     label: "Disetujui Oleh",
     fieldType: "select",
     options: {
@@ -95,6 +103,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "approved_at",
+    col: "left",
     label: "Approved At",
     fieldType: "date",
     required: false,
@@ -102,6 +111,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "total_estimated_cost",
+    col: "right",
     label: "Total Estimated Cost",
     fieldType: "number",
     required: false,
@@ -109,6 +119,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "justification",
+    col: "left",
     label: "Justification",
     fieldType: "textarea",
     required: false,

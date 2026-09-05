@@ -24,6 +24,7 @@ export const filterFields: FilterField[] = [
 export const formFields = (mode: string): FormField[] => [
     {
     name: "ship_id",
+    col: "left",
     label: "Kapal KRI",
     fieldType: "select",
     options: {
@@ -36,6 +37,7 @@ export const formFields = (mode: string): FormField[] => [
   },
     {
     name: "facility_id",
+    col: "right",
     label: "Fasilitas Pangkalan",
     fieldType: "select",
     options: {
@@ -48,6 +50,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "fuel_type",
+    col: "left",
     label: "Fuel Type",
     fieldType: "text",
     required: true,
@@ -55,6 +58,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "quantity_liters",
+    col: "right",
     label: "Quantity Liters",
     fieldType: "number",
     required: true,
@@ -62,6 +66,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "density_15c",
+    col: "left",
     label: "Density 15c",
     fieldType: "number",
     required: false,
@@ -69,6 +74,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "flow_rate_lph",
+    col: "right",
     label: "Flow Rate Lph",
     fieldType: "number",
     required: false,
@@ -76,6 +82,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "bunkering_start_time",
+    col: "left",
     label: "Bunkering Start Time",
     fieldType: "date",
     required: true,
@@ -83,6 +90,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "bunkering_end_time",
+    col: "right",
     label: "Bunkering End Time",
     fieldType: "date",
     required: true,
@@ -90,6 +98,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "receipt_voucher_no",
+    col: "left",
     label: "Receipt Voucher No",
     fieldType: "text",
     required: true,
@@ -97,6 +106,7 @@ export const formFields = (mode: string): FormField[] => [
   },
     {
     name: "authorised_by_user_id",
+    col: "right",
     label: "Diotorisasi Oleh",
     fieldType: "select",
     options: {

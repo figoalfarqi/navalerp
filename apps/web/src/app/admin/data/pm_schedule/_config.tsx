@@ -24,6 +24,7 @@ export const filterFields: FilterField[] = [
 export const formFields = (mode: string): FormField[] => [
     {
     name: "equipment_id",
+    col: "left",
     label: "Peralatan",
     fieldType: "select",
     options: {
@@ -36,6 +37,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "pm_code",
+    col: "right",
     label: "Pm Code",
     fieldType: "text",
     required: true,
@@ -43,6 +45,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "pm_title",
+    col: "left",
     label: "Pm Title",
     fieldType: "text",
     required: true,
@@ -50,6 +53,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "interval_hours",
+    col: "right",
     label: "Interval Hours",
     fieldType: "number",
     required: false,
@@ -57,6 +61,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "interval_days",
+    col: "left",
     label: "Interval Days",
     fieldType: "number",
     required: false,
@@ -64,6 +69,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "last_performed_at",
+    col: "right",
     label: "Last Performed At",
     fieldType: "date",
     required: false,
@@ -71,6 +77,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "next_due_at",
+    col: "left",
     label: "Next Due At",
     fieldType: "date",
     required: false,
@@ -78,6 +85,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "task_instructions",
+    col: "right",
     label: "Task Instructions",
     fieldType: "textarea",
     required: true,
@@ -85,6 +93,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "estimated_duration_hours",
+    col: "left",
     label: "Estimated Duration Hours",
     fieldType: "number",
     required: false,
@@ -92,6 +101,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "is_active",
+    col: "right",
     label: "Is Active",
     fieldType: "boolean",
     required: false,

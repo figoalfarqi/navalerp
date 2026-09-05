@@ -24,6 +24,7 @@ export const filterFields: FilterField[] = [
 export const formFields = (mode: string): FormField[] => [
   {
     name: "commitment_number",
+    col: "left",
     label: "Commitment Number",
     fieldType: "text",
     required: true,
@@ -31,6 +32,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "allocation_id",
+    col: "right",
     label: "Allocation Id",
     fieldType: "text",
     required: true,
@@ -38,6 +40,7 @@ export const formFields = (mode: string): FormField[] => [
   },
     {
     name: "contract_id",
+    col: "left",
     label: "No. Kontrak",
     fieldType: "select",
     options: {
@@ -50,6 +53,7 @@ export const formFields = (mode: string): FormField[] => [
   },
     {
     name: "po_id",
+    col: "right",
     label: "No. PO",
     fieldType: "select",
     options: {
@@ -62,6 +66,7 @@ export const formFields = (mode: string): FormField[] => [
   },
     {
     name: "work_order_id",
+    col: "left",
     label: "Perintah Kerja (WO)",
     fieldType: "select",
     options: {
@@ -74,6 +79,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "committed_amount",
+    col: "right",
     label: "Committed Amount",
     fieldType: "number",
     required: true,
@@ -81,6 +87,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "commitment_date",
+    col: "left",
     label: "Commitment Date",
     fieldType: "date",
     required: true,
@@ -88,6 +95,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "status",
+    col: "right",
     label: "Status",
     fieldType: "text",
     required: false,

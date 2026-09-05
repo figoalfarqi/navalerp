@@ -24,6 +24,7 @@ export const filterFields: FilterField[] = [
 export const formFields = (mode: string): FormField[] => [
     {
     name: "unit_id",
+    col: "left",
     label: "Satuan / Unit",
     fieldType: "select",
     options: {
@@ -36,6 +37,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "username",
+    col: "right",
     label: "Username",
     fieldType: "text",
     required: true,
@@ -43,6 +45,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "password_hash",
+    col: "left",
     label: "Password",
     fieldType: "password",
     required: true,
@@ -50,6 +53,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "full_name",
+    col: "right",
     label: "Full Name",
     fieldType: "text",
     required: true,
@@ -57,6 +61,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "email",
+    col: "left",
     label: "Email",
     fieldType: "text",
     required: false,
@@ -64,6 +69,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "phone",
+    col: "right",
     label: "Phone",
     fieldType: "text",
     required: false,
@@ -71,6 +77,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "military_id",
+    col: "left",
     label: "Military Id",
     fieldType: "text",
     required: false,
@@ -78,6 +85,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "rank_title",
+    col: "right",
     label: "Rank Title",
     fieldType: "text",
     required: false,
@@ -85,6 +93,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "department",
+    col: "left",
     label: "Department",
     fieldType: "text",
     required: false,
@@ -92,6 +101,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "role",
+    col: "right",
     label: "Role",
     fieldType: "text",
     required: false,
@@ -99,6 +109,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "is_active",
+    col: "left",
     label: "Is Active",
     fieldType: "boolean",
     required: false,
@@ -106,6 +117,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "last_login_at",
+    col: "right",
     label: "Last Login At",
     fieldType: "date",
     required: false,
@@ -113,6 +125,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "failed_login_attempts",
+    col: "left",
     label: "Failed Login Attempts",
     fieldType: "number",
     required: false,
@@ -120,6 +133,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "auth_version",
+    col: "right",
     label: "Auth Version",
     fieldType: "number",
     required: false,

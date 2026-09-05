@@ -227,7 +227,27 @@ const RenderField = ({
         tableProps={field.tableProps}
         id={""}
         label={field.label}
-        options={optionsMap[field.name] ?? []}
+        options={(() => {
+          const rawVal = formData[field.name];
+          const baseOptions = optionsMap[field.name] ?? [];
+          if (rawVal !== undefined && rawVal !== null && rawVal !== "") {
+            const exists = baseOptions.some((opt) => String(opt.value) === String(rawVal));
+            if (!exists) {
+              const nameCandidates = [
+                field.name.replace(/_id$/, "_name"),
+                field.name.replace(/_user_id$/, "_name"),
+                field.name.replace(/_id$/, "_title"),
+                field.name.replace(/_id$/, "_code"),
+              ];
+              for (const cand of nameCandidates) {
+                if (formData[cand] && typeof formData[cand] === "string") {
+                  return [{ value: rawVal as string | number, label: formData[cand] as string }, ...baseOptions];
+                }
+              }
+            }
+          }
+          return baseOptions;
+        })()}
         error={errorForm[field.name]}
         placeholder={field.placeholder}
       ></SelectField>
@@ -269,9 +289,15 @@ const RenderField = ({
         className=""
         required={field.required}
         disabled={field.disabled}
-        value={(formData[field.name] as number) ?? null}
-        onChange={(val) => setFormData({ ...formData, [field.name]: val })}
-        id={""}
+        value={
+          formData[field.name] === true || formData[field.name] === 1
+            ? 1
+            : formData[field.name] === false || formData[field.name] === 0
+              ? 0
+              : 0
+        }
+        onChange={(val) => setFormData({ ...formData, [field.name]: val === 1 })}
+        id={field.name}
         label={field.label}
         error={""}
       />

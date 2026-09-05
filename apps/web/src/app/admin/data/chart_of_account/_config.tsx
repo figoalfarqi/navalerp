@@ -24,6 +24,7 @@ export const filterFields: FilterField[] = [
 export const formFields = (mode: string): FormField[] => [
   {
     name: "account_code",
+    col: "left",
     label: "Account Code",
     fieldType: "text",
     required: true,
@@ -31,6 +32,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "account_name",
+    col: "right",
     label: "Account Name",
     fieldType: "text",
     required: true,
@@ -38,6 +40,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "account_type",
+    col: "left",
     label: "Account Type",
     fieldType: "text",
     required: true,
@@ -45,6 +48,7 @@ export const formFields = (mode: string): FormField[] => [
   },
     {
     name: "parent_account_id",
+    col: "right",
     label: "Akun Induk",
     fieldType: "select",
     options: {
@@ -57,6 +61,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "is_active",
+    col: "left",
     label: "Is Active",
     fieldType: "boolean",
     required: false,

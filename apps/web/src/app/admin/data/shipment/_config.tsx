@@ -24,6 +24,7 @@ export const filterFields: FilterField[] = [
 export const formFields = (mode: string): FormField[] => [
   {
     name: "manifest_number",
+    col: "left",
     label: "Manifest Number",
     fieldType: "text",
     required: true,
@@ -31,6 +32,7 @@ export const formFields = (mode: string): FormField[] => [
   },
     {
     name: "route_id",
+    col: "right",
     label: "Rute Logistik",
     fieldType: "select",
     options: {
@@ -43,6 +45,7 @@ export const formFields = (mode: string): FormField[] => [
   },
     {
     name: "transport_unit_id",
+    col: "left",
     label: "Unit Angkut",
     fieldType: "select",
     options: {
@@ -55,6 +58,7 @@ export const formFields = (mode: string): FormField[] => [
   },
     {
     name: "origin_warehouse_id",
+    col: "right",
     label: "Gudang Asal",
     fieldType: "select",
     options: {
@@ -67,6 +71,7 @@ export const formFields = (mode: string): FormField[] => [
   },
     {
     name: "destination_warehouse_id",
+    col: "left",
     label: "Gudang Tujuan",
     fieldType: "select",
     options: {
@@ -79,6 +84,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "departure_date",
+    col: "right",
     label: "Departure Date",
     fieldType: "date",
     required: true,
@@ -86,6 +92,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "arrival_date",
+    col: "left",
     label: "Arrival Date",
     fieldType: "date",
     required: false,
@@ -93,6 +100,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "escort_security_level",
+    col: "right",
     label: "Escort Security Level",
     fieldType: "text",
     required: false,
@@ -100,6 +108,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "status",
+    col: "left",
     label: "Status",
     fieldType: "text",
     required: false,
@@ -107,6 +116,7 @@ export const formFields = (mode: string): FormField[] => [
   },
     {
     name: "authorized_by_user_id",
+    col: "right",
     label: "Diotorisasi Oleh",
     fieldType: "select",
     options: {
@@ -119,6 +129,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "remarks",
+    col: "left",
     label: "Remarks",
     fieldType: "textarea",
     required: false,

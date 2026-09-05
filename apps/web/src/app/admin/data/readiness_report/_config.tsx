@@ -24,6 +24,7 @@ export const filterFields: FilterField[] = [
 export const formFields = (mode: string): FormField[] => [
     {
     name: "ship_id",
+    col: "left",
     label: "Kapal KRI",
     fieldType: "select",
     options: {
@@ -36,6 +37,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "snapshot_timestamp",
+    col: "right",
     label: "Snapshot Timestamp",
     fieldType: "date",
     required: true,
@@ -43,6 +45,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "readiness_category",
+    col: "left",
     label: "Readiness Category",
     fieldType: "text",
     required: true,
@@ -50,6 +53,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "mro_readiness_score",
+    col: "right",
     label: "Mro Readiness Score",
     fieldType: "number",
     required: true,
@@ -57,6 +61,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "personnel_manning_score",
+    col: "left",
     label: "Personnel Manning Score",
     fieldType: "number",
     required: true,
@@ -64,6 +69,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "logistics_supply_score",
+    col: "right",
     label: "Logistics Supply Score",
     fieldType: "number",
     required: true,
@@ -71,6 +77,7 @@ export const formFields = (mode: string): FormField[] => [
   },
   {
     name: "remarks",
+    col: "left",
     label: "Remarks",
     fieldType: "textarea",
     required: false,
