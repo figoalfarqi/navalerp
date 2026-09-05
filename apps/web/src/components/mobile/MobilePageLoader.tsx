@@ -18,11 +18,11 @@ export default function MobilePageLoader() {
         {/* Bungkus gambar agar animasi bekerja */}
         <div className="animate-scale-pulse transform">
           <Image
-            src={"/logo-pml.png"}
+            src={"/logo.png"}
             alt="loading"
-            width={180}
+            width={120}
             height={120}
-            className="w-[180px] h-[120px] object-cover"
+            className="w-[120px] h-[120px] object-contain"
           />
         </div>
 

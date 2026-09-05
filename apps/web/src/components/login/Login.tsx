@@ -1,4 +1,4 @@
-﻿/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useState } from "react";
@@ -54,11 +54,12 @@ export default function Login({
         <div className="w-full">
           <div className="flex justify-center mb-4">
             <Image
-              src="/logo-bulat.png"
+              src="/logo.png"
               alt="Naval ERP"
               width={isMobile ? 100 : 120}
               height={isMobile ? 100 : 120}
               priority
+              className="object-contain"
             />
           </div>
           <h2 className="text-2xl font-bold text-gray-800 text-center tracking-tight">

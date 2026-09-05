@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -22,7 +22,7 @@ export default function Home() {
       <header className="w-full max-w-7xl mx-auto px-6 py-6 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Image
-            src="/logo-bulat.png"
+            src="/logo.png"
             alt="Naval ERP"
             width={48}
             height={48}

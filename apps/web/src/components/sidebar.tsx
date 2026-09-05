@@ -62,20 +62,20 @@ export default function Sidebar({
           aria-label="Buka dashboard"
         >
           <Image
-            src="/logo-bulat.png"
-            alt="NavalERP"
+            src="/logo.png"
+            alt="Naval ERP"
             width={42}
             height={42}
-            className="shrink-0"
+            className="shrink-0 object-contain"
           />
           <span
             className={`min-w-0 ${desktopCollapsed ? "md:hidden" : ""}`}
           >
-              <span className="block truncate text-lg font-semibold text-white">
-                Virtual Gate
+              <span className="block truncate text-lg font-bold tracking-wide text-white">
+                NAVAL ERP
               </span>
-              <span className="block truncate text-xs text-cyan-100">
-                Administration
+              <span className="block truncate text-xs text-cyan-200">
+                TNI Angkatan Laut
               </span>
           </span>
         </button>
