@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
+import ReportPdfDocument from "@/components/admin/report/ReportPdfDocument";
 import {
   FaArrowRotateRight,
   FaFilePdf,
@@ -61,6 +60,7 @@ export default function AdminReportPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [reloadKey, setReloadKey] = useState(0);
+  const [exportingPdf, setExportingPdf] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -135,62 +135,39 @@ export default function AdminReportPage() {
     [projects],
   );
 
-  const exportPdf = () => {
-    const document = new jsPDF({
-      orientation: "landscape",
-      unit: "mm",
-      format: "a4",
-    });
-    const projectLabel = selectedProject
-      ? `${selectedProject.project_code ? `${selectedProject.project_code} - ` : ""}${selectedProject.project_name}`
-      : "Semua Project";
-    document.setFontSize(16);
-    document.text("Laporan Operasional & Keuangan NavalERP", 14, 15);
-    document.setFontSize(9);
-    document.setTextColor(90);
-    document.text(
-      `${projectLabel} | ${period === "weekly" ? "Mingguan" : "Bulanan"} | Acuan ${date}`,
-      14,
-      21,
-    );
-    document.text(
-      `Transport ${formatNumberID(summary.transport_count)} | Volume ${formatNumberID(summary.volume_cubic)} m3 | Berat ${formatNumberID(summary.weight_ton)} ton | Laba ${formatCurrencyIDR(summary.net_profit)}`,
-      14,
-      27,
-    );
+  const exportPdf = async () => {
+    if (rows.length === 0 || exportingPdf) return;
+    try {
+      setExportingPdf(true);
+      const projectLabel = selectedProject
+        ? `${selectedProject.project_code ? `${selectedProject.project_code} - ` : ""}${selectedProject.project_name}`
+        : "Semua Project";
+      const periodLabel = period === "weekly" ? "Mingguan" : "Bulanan";
 
-    autoTable(document, {
-      startY: 33,
-      head: [
-        [
-          "Project",
-          "Periode",
-          "Transport",
-          "Selesai",
-          "Volume (m3)",
-          "Berat (ton)",
-          "Pendapatan",
-          "Pengeluaran",
-          "Laba Bersih",
-        ],
-      ],
-      body: rows.map((row) => [
-        `${row.project_code ? `${row.project_code} - ` : ""}${row.project_name}`,
-        row.period_label,
-        formatNumberID(row.transport_count),
-        formatNumberID(row.completed_transport_count),
-        formatNumberID(row.volume_cubic),
-        formatNumberID(row.weight_ton),
-        formatCurrencyIDR(row.total_income),
-        formatCurrencyIDR(row.total_expense),
-        formatCurrencyIDR(row.net_profit),
-      ]),
-      styles: { fontSize: 7, cellPadding: 2 },
-      headStyles: { fillColor: [21, 94, 170] },
-      alternateRowStyles: { fillColor: [245, 248, 252] },
-    });
+      const { pdf } = await import("@react-pdf/renderer");
+      const blob = await pdf(
+        <ReportPdfDocument
+          projectLabel={projectLabel}
+          periodLabel={periodLabel}
+          date={date}
+          summary={summary}
+          rows={rows}
+        />,
+      ).toBlob();
 
-    document.save(`laporan-${period}-${date}.pdf`);
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `laporan-${period}-${date}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("Gagal mengekspor PDF:", err);
+    } finally {
+      setExportingPdf(false);
+    }
   };
 
   return (
@@ -220,10 +197,10 @@ export default function AdminReportPage() {
             <button
               type="button"
               onClick={exportPdf}
-              disabled={rows.length === 0}
+              disabled={rows.length === 0 || exportingPdf}
               className="inline-flex h-10 items-center gap-2 rounded-xl bg-red-600 px-4 text-sm font-medium text-white hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              <FaFilePdf /> Export PDF
+              <FaFilePdf /> {exportingPdf ? "Mengekspor..." : "Export PDF"}
             </button>
           </div>
         </div>
