@@ -16,9 +16,26 @@ export interface APIResponse<T = any> {
 export type authTokenType = "driver" | "admin" | "checker" | "none";
 
 export interface Options {
-    authToken: authTokenType // "" | "driver" | custom string
+    authToken: authTokenType; // "" | "driver" | custom string
     timeout?: number;   // default 10000 ms
     signal?: AbortSignal;
+}
+
+export function resolveApiUrl(url: string): string {
+    const rawBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8095/api/v1";
+    const baseUrl = rawBaseUrl.replace(/\/+$/, "");
+
+    if (/^(?:https?:|blob:|data:)/i.test(url)) {
+        return url;
+    }
+
+    if (url.startsWith("/api/v1/")) {
+        const origin = baseUrl.replace(/\/api\/v1\/?$/, "");
+        return `${origin}${url}`;
+    }
+
+    const cleanPath = url.startsWith("/") ? url : `/${url}`;
+    return `${baseUrl}${cleanPath}`;
 }
 
 export function useFetchAPI() {
@@ -49,15 +66,15 @@ export function useFetchAPI() {
             if (token) headers["Authorization"] = `Bearer ${token}`;
         }
 
-        // console.log(options.authToken, adminToken, headers["Authorization"])
-
         // Setup Content-Type (skip kalau FormData)
         if (!(body instanceof FormData)) {
             headers["Content-Type"] = "application/json";
         }
 
+        const targetUrl = resolveApiUrl(url);
+
         try {
-            const response = await fetch(url, {
+            const response = await fetch(targetUrl, {
                 method,
                 headers,
                 body: body
