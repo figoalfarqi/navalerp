@@ -1406,14 +1406,14 @@ export default function Table({
                                     : dataItems.length == index + 1
                                       ? "border-x"
                                       : "border"
-                                } align-top`}
+                                } align-top overflow-hidden`}
                               >
                                 {col.render ? (
                                   <div
-                                    className={`${
+                                    className={`break-words break-all [overflow-wrap:anywhere] ${
                                       isSelected
-                                        ? ""
-                                        : "line-clamp-1 break-all"
+                                        ? "whitespace-normal"
+                                        : "line-clamp-1"
                                     }`}
                                   >
                                     {col.render(
@@ -1428,10 +1428,10 @@ export default function Table({
                                   </div>
                                 ) : (
                                   <div
-                                    className={`${
+                                    className={`break-words break-all [overflow-wrap:anywhere] ${
                                       isSelected
-                                        ? ""
-                                        : "line-clamp-1 break-all"
+                                        ? "whitespace-normal"
+                                        : "line-clamp-1"
                                     }`}
                                   >
                                     {item[col.key]}
