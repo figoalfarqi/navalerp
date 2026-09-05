@@ -187,8 +187,10 @@ export default function FormCrud({
   );
 
   // Ambil base route: /admin/data/driver
+  const querySuffix =
+    searchParams && searchParams.toString() ? `?${searchParams.toString()}` : "";
   const baseRoute =
-    pathname.split("/").slice(0, 4).join("/") + "?" + searchParams;
+    pathname.split("/").slice(0, 4).join("/") + querySuffix;
 
   const handleValidate = async (): Promise<boolean> => {
     const newErrors: Record<string, string> = {};

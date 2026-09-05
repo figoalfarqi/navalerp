@@ -140,7 +140,11 @@ export default function Table({
 }: TableProps) {
   const filters = rawFilters ?? filterFields ?? [];
   const key_table = primaryKey ? primaryKey : `${table_name}_id`;
-  const table_web_url = table_url ? table_url : actionUrl ? actionUrl : table_name;
+  const raw_table_url = table_url ? table_url : actionUrl ? actionUrl : table_name;
+  const table_web_url = (raw_table_url || "")
+    .replace(/^\/?admin\/data\/?/, "")
+    .replace(/^\/+/, "")
+    .replace(/\/+$/, "");
   const isForDetail = tableFor === "detail";
   const isForSelect = tableFor === "select";
   // Hitung di luar — jadi bisa digunakan di mana saja
@@ -1087,11 +1091,17 @@ export default function Table({
                 {!isForDetail && !isForSelect && isCreateable && !readOnly && (
                   <Button
                     id=""
-                    onClick={() =>
+                    onClick={() => {
+                      const query =
+                        searchParams && searchParams.toString()
+                          ? `?${searchParams.toString()}`
+                          : "";
                       router.push(
-                        `/admin/data/${table_web_url}/create?${searchParams}`,
-                      )
-                    }
+                        createUrl
+                          ? `${createUrl}${query}`
+                          : `/admin/data/${table_web_url}/create${query}`,
+                      );
+                    }}
                   >
                     Create
                   </Button>
@@ -1115,24 +1125,36 @@ export default function Table({
               <TableToolbar
                 selectedCount={selectedRows.length}
                 onCopy={() => {
+                  const query =
+                    searchParams && searchParams.toString()
+                      ? `?${searchParams.toString()}`
+                      : "";
                   isForDetail
                     ? detailAction?.setMode("copy")
                     : router.push(
-                        `/admin/data/${table_web_url}/${selectedRows[0][key_table]}/copy?${searchParams}`,
+                        `/admin/data/${table_web_url}/${selectedRows[0][key_table]}/copy${query}`,
                       );
                 }}
                 onEdit={() => {
+                  const query =
+                    searchParams && searchParams.toString()
+                      ? `?${searchParams.toString()}`
+                      : "";
                   isForDetail
                     ? detailAction?.setMode("edit")
                     : router.push(
-                        `/admin/data/${table_web_url}/${selectedRows[0][key_table]}/edit?${searchParams}`,
+                        `/admin/data/${table_web_url}/${selectedRows[0][key_table]}/edit${query}`,
                       );
                 }}
                 onView={() => {
+                  const query =
+                    searchParams && searchParams.toString()
+                      ? `?${searchParams.toString()}`
+                      : "";
                   isForDetail
                     ? detailAction?.setMode("view")
                     : router.push(
-                        `/admin/data/${table_web_url}/${selectedRows[0][key_table]}/view?${searchParams}`,
+                        `/admin/data/${table_web_url}/${selectedRows[0][key_table]}/view${query}`,
                       );
                 }}
                 {...(hasIsActiveFilter && activateData
