@@ -9,9 +9,8 @@ export const entityEndpoint = "/admin/fuel_bunker";
 export const primaryKey = "bunker_id";
 
 export const columns: ColumnField[] = [
-  { key: "bunker_id", label: "Bunker Id" },
-  { key: "ship_id", label: "Ship Id" },
-  { key: "facility_id", label: "Facility Id" },
+  { key: "ship_name", label: "Kapal KRI" },
+  { key: "facility_name", label: "Fasilitas Pangkalan" },
   { key: "fuel_type", label: "Fuel Type" },
   { key: "quantity_liters", label: "Quantity Liters" },
   { key: "density_15c", label: "Density 15c" },
@@ -23,17 +22,27 @@ export const filterFields: FilterField[] = [
 ];
 
 export const formFields = (mode: string): FormField[] => [
-  {
+    {
     name: "ship_id",
-    label: "Ship Id",
-    fieldType: "text",
+    label: "Kapal KRI",
+    fieldType: "select",
+    options: {
+      url: "/admin/ship?limit=100",
+      labelKey: "ship_name",
+      valueKey: "ship_id",
+    },
     required: true,
     disabled: mode === "view",
   },
-  {
+    {
     name: "facility_id",
-    label: "Facility Id",
-    fieldType: "text",
+    label: "Fasilitas Pangkalan",
+    fieldType: "select",
+    options: {
+      url: "/admin/base_facility?limit=100",
+      labelKey: "facility_name",
+      valueKey: "facility_id",
+    },
     required: false,
     disabled: mode === "view",
   },
@@ -86,10 +95,15 @@ export const formFields = (mode: string): FormField[] => [
     required: true,
     disabled: mode === "view",
   },
-  {
+    {
     name: "authorised_by_user_id",
-    label: "Authorised By User Id",
-    fieldType: "text",
+    label: "Diotorisasi Oleh",
+    fieldType: "select",
+    options: {
+      url: "/admin/sys_user?limit=100",
+      labelKey: "full_name",
+      valueKey: "user_id",
+    },
     required: true,
     disabled: mode === "view",
   },

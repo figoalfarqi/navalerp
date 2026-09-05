@@ -19,10 +19,14 @@ func NewCrewAssignmentRepository(db *pgxpool.Pool) *CrewAssignmentRepository {
 
 // Get retrieves a single crew_assignment by assignment_id
 func (r *CrewAssignmentRepository) Get(ctx context.Context, id string) (*model.CrewAssignment, error) {
-	query := `SELECT assignment_id, ship_id, personnel_id, crew_role, department, watch_bill_duty, assigned_date, relieved_date, is_active, created_by, created_at, updated_at FROM hcm_crew_assignments WHERE assignment_id = $1`
+	query := `SELECT t.assignment_id, t.ship_id, COALESCE(j_ship.ship_name, ''), t.personnel_id, COALESCE(j_prs.full_name, ''), t.crew_role, t.department, t.watch_bill_duty, t.assigned_date, t.relieved_date, t.is_active, t.created_by, t.created_at, t.updated_at
+	FROM hcm_crew_assignments t
+	LEFT JOIN mro_ships j_ship ON j_ship.ship_id = t.ship_id
+	LEFT JOIN hcm_personnel j_prs ON j_prs.personnel_id = t.personnel_id
+	WHERE t.assignment_id = $1`
 
 	var m model.CrewAssignment
-	err := r.DB.QueryRow(ctx, query, id).Scan(&m.AssignmentId, &m.ShipId, &m.PersonnelId, &m.CrewRole, &m.Department, &m.WatchBillDuty, &m.AssignedDate, &m.RelievedDate, &m.IsActive, &m.CreatedBy, &m.CreatedAt, &m.UpdatedAt)
+	err := r.DB.QueryRow(ctx, query, id).Scan(&m.AssignmentId, &m.ShipId, &m.ShipName, &m.PersonnelId, &m.PersonnelName, &m.CrewRole, &m.Department, &m.WatchBillDuty, &m.AssignedDate, &m.RelievedDate, &m.IsActive, &m.CreatedBy, &m.CreatedAt, &m.UpdatedAt)
 	if err != nil {
 		return nil, err
 	}
@@ -56,7 +60,7 @@ func (r *CrewAssignmentRepository) List(ctx context.Context, opts model.ListOpti
 	}
 
 	whereSql := strings.Join(whereClauses, " AND ")
-	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM hcm_crew_assignments WHERE %s", whereSql)
+	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM hcm_crew_assignments t WHERE %s", whereSql)
 	var total int
 	if err := r.DB.QueryRow(ctx, countQuery, args...).Scan(&total); err != nil {
 		return nil, 0, err
@@ -67,7 +71,11 @@ func (r *CrewAssignmentRepository) List(ctx context.Context, opts model.ListOpti
 	offset := opts.Offset
 	if offset < 0 { offset = 0 }
 
-	listQuery := fmt.Sprintf("SELECT assignment_id, ship_id, personnel_id, crew_role, department, watch_bill_duty, assigned_date, relieved_date, is_active, created_by, created_at, updated_at FROM hcm_crew_assignments WHERE %s ORDER BY created_at DESC LIMIT $%d OFFSET $%d", whereSql, argPos, argPos+1)
+	listQuery := fmt.Sprintf(`SELECT t.assignment_id, t.ship_id, COALESCE(j_ship.ship_name, ''), t.personnel_id, COALESCE(j_prs.full_name, ''), t.crew_role, t.department, t.watch_bill_duty, t.assigned_date, t.relieved_date, t.is_active, t.created_by, t.created_at, t.updated_at
+	FROM hcm_crew_assignments t
+	LEFT JOIN mro_ships j_ship ON j_ship.ship_id = t.ship_id
+	LEFT JOIN hcm_personnel j_prs ON j_prs.personnel_id = t.personnel_id
+	WHERE %s ORDER BY t.created_at DESC LIMIT $%d OFFSET $%d`, whereSql, argPos, argPos+1)
 	args = append(args, limit, offset)
 
 	rows, err := r.DB.Query(ctx, listQuery, args...)
@@ -79,7 +87,7 @@ func (r *CrewAssignmentRepository) List(ctx context.Context, opts model.ListOpti
 	var items []model.CrewAssignment
 	for rows.Next() {
 		var m model.CrewAssignment
-		if err := rows.Scan(&m.AssignmentId, &m.ShipId, &m.PersonnelId, &m.CrewRole, &m.Department, &m.WatchBillDuty, &m.AssignedDate, &m.RelievedDate, &m.IsActive, &m.CreatedBy, &m.CreatedAt, &m.UpdatedAt); err != nil {
+		if err := rows.Scan(&m.AssignmentId, &m.ShipId, &m.ShipName, &m.PersonnelId, &m.PersonnelName, &m.CrewRole, &m.Department, &m.WatchBillDuty, &m.AssignedDate, &m.RelievedDate, &m.IsActive, &m.CreatedBy, &m.CreatedAt, &m.UpdatedAt); err != nil {
 			return nil, 0, err
 		}
 		items = append(items, m)
@@ -145,7 +153,7 @@ func (r *CrewAssignmentRepository) Update(ctx context.Context, id string, m *mod
 
 // Delete removes or soft-deletes crew_assignment
 func (r *CrewAssignmentRepository) Delete(ctx context.Context, id string) error {
-	query := `DELETE FROM hcm_crew_assignments WHERE assignment_id = $1`
+	query := `DELETE FROM hcm_crew_assignments t WHERE assignment_id = $1`
 	_, err := r.DB.Exec(ctx, query, id)
 	return err
 }

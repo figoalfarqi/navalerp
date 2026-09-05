@@ -19,10 +19,13 @@ func NewAuditLogRepository(db *pgxpool.Pool) *AuditLogRepository {
 
 // Get retrieves a single audit_log by log_id
 func (r *AuditLogRepository) Get(ctx context.Context, id string) (*model.AuditLog, error) {
-	query := `SELECT log_id, user_id, action, entity_table, entity_id, old_values, new_values, ip_address, user_agent, created_at FROM sys_audit_logs WHERE log_id = $1`
+	query := `SELECT t.log_id, t.user_id, COALESCE(j_usr.full_name, ''), t.action, t.entity_table, t.entity_id, t.old_values, t.new_values, t.ip_address, t.user_agent, t.created_at
+	FROM sys_audit_logs t
+	LEFT JOIN sys_users j_usr ON j_usr.user_id = t.user_id
+	WHERE t.log_id = $1`
 
 	var m model.AuditLog
-	err := r.DB.QueryRow(ctx, query, id).Scan(&m.LogId, &m.UserId, &m.Action, &m.EntityTable, &m.EntityId, &m.OldValues, &m.NewValues, &m.IpAddress, &m.UserAgent, &m.CreatedAt)
+	err := r.DB.QueryRow(ctx, query, id).Scan(&m.LogId, &m.UserId, &m.UserName, &m.Action, &m.EntityTable, &m.EntityId, &m.OldValues, &m.NewValues, &m.IpAddress, &m.UserAgent, &m.CreatedAt)
 	if err != nil {
 		return nil, err
 	}
@@ -44,7 +47,7 @@ func (r *AuditLogRepository) List(ctx context.Context, opts model.ListOptions) (
 	}
 
 	whereSql := strings.Join(whereClauses, " AND ")
-	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM sys_audit_logs WHERE %s", whereSql)
+	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM sys_audit_logs t WHERE %s", whereSql)
 	var total int
 	if err := r.DB.QueryRow(ctx, countQuery, args...).Scan(&total); err != nil {
 		return nil, 0, err
@@ -55,7 +58,10 @@ func (r *AuditLogRepository) List(ctx context.Context, opts model.ListOptions) (
 	offset := opts.Offset
 	if offset < 0 { offset = 0 }
 
-	listQuery := fmt.Sprintf("SELECT log_id, user_id, action, entity_table, entity_id, old_values, new_values, ip_address, user_agent, created_at FROM sys_audit_logs WHERE %s ORDER BY created_at DESC LIMIT $%d OFFSET $%d", whereSql, argPos, argPos+1)
+	listQuery := fmt.Sprintf(`SELECT t.log_id, t.user_id, COALESCE(j_usr.full_name, ''), t.action, t.entity_table, t.entity_id, t.old_values, t.new_values, t.ip_address, t.user_agent, t.created_at
+	FROM sys_audit_logs t
+	LEFT JOIN sys_users j_usr ON j_usr.user_id = t.user_id
+	WHERE %s ORDER BY t.created_at DESC LIMIT $%d OFFSET $%d`, whereSql, argPos, argPos+1)
 	args = append(args, limit, offset)
 
 	rows, err := r.DB.Query(ctx, listQuery, args...)
@@ -67,7 +73,7 @@ func (r *AuditLogRepository) List(ctx context.Context, opts model.ListOptions) (
 	var items []model.AuditLog
 	for rows.Next() {
 		var m model.AuditLog
-		if err := rows.Scan(&m.LogId, &m.UserId, &m.Action, &m.EntityTable, &m.EntityId, &m.OldValues, &m.NewValues, &m.IpAddress, &m.UserAgent, &m.CreatedAt); err != nil {
+		if err := rows.Scan(&m.LogId, &m.UserId, &m.UserName, &m.Action, &m.EntityTable, &m.EntityId, &m.OldValues, &m.NewValues, &m.IpAddress, &m.UserAgent, &m.CreatedAt); err != nil {
 			return nil, 0, err
 		}
 		items = append(items, m)
@@ -116,7 +122,7 @@ func (r *AuditLogRepository) Update(ctx context.Context, id string, m *model.Aud
 
 // Delete removes or soft-deletes audit_log
 func (r *AuditLogRepository) Delete(ctx context.Context, id string) error {
-	query := `DELETE FROM sys_audit_logs WHERE log_id = $1`
+	query := `DELETE FROM sys_audit_logs t WHERE log_id = $1`
 	_, err := r.DB.Exec(ctx, query, id)
 	return err
 }

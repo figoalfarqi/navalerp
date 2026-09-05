@@ -7,6 +7,7 @@ import (
 type SysUser struct {
 	UserId string `json:"user_id"`
 	UnitId string `json:"unit_id"`
+	UnitName *string `json:"unit_name,omitempty"`
 	Username string `json:"username"`
 	PasswordHash string `json:"password_hash"`
 	FullName string `json:"full_name"`

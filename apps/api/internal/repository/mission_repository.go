@@ -19,10 +19,13 @@ func NewMissionRepository(db *pgxpool.Pool) *MissionRepository {
 
 // Get retrieves a single mission by mission_id
 func (r *MissionRepository) Get(ctx context.Context, id string) (*model.Mission, error) {
-	query := `SELECT mission_id, theater_id, mission_code, mission_name, mission_type, start_date, end_date, commanding_officer_user_id, mission_status, created_by, updated_by, deleted_by, created_at, updated_at, deleted_at FROM ops_missions WHERE mission_id = $1 AND deleted_at IS NULL`
+	query := `SELECT t.mission_id, t.theater_id, COALESCE(j_tht.theater_name, ''), t.mission_code, t.mission_name, t.mission_type, t.start_date, t.end_date, t.commanding_officer_user_id, t.mission_status, t.created_by, t.updated_by, t.deleted_by, t.created_at, t.updated_at, t.deleted_at
+	FROM ops_missions t
+	LEFT JOIN ops_theaters j_tht ON j_tht.theater_id = t.theater_id
+	WHERE t.mission_id = $1 AND t.deleted_at IS NULL`
 
 	var m model.Mission
-	err := r.DB.QueryRow(ctx, query, id).Scan(&m.MissionId, &m.TheaterId, &m.MissionCode, &m.MissionName, &m.MissionType, &m.StartDate, &m.EndDate, &m.CommandingOfficerUserId, &m.MissionStatus, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt)
+	err := r.DB.QueryRow(ctx, query, id).Scan(&m.MissionId, &m.TheaterId, &m.TheaterName, &m.MissionCode, &m.MissionName, &m.MissionType, &m.StartDate, &m.EndDate, &m.CommandingOfficerUserId, &m.MissionStatus, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt)
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +51,7 @@ func (r *MissionRepository) List(ctx context.Context, opts model.ListOptions) ([
 	var args []any
 	argPos := 1
 
-	whereClauses = append(whereClauses, "deleted_at IS NULL")
+	whereClauses = append(whereClauses, "t.deleted_at IS NULL")
 	if opts.Search != "" {
 		searchPattern := "%" + opts.Search + "%"
 		whereClauses = append(whereClauses, fmt.Sprintf("(mission_code ILIKE $%[1]d OR mission_name ILIKE $%[1]d)", argPos))
@@ -57,7 +60,7 @@ func (r *MissionRepository) List(ctx context.Context, opts model.ListOptions) ([
 	}
 
 	whereSql := strings.Join(whereClauses, " AND ")
-	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM ops_missions WHERE %s", whereSql)
+	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM ops_missions t WHERE %s", whereSql)
 	var total int
 	if err := r.DB.QueryRow(ctx, countQuery, args...).Scan(&total); err != nil {
 		return nil, 0, err
@@ -68,7 +71,10 @@ func (r *MissionRepository) List(ctx context.Context, opts model.ListOptions) ([
 	offset := opts.Offset
 	if offset < 0 { offset = 0 }
 
-	listQuery := fmt.Sprintf("SELECT mission_id, theater_id, mission_code, mission_name, mission_type, start_date, end_date, commanding_officer_user_id, mission_status, created_by, updated_by, deleted_by, created_at, updated_at, deleted_at FROM ops_missions WHERE %s ORDER BY created_at DESC LIMIT $%d OFFSET $%d", whereSql, argPos, argPos+1)
+	listQuery := fmt.Sprintf(`SELECT t.mission_id, t.theater_id, COALESCE(j_tht.theater_name, ''), t.mission_code, t.mission_name, t.mission_type, t.start_date, t.end_date, t.commanding_officer_user_id, t.mission_status, t.created_by, t.updated_by, t.deleted_by, t.created_at, t.updated_at, t.deleted_at
+	FROM ops_missions t
+	LEFT JOIN ops_theaters j_tht ON j_tht.theater_id = t.theater_id
+	WHERE %s ORDER BY t.created_at DESC LIMIT $%d OFFSET $%d`, whereSql, argPos, argPos+1)
 	args = append(args, limit, offset)
 
 	rows, err := r.DB.Query(ctx, listQuery, args...)
@@ -80,7 +86,7 @@ func (r *MissionRepository) List(ctx context.Context, opts model.ListOptions) ([
 	var items []model.Mission
 	for rows.Next() {
 		var m model.Mission
-		if err := rows.Scan(&m.MissionId, &m.TheaterId, &m.MissionCode, &m.MissionName, &m.MissionType, &m.StartDate, &m.EndDate, &m.CommandingOfficerUserId, &m.MissionStatus, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt); err != nil {
+		if err := rows.Scan(&m.MissionId, &m.TheaterId, &m.TheaterName, &m.MissionCode, &m.MissionName, &m.MissionType, &m.StartDate, &m.EndDate, &m.CommandingOfficerUserId, &m.MissionStatus, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt); err != nil {
 			return nil, 0, err
 		}
 		items = append(items, m)

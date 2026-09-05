@@ -8,7 +8,9 @@ type StockTransfer struct {
 	TransferId string `json:"transfer_id"`
 	TransferNumber string `json:"transfer_number"`
 	FromWarehouseId string `json:"from_warehouse_id"`
+	SourceWarehouseName *string `json:"source_warehouse_name,omitempty"`
 	ToWarehouseId string `json:"to_warehouse_id"`
+	DestWarehouseName *string `json:"dest_warehouse_name,omitempty"`
 	MovementType string `json:"movement_type"`
 	ScheduledDeparture *time.Time `json:"scheduled_departure,omitempty"`
 	ActualDeparture *time.Time `json:"actual_departure,omitempty"`

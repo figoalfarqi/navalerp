@@ -7,7 +7,9 @@ import (
 type FailureReport struct {
 	ReportId string `json:"report_id"`
 	EquipmentId string `json:"equipment_id"`
+	EquipmentName *string `json:"equipment_name,omitempty"`
 	ReportedByUserId string `json:"reported_by_user_id"`
+	ReporterName *string `json:"reporter_name,omitempty"`
 	ReportNumber string `json:"report_number"`
 	IncidentDate time.Time `json:"incident_date"`
 	Severity string `json:"severity"`

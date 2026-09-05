@@ -7,11 +7,13 @@ import (
 type Warehouse struct {
 	WarehouseId string `json:"warehouse_id"`
 	UnitId string `json:"unit_id"`
+	UnitName *string `json:"unit_name,omitempty"`
 	WarehouseCode string `json:"warehouse_code"`
 	WarehouseName string `json:"warehouse_name"`
 	WarehouseType string `json:"warehouse_type"`
 	CapacityM3 *float64 `json:"capacity_m3,omitempty"`
 	ManagerUserId *string `json:"manager_user_id,omitempty"`
+	ManagerName *string `json:"manager_name,omitempty"`
 	LocationAddress *string `json:"location_address,omitempty"`
 	IsActive *bool `json:"is_active,omitempty"`
 	CreatedBy *string `json:"created_by,omitempty"`

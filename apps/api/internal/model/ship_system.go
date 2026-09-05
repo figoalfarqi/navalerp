@@ -7,6 +7,7 @@ import (
 type ShipSystem struct {
 	SystemId string `json:"system_id"`
 	ShipId string `json:"ship_id"`
+	ShipName *string `json:"ship_name,omitempty"`
 	ParentSystemId *string `json:"parent_system_id,omitempty"`
 	SystemCode string `json:"system_code"`
 	SystemName string `json:"system_name"`

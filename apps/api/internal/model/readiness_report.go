@@ -7,6 +7,7 @@ import (
 type ReadinessReport struct {
 	SnapshotId string `json:"snapshot_id"`
 	ShipId string `json:"ship_id"`
+	ShipName *string `json:"ship_name,omitempty"`
 	SnapshotTimestamp time.Time `json:"snapshot_timestamp"`
 	ReadinessCategory string `json:"readiness_category"`
 	MroReadinessScore float64 `json:"mro_readiness_score"`

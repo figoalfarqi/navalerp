@@ -9,9 +9,8 @@ export const entityEndpoint = "/admin/ship_system";
 export const primaryKey = "system_id";
 
 export const columns: ColumnField[] = [
-  { key: "system_id", label: "System Id" },
-  { key: "ship_id", label: "Ship Id" },
-  { key: "parent_system_id", label: "Parent System Id" },
+  { key: "ship_name", label: "Kapal KRI" },
+  { key: "parent_system_name", label: "Sistem Induk" },
   { key: "system_code", label: "System Code" },
   { key: "system_name", label: "System Name" },
   { key: "system_category", label: "System Category" },
@@ -23,17 +22,27 @@ export const filterFields: FilterField[] = [
 ];
 
 export const formFields = (mode: string): FormField[] => [
-  {
+    {
     name: "ship_id",
-    label: "Ship Id",
-    fieldType: "text",
+    label: "Kapal KRI",
+    fieldType: "select",
+    options: {
+      url: "/admin/ship?limit=100",
+      labelKey: "ship_name",
+      valueKey: "ship_id",
+    },
     required: true,
     disabled: mode === "view",
   },
-  {
+    {
     name: "parent_system_id",
-    label: "Parent System Id",
-    fieldType: "text",
+    label: "Sistem Induk",
+    fieldType: "select",
+    options: {
+      url: "/admin/ship_system?limit=100",
+      labelKey: "system_name",
+      valueKey: "system_id",
+    },
     required: false,
     disabled: mode === "view",
   },

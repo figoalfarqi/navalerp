@@ -9,9 +9,8 @@ export const entityEndpoint = "/admin/readiness_alert";
 export const primaryKey = "alert_id";
 
 export const columns: ColumnField[] = [
-  { key: "alert_id", label: "Alert Id" },
-  { key: "ship_id", label: "Ship Id" },
-  { key: "equipment_id", label: "Equipment Id" },
+  { key: "ship_name", label: "Kapal KRI" },
+  { key: "equipment_name", label: "Peralatan" },
   { key: "severity", label: "Severity" },
   { key: "alert_type", label: "Alert Type" },
   { key: "alert_message", label: "Alert Message" },
@@ -23,17 +22,27 @@ export const filterFields: FilterField[] = [
 ];
 
 export const formFields = (mode: string): FormField[] => [
-  {
+    {
     name: "ship_id",
-    label: "Ship Id",
-    fieldType: "text",
+    label: "Kapal KRI",
+    fieldType: "select",
+    options: {
+      url: "/admin/ship?limit=100",
+      labelKey: "ship_name",
+      valueKey: "ship_id",
+    },
     required: true,
     disabled: mode === "view",
   },
-  {
+    {
     name: "equipment_id",
-    label: "Equipment Id",
-    fieldType: "text",
+    label: "Peralatan",
+    fieldType: "select",
+    options: {
+      url: "/admin/equipment?limit=100",
+      labelKey: "equipment_name",
+      valueKey: "equipment_id",
+    },
     required: false,
     disabled: mode === "view",
   },

@@ -19,10 +19,14 @@ func NewRequisitionRepository(db *pgxpool.Pool) *RequisitionRepository {
 
 // Get retrieves a single requisition by requisition_id
 func (r *RequisitionRepository) Get(ctx context.Context, id string) (*model.Requisition, error) {
-	query := `SELECT requisition_id, requisition_number, origin_unit_id, work_order_id, priority, requested_date, required_by_date, approval_status, approved_by_user_id, approved_at, total_estimated_cost, justification, created_by, updated_by, deleted_by, created_at, updated_at, deleted_at FROM proc_requisitions WHERE requisition_id = $1 AND deleted_at IS NULL`
+	query := `SELECT t.requisition_id, t.requisition_number, t.origin_unit_id, COALESCE(j_unit.unit_name, ''), t.work_order_id, t.priority, t.requested_date, t.required_by_date, t.approval_status, t.approved_by_user_id, COALESCE(j_usr.full_name, ''), t.approved_at, t.total_estimated_cost, t.justification, t.created_by, t.updated_by, t.deleted_by, t.created_at, t.updated_at, t.deleted_at
+	FROM proc_requisitions t
+	LEFT JOIN org_units j_unit ON j_unit.unit_id = t.origin_unit_id
+	LEFT JOIN sys_users j_usr ON j_usr.user_id = t.approved_by_user_id
+	WHERE t.requisition_id = $1 AND t.deleted_at IS NULL`
 
 	var m model.Requisition
-	err := r.DB.QueryRow(ctx, query, id).Scan(&m.RequisitionId, &m.RequisitionNumber, &m.OriginUnitId, &m.WorkOrderId, &m.Priority, &m.RequestedDate, &m.RequiredByDate, &m.ApprovalStatus, &m.ApprovedByUserId, &m.ApprovedAt, &m.TotalEstimatedCost, &m.Justification, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt)
+	err := r.DB.QueryRow(ctx, query, id).Scan(&m.RequisitionId, &m.RequisitionNumber, &m.OriginUnitId, &m.UnitName, &m.WorkOrderId, &m.Priority, &m.RequestedDate, &m.RequiredByDate, &m.ApprovalStatus, &m.ApprovedByUserId, &m.ApproverName, &m.ApprovedAt, &m.TotalEstimatedCost, &m.Justification, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt)
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +52,7 @@ func (r *RequisitionRepository) List(ctx context.Context, opts model.ListOptions
 	var args []any
 	argPos := 1
 
-	whereClauses = append(whereClauses, "deleted_at IS NULL")
+	whereClauses = append(whereClauses, "t.deleted_at IS NULL")
 	if opts.Search != "" {
 		searchPattern := "%" + opts.Search + "%"
 		whereClauses = append(whereClauses, fmt.Sprintf("(requisition_number ILIKE $%[1]d OR justification ILIKE $%[1]d)", argPos))
@@ -57,7 +61,7 @@ func (r *RequisitionRepository) List(ctx context.Context, opts model.ListOptions
 	}
 
 	whereSql := strings.Join(whereClauses, " AND ")
-	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM proc_requisitions WHERE %s", whereSql)
+	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM proc_requisitions t WHERE %s", whereSql)
 	var total int
 	if err := r.DB.QueryRow(ctx, countQuery, args...).Scan(&total); err != nil {
 		return nil, 0, err
@@ -68,7 +72,11 @@ func (r *RequisitionRepository) List(ctx context.Context, opts model.ListOptions
 	offset := opts.Offset
 	if offset < 0 { offset = 0 }
 
-	listQuery := fmt.Sprintf("SELECT requisition_id, requisition_number, origin_unit_id, work_order_id, priority, requested_date, required_by_date, approval_status, approved_by_user_id, approved_at, total_estimated_cost, justification, created_by, updated_by, deleted_by, created_at, updated_at, deleted_at FROM proc_requisitions WHERE %s ORDER BY created_at DESC LIMIT $%d OFFSET $%d", whereSql, argPos, argPos+1)
+	listQuery := fmt.Sprintf(`SELECT t.requisition_id, t.requisition_number, t.origin_unit_id, COALESCE(j_unit.unit_name, ''), t.work_order_id, t.priority, t.requested_date, t.required_by_date, t.approval_status, t.approved_by_user_id, COALESCE(j_usr.full_name, ''), t.approved_at, t.total_estimated_cost, t.justification, t.created_by, t.updated_by, t.deleted_by, t.created_at, t.updated_at, t.deleted_at
+	FROM proc_requisitions t
+	LEFT JOIN org_units j_unit ON j_unit.unit_id = t.origin_unit_id
+	LEFT JOIN sys_users j_usr ON j_usr.user_id = t.approved_by_user_id
+	WHERE %s ORDER BY t.created_at DESC LIMIT $%d OFFSET $%d`, whereSql, argPos, argPos+1)
 	args = append(args, limit, offset)
 
 	rows, err := r.DB.Query(ctx, listQuery, args...)
@@ -80,7 +88,7 @@ func (r *RequisitionRepository) List(ctx context.Context, opts model.ListOptions
 	var items []model.Requisition
 	for rows.Next() {
 		var m model.Requisition
-		if err := rows.Scan(&m.RequisitionId, &m.RequisitionNumber, &m.OriginUnitId, &m.WorkOrderId, &m.Priority, &m.RequestedDate, &m.RequiredByDate, &m.ApprovalStatus, &m.ApprovedByUserId, &m.ApprovedAt, &m.TotalEstimatedCost, &m.Justification, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt); err != nil {
+		if err := rows.Scan(&m.RequisitionId, &m.RequisitionNumber, &m.OriginUnitId, &m.UnitName, &m.WorkOrderId, &m.Priority, &m.RequestedDate, &m.RequiredByDate, &m.ApprovalStatus, &m.ApprovedByUserId, &m.ApproverName, &m.ApprovedAt, &m.TotalEstimatedCost, &m.Justification, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt); err != nil {
 			return nil, 0, err
 		}
 		items = append(items, m)

@@ -9,10 +9,9 @@ export const entityEndpoint = "/admin/requisition";
 export const primaryKey = "requisition_id";
 
 export const columns: ColumnField[] = [
-  { key: "requisition_id", label: "Requisition Id" },
   { key: "requisition_number", label: "Requisition Number" },
-  { key: "origin_unit_id", label: "Origin Unit Id" },
-  { key: "work_order_id", label: "Work Order Id" },
+  { key: "unit_name", label: "Satuan Pengaju" },
+  { key: "work_order_number", label: "Perintah Kerja (WO)" },
   { key: "priority", label: "Priority" },
   { key: "requested_date", label: "Requested Date" },
   { key: "required_by_date", label: "Required By Date" },
@@ -30,17 +29,27 @@ export const formFields = (mode: string): FormField[] => [
     required: true,
     disabled: mode === "view",
   },
-  {
+    {
     name: "origin_unit_id",
-    label: "Origin Unit Id",
-    fieldType: "text",
+    label: "Satuan Pengaju",
+    fieldType: "select",
+    options: {
+      url: "/admin/org_unit?limit=100",
+      labelKey: "unit_name",
+      valueKey: "unit_id",
+    },
     required: true,
     disabled: mode === "view",
   },
-  {
+    {
     name: "work_order_id",
-    label: "Work Order Id",
-    fieldType: "text",
+    label: "Perintah Kerja (WO)",
+    fieldType: "select",
+    options: {
+      url: "/admin/work_order?limit=100",
+      labelKey: "work_order_number",
+      valueKey: "work_order_id",
+    },
     required: false,
     disabled: mode === "view",
   },
@@ -72,10 +81,15 @@ export const formFields = (mode: string): FormField[] => [
     required: false,
     disabled: mode === "view",
   },
-  {
+    {
     name: "approved_by_user_id",
-    label: "Approved By User Id",
-    fieldType: "text",
+    label: "Disetujui Oleh",
+    fieldType: "select",
+    options: {
+      url: "/admin/sys_user?limit=100",
+      labelKey: "full_name",
+      valueKey: "user_id",
+    },
     required: false,
     disabled: mode === "view",
   },

@@ -19,10 +19,13 @@ func NewTenderRepository(db *pgxpool.Pool) *TenderRepository {
 
 // Get retrieves a single tender by tender_id
 func (r *TenderRepository) Get(ctx context.Context, id string) (*model.Tender, error) {
-	query := `SELECT tender_id, tender_number, title, procurement_category, estimated_budget, procurement_method, start_date, closing_date, status, winner_vendor_id, created_by, updated_by, deleted_by, created_at, updated_at, deleted_at FROM proc_tenders WHERE tender_id = $1 AND deleted_at IS NULL`
+	query := `SELECT t.tender_id, t.tender_number, t.title, t.procurement_category, t.estimated_budget, t.procurement_method, t.start_date, t.closing_date, t.status, t.winner_vendor_id, COALESCE(j_vnd.vendor_name, ''), t.created_by, t.updated_by, t.deleted_by, t.created_at, t.updated_at, t.deleted_at
+	FROM proc_tenders t
+	LEFT JOIN proc_vendors j_vnd ON j_vnd.vendor_id = t.winner_vendor_id
+	WHERE t.tender_id = $1 AND t.deleted_at IS NULL`
 
 	var m model.Tender
-	err := r.DB.QueryRow(ctx, query, id).Scan(&m.TenderId, &m.TenderNumber, &m.Title, &m.ProcurementCategory, &m.EstimatedBudget, &m.ProcurementMethod, &m.StartDate, &m.ClosingDate, &m.Status, &m.WinnerVendorId, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt)
+	err := r.DB.QueryRow(ctx, query, id).Scan(&m.TenderId, &m.TenderNumber, &m.Title, &m.ProcurementCategory, &m.EstimatedBudget, &m.ProcurementMethod, &m.StartDate, &m.ClosingDate, &m.Status, &m.WinnerVendorId, &m.WinnerVendorName, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt)
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +51,7 @@ func (r *TenderRepository) List(ctx context.Context, opts model.ListOptions) ([]
 	var args []any
 	argPos := 1
 
-	whereClauses = append(whereClauses, "deleted_at IS NULL")
+	whereClauses = append(whereClauses, "t.deleted_at IS NULL")
 	if opts.Search != "" {
 		searchPattern := "%" + opts.Search + "%"
 		whereClauses = append(whereClauses, fmt.Sprintf("(tender_number ILIKE $%[1]d OR title ILIKE $%[1]d)", argPos))
@@ -57,7 +60,7 @@ func (r *TenderRepository) List(ctx context.Context, opts model.ListOptions) ([]
 	}
 
 	whereSql := strings.Join(whereClauses, " AND ")
-	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM proc_tenders WHERE %s", whereSql)
+	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM proc_tenders t WHERE %s", whereSql)
 	var total int
 	if err := r.DB.QueryRow(ctx, countQuery, args...).Scan(&total); err != nil {
 		return nil, 0, err
@@ -68,7 +71,10 @@ func (r *TenderRepository) List(ctx context.Context, opts model.ListOptions) ([]
 	offset := opts.Offset
 	if offset < 0 { offset = 0 }
 
-	listQuery := fmt.Sprintf("SELECT tender_id, tender_number, title, procurement_category, estimated_budget, procurement_method, start_date, closing_date, status, winner_vendor_id, created_by, updated_by, deleted_by, created_at, updated_at, deleted_at FROM proc_tenders WHERE %s ORDER BY created_at DESC LIMIT $%d OFFSET $%d", whereSql, argPos, argPos+1)
+	listQuery := fmt.Sprintf(`SELECT t.tender_id, t.tender_number, t.title, t.procurement_category, t.estimated_budget, t.procurement_method, t.start_date, t.closing_date, t.status, t.winner_vendor_id, COALESCE(j_vnd.vendor_name, ''), t.created_by, t.updated_by, t.deleted_by, t.created_at, t.updated_at, t.deleted_at
+	FROM proc_tenders t
+	LEFT JOIN proc_vendors j_vnd ON j_vnd.vendor_id = t.winner_vendor_id
+	WHERE %s ORDER BY t.created_at DESC LIMIT $%d OFFSET $%d`, whereSql, argPos, argPos+1)
 	args = append(args, limit, offset)
 
 	rows, err := r.DB.Query(ctx, listQuery, args...)
@@ -80,7 +86,7 @@ func (r *TenderRepository) List(ctx context.Context, opts model.ListOptions) ([]
 	var items []model.Tender
 	for rows.Next() {
 		var m model.Tender
-		if err := rows.Scan(&m.TenderId, &m.TenderNumber, &m.Title, &m.ProcurementCategory, &m.EstimatedBudget, &m.ProcurementMethod, &m.StartDate, &m.ClosingDate, &m.Status, &m.WinnerVendorId, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt); err != nil {
+		if err := rows.Scan(&m.TenderId, &m.TenderNumber, &m.Title, &m.ProcurementCategory, &m.EstimatedBudget, &m.ProcurementMethod, &m.StartDate, &m.ClosingDate, &m.Status, &m.WinnerVendorId, &m.WinnerVendorName, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt); err != nil {
 			return nil, 0, err
 		}
 		items = append(items, m)

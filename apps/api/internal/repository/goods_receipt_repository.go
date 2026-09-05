@@ -19,10 +19,15 @@ func NewGoodsReceiptRepository(db *pgxpool.Pool) *GoodsReceiptRepository {
 
 // Get retrieves a single goods_receipt by receipt_id
 func (r *GoodsReceiptRepository) Get(ctx context.Context, id string) (*model.GoodsReceipt, error) {
-	query := `SELECT receipt_id, receipt_number, po_id, warehouse_id, received_date, delivery_order_number, inspected_by_user_id, inspection_passed, remarks, created_by, updated_by, deleted_by, created_at, updated_at, deleted_at FROM proc_goods_receipts WHERE receipt_id = $1 AND deleted_at IS NULL`
+	query := `SELECT t.receipt_id, t.receipt_number, t.po_id, COALESCE(j_po.po_number, ''), t.warehouse_id, COALESCE(j_wh.warehouse_name, ''), t.received_date, t.delivery_order_number, t.inspected_by_user_id, COALESCE(j_usr.full_name, ''), t.inspection_passed, t.remarks, t.created_by, t.updated_by, t.deleted_by, t.created_at, t.updated_at, t.deleted_at
+	FROM proc_goods_receipts t
+	LEFT JOIN proc_purchase_orders j_po ON j_po.po_id = t.po_id
+	LEFT JOIN inv_warehouses j_wh ON j_wh.warehouse_id = t.warehouse_id
+	LEFT JOIN sys_users j_usr ON j_usr.user_id = t.inspected_by_user_id
+	WHERE t.receipt_id = $1 AND t.deleted_at IS NULL`
 
 	var m model.GoodsReceipt
-	err := r.DB.QueryRow(ctx, query, id).Scan(&m.ReceiptId, &m.ReceiptNumber, &m.PoId, &m.WarehouseId, &m.ReceivedDate, &m.DeliveryOrderNumber, &m.InspectedByUserId, &m.InspectionPassed, &m.Remarks, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt)
+	err := r.DB.QueryRow(ctx, query, id).Scan(&m.ReceiptId, &m.ReceiptNumber, &m.PoId, &m.PoNumber, &m.WarehouseId, &m.WarehouseName, &m.ReceivedDate, &m.DeliveryOrderNumber, &m.InspectedByUserId, &m.InspectorName, &m.InspectionPassed, &m.Remarks, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt)
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +53,7 @@ func (r *GoodsReceiptRepository) List(ctx context.Context, opts model.ListOption
 	var args []any
 	argPos := 1
 
-	whereClauses = append(whereClauses, "deleted_at IS NULL")
+	whereClauses = append(whereClauses, "t.deleted_at IS NULL")
 	if opts.Search != "" {
 		searchPattern := "%" + opts.Search + "%"
 		whereClauses = append(whereClauses, fmt.Sprintf("(receipt_number ILIKE $%[1]d OR delivery_order_number ILIKE $%[1]d OR remarks ILIKE $%[1]d)", argPos))
@@ -57,7 +62,7 @@ func (r *GoodsReceiptRepository) List(ctx context.Context, opts model.ListOption
 	}
 
 	whereSql := strings.Join(whereClauses, " AND ")
-	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM proc_goods_receipts WHERE %s", whereSql)
+	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM proc_goods_receipts t WHERE %s", whereSql)
 	var total int
 	if err := r.DB.QueryRow(ctx, countQuery, args...).Scan(&total); err != nil {
 		return nil, 0, err
@@ -68,7 +73,12 @@ func (r *GoodsReceiptRepository) List(ctx context.Context, opts model.ListOption
 	offset := opts.Offset
 	if offset < 0 { offset = 0 }
 
-	listQuery := fmt.Sprintf("SELECT receipt_id, receipt_number, po_id, warehouse_id, received_date, delivery_order_number, inspected_by_user_id, inspection_passed, remarks, created_by, updated_by, deleted_by, created_at, updated_at, deleted_at FROM proc_goods_receipts WHERE %s ORDER BY created_at DESC LIMIT $%d OFFSET $%d", whereSql, argPos, argPos+1)
+	listQuery := fmt.Sprintf(`SELECT t.receipt_id, t.receipt_number, t.po_id, COALESCE(j_po.po_number, ''), t.warehouse_id, COALESCE(j_wh.warehouse_name, ''), t.received_date, t.delivery_order_number, t.inspected_by_user_id, COALESCE(j_usr.full_name, ''), t.inspection_passed, t.remarks, t.created_by, t.updated_by, t.deleted_by, t.created_at, t.updated_at, t.deleted_at
+	FROM proc_goods_receipts t
+	LEFT JOIN proc_purchase_orders j_po ON j_po.po_id = t.po_id
+	LEFT JOIN inv_warehouses j_wh ON j_wh.warehouse_id = t.warehouse_id
+	LEFT JOIN sys_users j_usr ON j_usr.user_id = t.inspected_by_user_id
+	WHERE %s ORDER BY t.created_at DESC LIMIT $%d OFFSET $%d`, whereSql, argPos, argPos+1)
 	args = append(args, limit, offset)
 
 	rows, err := r.DB.Query(ctx, listQuery, args...)
@@ -80,7 +90,7 @@ func (r *GoodsReceiptRepository) List(ctx context.Context, opts model.ListOption
 	var items []model.GoodsReceipt
 	for rows.Next() {
 		var m model.GoodsReceipt
-		if err := rows.Scan(&m.ReceiptId, &m.ReceiptNumber, &m.PoId, &m.WarehouseId, &m.ReceivedDate, &m.DeliveryOrderNumber, &m.InspectedByUserId, &m.InspectionPassed, &m.Remarks, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt); err != nil {
+		if err := rows.Scan(&m.ReceiptId, &m.ReceiptNumber, &m.PoId, &m.PoNumber, &m.WarehouseId, &m.WarehouseName, &m.ReceivedDate, &m.DeliveryOrderNumber, &m.InspectedByUserId, &m.InspectorName, &m.InspectionPassed, &m.Remarks, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt); err != nil {
 			return nil, 0, err
 		}
 		items = append(items, m)

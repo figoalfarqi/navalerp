@@ -19,10 +19,14 @@ func NewPaymentRepository(db *pgxpool.Pool) *PaymentRepository {
 
 // Get retrieves a single payment by payment_id
 func (r *PaymentRepository) Get(ctx context.Context, id string) (*model.Payment, error) {
-	query := `SELECT payment_id, payment_reference_no, spp_number, spm_number, invoice_id, payment_date, amount_paid, payment_method, bank_source_account, authorised_by_user_id, created_by, updated_by, deleted_by, created_at, updated_at, deleted_at FROM fin_payments WHERE payment_id = $1 AND deleted_at IS NULL`
+	query := `SELECT t.payment_id, t.payment_reference_no, t.spp_number, t.spm_number, t.invoice_id, COALESCE(j_inv.invoice_number, ''), t.payment_date, t.amount_paid, t.payment_method, t.bank_source_account, t.authorised_by_user_id, COALESCE(j_usr.full_name, ''), t.created_by, t.updated_by, t.deleted_by, t.created_at, t.updated_at, t.deleted_at
+	FROM fin_payments t
+	LEFT JOIN fin_invoices j_inv ON j_inv.invoice_id = t.invoice_id
+	LEFT JOIN sys_users j_usr ON j_usr.user_id = t.authorised_by_user_id
+	WHERE t.payment_id = $1 AND t.deleted_at IS NULL`
 
 	var m model.Payment
-	err := r.DB.QueryRow(ctx, query, id).Scan(&m.PaymentId, &m.PaymentReferenceNo, &m.SppNumber, &m.SpmNumber, &m.InvoiceId, &m.PaymentDate, &m.AmountPaid, &m.PaymentMethod, &m.BankSourceAccount, &m.AuthorisedByUserId, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt)
+	err := r.DB.QueryRow(ctx, query, id).Scan(&m.PaymentId, &m.PaymentReferenceNo, &m.SppNumber, &m.SpmNumber, &m.InvoiceId, &m.InvoiceNumber, &m.PaymentDate, &m.AmountPaid, &m.PaymentMethod, &m.BankSourceAccount, &m.AuthorisedByUserId, &m.AuthoriserName, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt)
 	if err != nil {
 		return nil, err
 	}
@@ -36,7 +40,7 @@ func (r *PaymentRepository) List(ctx context.Context, opts model.ListOptions) ([
 	var args []any
 	argPos := 1
 
-	whereClauses = append(whereClauses, "deleted_at IS NULL")
+	whereClauses = append(whereClauses, "t.deleted_at IS NULL")
 	if opts.Search != "" {
 		searchPattern := "%" + opts.Search + "%"
 		whereClauses = append(whereClauses, fmt.Sprintf("(payment_reference_no ILIKE $%[1]d OR spp_number ILIKE $%[1]d OR spm_number ILIKE $%[1]d)", argPos))
@@ -45,7 +49,7 @@ func (r *PaymentRepository) List(ctx context.Context, opts model.ListOptions) ([
 	}
 
 	whereSql := strings.Join(whereClauses, " AND ")
-	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM fin_payments WHERE %s", whereSql)
+	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM fin_payments t WHERE %s", whereSql)
 	var total int
 	if err := r.DB.QueryRow(ctx, countQuery, args...).Scan(&total); err != nil {
 		return nil, 0, err
@@ -56,7 +60,11 @@ func (r *PaymentRepository) List(ctx context.Context, opts model.ListOptions) ([
 	offset := opts.Offset
 	if offset < 0 { offset = 0 }
 
-	listQuery := fmt.Sprintf("SELECT payment_id, payment_reference_no, spp_number, spm_number, invoice_id, payment_date, amount_paid, payment_method, bank_source_account, authorised_by_user_id, created_by, updated_by, deleted_by, created_at, updated_at, deleted_at FROM fin_payments WHERE %s ORDER BY created_at DESC LIMIT $%d OFFSET $%d", whereSql, argPos, argPos+1)
+	listQuery := fmt.Sprintf(`SELECT t.payment_id, t.payment_reference_no, t.spp_number, t.spm_number, t.invoice_id, COALESCE(j_inv.invoice_number, ''), t.payment_date, t.amount_paid, t.payment_method, t.bank_source_account, t.authorised_by_user_id, COALESCE(j_usr.full_name, ''), t.created_by, t.updated_by, t.deleted_by, t.created_at, t.updated_at, t.deleted_at
+	FROM fin_payments t
+	LEFT JOIN fin_invoices j_inv ON j_inv.invoice_id = t.invoice_id
+	LEFT JOIN sys_users j_usr ON j_usr.user_id = t.authorised_by_user_id
+	WHERE %s ORDER BY t.created_at DESC LIMIT $%d OFFSET $%d`, whereSql, argPos, argPos+1)
 	args = append(args, limit, offset)
 
 	rows, err := r.DB.Query(ctx, listQuery, args...)
@@ -68,7 +76,7 @@ func (r *PaymentRepository) List(ctx context.Context, opts model.ListOptions) ([
 	var items []model.Payment
 	for rows.Next() {
 		var m model.Payment
-		if err := rows.Scan(&m.PaymentId, &m.PaymentReferenceNo, &m.SppNumber, &m.SpmNumber, &m.InvoiceId, &m.PaymentDate, &m.AmountPaid, &m.PaymentMethod, &m.BankSourceAccount, &m.AuthorisedByUserId, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt); err != nil {
+		if err := rows.Scan(&m.PaymentId, &m.PaymentReferenceNo, &m.SppNumber, &m.SpmNumber, &m.InvoiceId, &m.InvoiceNumber, &m.PaymentDate, &m.AmountPaid, &m.PaymentMethod, &m.BankSourceAccount, &m.AuthorisedByUserId, &m.AuthoriserName, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt); err != nil {
 			return nil, 0, err
 		}
 		items = append(items, m)

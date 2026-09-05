@@ -9,7 +9,6 @@ export const entityEndpoint = "/admin/material";
 export const primaryKey = "material_id";
 
 export const columns: ColumnField[] = [
-  { key: "material_id", label: "Material Id" },
   { key: "material_code", label: "Material Code" },
   { key: "nsn", label: "Nsn" },
   { key: "part_number", label: "Part Number" },

@@ -7,7 +7,9 @@ import (
 type FuelBunker struct {
 	BunkerId string `json:"bunker_id"`
 	ShipId string `json:"ship_id"`
+	ShipName *string `json:"ship_name,omitempty"`
 	FacilityId *string `json:"facility_id,omitempty"`
+	FacilityName *string `json:"facility_name,omitempty"`
 	FuelType string `json:"fuel_type"`
 	QuantityLiters float64 `json:"quantity_liters"`
 	Density15c *float64 `json:"density_15c,omitempty"`

@@ -9,8 +9,11 @@ type Personnel struct {
 	Nrp string `json:"nrp"`
 	FullName string `json:"full_name"`
 	RankId string `json:"rank_id"`
+	RankName *string `json:"rank_name,omitempty"`
 	CorpsId string `json:"corps_id"`
+	CorpsName *string `json:"corps_name,omitempty"`
 	CurrentUnitId string `json:"current_unit_id"`
+	UnitName *string `json:"unit_name,omitempty"`
 	CurrentPosition string `json:"current_position"`
 	BirthPlace *string `json:"birth_place,omitempty"`
 	BirthDate time.Time `json:"birth_date"`

@@ -9,8 +9,7 @@ export const entityEndpoint = "/admin/pm_schedule";
 export const primaryKey = "pm_id";
 
 export const columns: ColumnField[] = [
-  { key: "pm_id", label: "Pm Id" },
-  { key: "equipment_id", label: "Equipment Id" },
+  { key: "equipment_name", label: "Peralatan" },
   { key: "pm_code", label: "Pm Code" },
   { key: "pm_title", label: "Pm Title" },
   { key: "interval_hours", label: "Interval Hours" },
@@ -23,10 +22,15 @@ export const filterFields: FilterField[] = [
 ];
 
 export const formFields = (mode: string): FormField[] => [
-  {
+    {
     name: "equipment_id",
-    label: "Equipment Id",
-    fieldType: "text",
+    label: "Peralatan",
+    fieldType: "select",
+    options: {
+      url: "/admin/equipment?limit=100",
+      labelKey: "equipment_name",
+      valueKey: "equipment_id",
+    },
     required: true,
     disabled: mode === "view",
   },

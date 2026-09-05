@@ -9,6 +9,7 @@ type WorkOrder struct {
 	FailureReportId *string `json:"failure_report_id,omitempty"`
 	PmScheduleId *string `json:"pm_schedule_id,omitempty"`
 	EquipmentId string `json:"equipment_id"`
+	EquipmentName *string `json:"equipment_name,omitempty"`
 	WorkOrderNumber string `json:"work_order_number"`
 	WorkOrderType string `json:"work_order_type"`
 	Priority string `json:"priority"`
@@ -17,6 +18,7 @@ type WorkOrder struct {
 	ActualStartDate *time.Time `json:"actual_start_date,omitempty"`
 	ActualEndDate *time.Time `json:"actual_end_date,omitempty"`
 	LeadEngineerUserId *string `json:"lead_engineer_user_id,omitempty"`
+	EngineerName *string `json:"engineer_name,omitempty"`
 	AssignedFacility *string `json:"assigned_facility,omitempty"`
 	Status *string `json:"status,omitempty"`
 	TotalLaborHours *float64 `json:"total_labor_hours,omitempty"`

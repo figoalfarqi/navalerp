@@ -9,9 +9,8 @@ export const entityEndpoint = "/admin/berth_booking";
 export const primaryKey = "booking_id";
 
 export const columns: ColumnField[] = [
-  { key: "booking_id", label: "Booking Id" },
-  { key: "facility_id", label: "Facility Id" },
-  { key: "ship_id", label: "Ship Id" },
+  { key: "facility_name", label: "Fasilitas Pangkalan" },
+  { key: "ship_name", label: "Kapal KRI" },
   { key: "booking_purpose", label: "Booking Purpose" },
   { key: "eta", label: "Eta" },
   { key: "etd", label: "Etd" },
@@ -23,17 +22,27 @@ export const filterFields: FilterField[] = [
 ];
 
 export const formFields = (mode: string): FormField[] => [
-  {
+    {
     name: "facility_id",
-    label: "Facility Id",
-    fieldType: "text",
+    label: "Fasilitas Pangkalan",
+    fieldType: "select",
+    options: {
+      url: "/admin/base_facility?limit=100",
+      labelKey: "facility_name",
+      valueKey: "facility_id",
+    },
     required: true,
     disabled: mode === "view",
   },
-  {
+    {
     name: "ship_id",
-    label: "Ship Id",
-    fieldType: "text",
+    label: "Kapal KRI",
+    fieldType: "select",
+    options: {
+      url: "/admin/ship?limit=100",
+      labelKey: "ship_name",
+      valueKey: "ship_id",
+    },
     required: true,
     disabled: mode === "view",
   },
@@ -93,10 +102,15 @@ export const formFields = (mode: string): FormField[] => [
     required: false,
     disabled: mode === "view",
   },
-  {
+    {
     name: "approved_by_user_id",
-    label: "Approved By User Id",
-    fieldType: "text",
+    label: "Disetujui Oleh",
+    fieldType: "select",
+    options: {
+      url: "/admin/sys_user?limit=100",
+      labelKey: "full_name",
+      valueKey: "user_id",
+    },
     required: false,
     disabled: mode === "view",
   },

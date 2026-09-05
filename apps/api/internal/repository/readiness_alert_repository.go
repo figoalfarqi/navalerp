@@ -19,10 +19,14 @@ func NewReadinessAlertRepository(db *pgxpool.Pool) *ReadinessAlertRepository {
 
 // Get retrieves a single readiness_alert by alert_id
 func (r *ReadinessAlertRepository) Get(ctx context.Context, id string) (*model.ReadinessAlert, error) {
-	query := `SELECT alert_id, ship_id, equipment_id, severity, alert_type, alert_message, is_acknowledged, acknowledged_by_user_id, acknowledged_at, created_at FROM ops_readiness_alerts WHERE alert_id = $1`
+	query := `SELECT t.alert_id, t.ship_id, COALESCE(j_ship.ship_name, ''), t.equipment_id, COALESCE(j_eqp.equipment_name, ''), t.severity, t.alert_type, t.alert_message, t.is_acknowledged, t.acknowledged_by_user_id, t.acknowledged_at, t.created_at
+	FROM ops_readiness_alerts t
+	LEFT JOIN mro_ships j_ship ON j_ship.ship_id = t.ship_id
+	LEFT JOIN mro_equipments j_eqp ON j_eqp.equipment_id = t.equipment_id
+	WHERE t.alert_id = $1`
 
 	var m model.ReadinessAlert
-	err := r.DB.QueryRow(ctx, query, id).Scan(&m.AlertId, &m.ShipId, &m.EquipmentId, &m.Severity, &m.AlertType, &m.AlertMessage, &m.IsAcknowledged, &m.AcknowledgedByUserId, &m.AcknowledgedAt, &m.CreatedAt)
+	err := r.DB.QueryRow(ctx, query, id).Scan(&m.AlertId, &m.ShipId, &m.ShipName, &m.EquipmentId, &m.EquipmentName, &m.Severity, &m.AlertType, &m.AlertMessage, &m.IsAcknowledged, &m.AcknowledgedByUserId, &m.AcknowledgedAt, &m.CreatedAt)
 	if err != nil {
 		return nil, err
 	}
@@ -44,7 +48,7 @@ func (r *ReadinessAlertRepository) List(ctx context.Context, opts model.ListOpti
 	}
 
 	whereSql := strings.Join(whereClauses, " AND ")
-	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM ops_readiness_alerts WHERE %s", whereSql)
+	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM ops_readiness_alerts t WHERE %s", whereSql)
 	var total int
 	if err := r.DB.QueryRow(ctx, countQuery, args...).Scan(&total); err != nil {
 		return nil, 0, err
@@ -55,7 +59,11 @@ func (r *ReadinessAlertRepository) List(ctx context.Context, opts model.ListOpti
 	offset := opts.Offset
 	if offset < 0 { offset = 0 }
 
-	listQuery := fmt.Sprintf("SELECT alert_id, ship_id, equipment_id, severity, alert_type, alert_message, is_acknowledged, acknowledged_by_user_id, acknowledged_at, created_at FROM ops_readiness_alerts WHERE %s ORDER BY created_at DESC LIMIT $%d OFFSET $%d", whereSql, argPos, argPos+1)
+	listQuery := fmt.Sprintf(`SELECT t.alert_id, t.ship_id, COALESCE(j_ship.ship_name, ''), t.equipment_id, COALESCE(j_eqp.equipment_name, ''), t.severity, t.alert_type, t.alert_message, t.is_acknowledged, t.acknowledged_by_user_id, t.acknowledged_at, t.created_at
+	FROM ops_readiness_alerts t
+	LEFT JOIN mro_ships j_ship ON j_ship.ship_id = t.ship_id
+	LEFT JOIN mro_equipments j_eqp ON j_eqp.equipment_id = t.equipment_id
+	WHERE %s ORDER BY t.created_at DESC LIMIT $%d OFFSET $%d`, whereSql, argPos, argPos+1)
 	args = append(args, limit, offset)
 
 	rows, err := r.DB.Query(ctx, listQuery, args...)
@@ -67,7 +75,7 @@ func (r *ReadinessAlertRepository) List(ctx context.Context, opts model.ListOpti
 	var items []model.ReadinessAlert
 	for rows.Next() {
 		var m model.ReadinessAlert
-		if err := rows.Scan(&m.AlertId, &m.ShipId, &m.EquipmentId, &m.Severity, &m.AlertType, &m.AlertMessage, &m.IsAcknowledged, &m.AcknowledgedByUserId, &m.AcknowledgedAt, &m.CreatedAt); err != nil {
+		if err := rows.Scan(&m.AlertId, &m.ShipId, &m.ShipName, &m.EquipmentId, &m.EquipmentName, &m.Severity, &m.AlertType, &m.AlertMessage, &m.IsAcknowledged, &m.AcknowledgedByUserId, &m.AcknowledgedAt, &m.CreatedAt); err != nil {
 			return nil, 0, err
 		}
 		items = append(items, m)
@@ -116,7 +124,7 @@ func (r *ReadinessAlertRepository) Update(ctx context.Context, id string, m *mod
 
 // Delete removes or soft-deletes readiness_alert
 func (r *ReadinessAlertRepository) Delete(ctx context.Context, id string) error {
-	query := `DELETE FROM ops_readiness_alerts WHERE alert_id = $1`
+	query := `DELETE FROM ops_readiness_alerts t WHERE alert_id = $1`
 	_, err := r.DB.Exec(ctx, query, id)
 	return err
 }

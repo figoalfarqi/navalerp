@@ -19,10 +19,14 @@ func NewFuelBunkerRepository(db *pgxpool.Pool) *FuelBunkerRepository {
 
 // Get retrieves a single fuel_bunker by bunker_id
 func (r *FuelBunkerRepository) Get(ctx context.Context, id string) (*model.FuelBunker, error) {
-	query := `SELECT bunker_id, ship_id, facility_id, fuel_type, quantity_liters, density_15c, flow_rate_lph, bunkering_start_time, bunkering_end_time, receipt_voucher_no, authorised_by_user_id, created_by, updated_by, deleted_by, created_at, updated_at, deleted_at FROM infra_fuel_bunker_records WHERE bunker_id = $1 AND deleted_at IS NULL`
+	query := `SELECT t.bunker_id, t.ship_id, COALESCE(j_ship.ship_name, ''), t.facility_id, COALESCE(j_fac.facility_name, ''), t.fuel_type, t.quantity_liters, t.density_15c, t.flow_rate_lph, t.bunkering_start_time, t.bunkering_end_time, t.receipt_voucher_no, t.authorised_by_user_id, t.created_by, t.updated_by, t.deleted_by, t.created_at, t.updated_at, t.deleted_at
+	FROM infra_fuel_bunker_records t
+	LEFT JOIN mro_ships j_ship ON j_ship.ship_id = t.ship_id
+	LEFT JOIN infra_facilities j_fac ON j_fac.facility_id = t.facility_id
+	WHERE t.bunker_id = $1 AND t.deleted_at IS NULL`
 
 	var m model.FuelBunker
-	err := r.DB.QueryRow(ctx, query, id).Scan(&m.BunkerId, &m.ShipId, &m.FacilityId, &m.FuelType, &m.QuantityLiters, &m.Density15c, &m.FlowRateLph, &m.BunkeringStartTime, &m.BunkeringEndTime, &m.ReceiptVoucherNo, &m.AuthorisedByUserId, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt)
+	err := r.DB.QueryRow(ctx, query, id).Scan(&m.BunkerId, &m.ShipId, &m.ShipName, &m.FacilityId, &m.FacilityName, &m.FuelType, &m.QuantityLiters, &m.Density15c, &m.FlowRateLph, &m.BunkeringStartTime, &m.BunkeringEndTime, &m.ReceiptVoucherNo, &m.AuthorisedByUserId, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt)
 	if err != nil {
 		return nil, err
 	}
@@ -36,7 +40,7 @@ func (r *FuelBunkerRepository) List(ctx context.Context, opts model.ListOptions)
 	var args []any
 	argPos := 1
 
-	whereClauses = append(whereClauses, "deleted_at IS NULL")
+	whereClauses = append(whereClauses, "t.deleted_at IS NULL")
 	if opts.Search != "" {
 		searchPattern := "%" + opts.Search + "%"
 		whereClauses = append(whereClauses, fmt.Sprintf("(receipt_voucher_no ILIKE $%[1]d)", argPos))
@@ -45,7 +49,7 @@ func (r *FuelBunkerRepository) List(ctx context.Context, opts model.ListOptions)
 	}
 
 	whereSql := strings.Join(whereClauses, " AND ")
-	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM infra_fuel_bunker_records WHERE %s", whereSql)
+	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM infra_fuel_bunker_records t WHERE %s", whereSql)
 	var total int
 	if err := r.DB.QueryRow(ctx, countQuery, args...).Scan(&total); err != nil {
 		return nil, 0, err
@@ -56,7 +60,11 @@ func (r *FuelBunkerRepository) List(ctx context.Context, opts model.ListOptions)
 	offset := opts.Offset
 	if offset < 0 { offset = 0 }
 
-	listQuery := fmt.Sprintf("SELECT bunker_id, ship_id, facility_id, fuel_type, quantity_liters, density_15c, flow_rate_lph, bunkering_start_time, bunkering_end_time, receipt_voucher_no, authorised_by_user_id, created_by, updated_by, deleted_by, created_at, updated_at, deleted_at FROM infra_fuel_bunker_records WHERE %s ORDER BY created_at DESC LIMIT $%d OFFSET $%d", whereSql, argPos, argPos+1)
+	listQuery := fmt.Sprintf(`SELECT t.bunker_id, t.ship_id, COALESCE(j_ship.ship_name, ''), t.facility_id, COALESCE(j_fac.facility_name, ''), t.fuel_type, t.quantity_liters, t.density_15c, t.flow_rate_lph, t.bunkering_start_time, t.bunkering_end_time, t.receipt_voucher_no, t.authorised_by_user_id, t.created_by, t.updated_by, t.deleted_by, t.created_at, t.updated_at, t.deleted_at
+	FROM infra_fuel_bunker_records t
+	LEFT JOIN mro_ships j_ship ON j_ship.ship_id = t.ship_id
+	LEFT JOIN infra_facilities j_fac ON j_fac.facility_id = t.facility_id
+	WHERE %s ORDER BY t.created_at DESC LIMIT $%d OFFSET $%d`, whereSql, argPos, argPos+1)
 	args = append(args, limit, offset)
 
 	rows, err := r.DB.Query(ctx, listQuery, args...)
@@ -68,7 +76,7 @@ func (r *FuelBunkerRepository) List(ctx context.Context, opts model.ListOptions)
 	var items []model.FuelBunker
 	for rows.Next() {
 		var m model.FuelBunker
-		if err := rows.Scan(&m.BunkerId, &m.ShipId, &m.FacilityId, &m.FuelType, &m.QuantityLiters, &m.Density15c, &m.FlowRateLph, &m.BunkeringStartTime, &m.BunkeringEndTime, &m.ReceiptVoucherNo, &m.AuthorisedByUserId, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt); err != nil {
+		if err := rows.Scan(&m.BunkerId, &m.ShipId, &m.ShipName, &m.FacilityId, &m.FacilityName, &m.FuelType, &m.QuantityLiters, &m.Density15c, &m.FlowRateLph, &m.BunkeringStartTime, &m.BunkeringEndTime, &m.ReceiptVoucherNo, &m.AuthorisedByUserId, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt); err != nil {
 			return nil, 0, err
 		}
 		items = append(items, m)

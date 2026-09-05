@@ -9,12 +9,11 @@ export const entityEndpoint = "/admin/shipment";
 export const primaryKey = "shipment_id";
 
 export const columns: ColumnField[] = [
-  { key: "shipment_id", label: "Shipment Id" },
   { key: "manifest_number", label: "Manifest Number" },
-  { key: "route_id", label: "Route Id" },
-  { key: "transport_unit_id", label: "Transport Unit Id" },
-  { key: "origin_warehouse_id", label: "Origin Warehouse Id" },
-  { key: "destination_warehouse_id", label: "Destination Warehouse Id" },
+  { key: "route_name", label: "Rute Logistik" },
+  { key: "transport_unit_name", label: "Unit Angkut" },
+  { key: "origin_warehouse_name", label: "Gudang Asal" },
+  { key: "destination_warehouse_name", label: "Gudang Tujuan" },
   { key: "departure_date", label: "Departure Date" },
 ];
 
@@ -30,31 +29,51 @@ export const formFields = (mode: string): FormField[] => [
     required: true,
     disabled: mode === "view",
   },
-  {
+    {
     name: "route_id",
-    label: "Route Id",
-    fieldType: "text",
+    label: "Rute Logistik",
+    fieldType: "select",
+    options: {
+      url: "/admin/route?limit=100",
+      labelKey: "route_name",
+      valueKey: "route_id",
+    },
     required: true,
     disabled: mode === "view",
   },
-  {
+    {
     name: "transport_unit_id",
-    label: "Transport Unit Id",
-    fieldType: "text",
+    label: "Unit Angkut",
+    fieldType: "select",
+    options: {
+      url: "/admin/transport_unit?limit=100",
+      labelKey: "unit_code",
+      valueKey: "transport_unit_id",
+    },
     required: true,
     disabled: mode === "view",
   },
-  {
+    {
     name: "origin_warehouse_id",
-    label: "Origin Warehouse Id",
-    fieldType: "text",
+    label: "Gudang Asal",
+    fieldType: "select",
+    options: {
+      url: "/admin/warehouse?limit=100",
+      labelKey: "warehouse_name",
+      valueKey: "warehouse_id",
+    },
     required: true,
     disabled: mode === "view",
   },
-  {
+    {
     name: "destination_warehouse_id",
-    label: "Destination Warehouse Id",
-    fieldType: "text",
+    label: "Gudang Tujuan",
+    fieldType: "select",
+    options: {
+      url: "/admin/warehouse?limit=100",
+      labelKey: "warehouse_name",
+      valueKey: "warehouse_id",
+    },
     required: true,
     disabled: mode === "view",
   },
@@ -86,10 +105,15 @@ export const formFields = (mode: string): FormField[] => [
     required: false,
     disabled: mode === "view",
   },
-  {
+    {
     name: "authorized_by_user_id",
-    label: "Authorized By User Id",
-    fieldType: "text",
+    label: "Diotorisasi Oleh",
+    fieldType: "select",
+    options: {
+      url: "/admin/sys_user?limit=100",
+      labelKey: "full_name",
+      valueKey: "user_id",
+    },
     required: false,
     disabled: mode === "view",
   },

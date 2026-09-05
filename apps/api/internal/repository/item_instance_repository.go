@@ -19,10 +19,14 @@ func NewItemInstanceRepository(db *pgxpool.Pool) *ItemInstanceRepository {
 
 // Get retrieves a single item_instance by instance_id
 func (r *ItemInstanceRepository) Get(ctx context.Context, id string) (*model.ItemInstance, error) {
-	query := `SELECT instance_id, warehouse_id, location_id, material_id, batch_number, serial_number, lot_number, expiry_date, manufactured_date, condition, inspection_due_date, quantity, created_by, updated_by, deleted_by, created_at, updated_at, deleted_at FROM inv_item_instances WHERE instance_id = $1 AND deleted_at IS NULL`
+	query := `SELECT t.instance_id, t.warehouse_id, COALESCE(j_wh.warehouse_name, ''), t.location_id, t.material_id, COALESCE(j_mat.material_name, ''), t.batch_number, t.serial_number, t.lot_number, t.expiry_date, t.manufactured_date, t.condition, t.inspection_due_date, t.quantity, t.created_by, t.updated_by, t.deleted_by, t.created_at, t.updated_at, t.deleted_at
+	FROM inv_item_instances t
+	LEFT JOIN inv_warehouses j_wh ON j_wh.warehouse_id = t.warehouse_id
+	LEFT JOIN inv_materials j_mat ON j_mat.material_id = t.material_id
+	WHERE t.instance_id = $1 AND t.deleted_at IS NULL`
 
 	var m model.ItemInstance
-	err := r.DB.QueryRow(ctx, query, id).Scan(&m.InstanceId, &m.WarehouseId, &m.LocationId, &m.MaterialId, &m.BatchNumber, &m.SerialNumber, &m.LotNumber, &m.ExpiryDate, &m.ManufacturedDate, &m.Condition, &m.InspectionDueDate, &m.Quantity, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt)
+	err := r.DB.QueryRow(ctx, query, id).Scan(&m.InstanceId, &m.WarehouseId, &m.WarehouseName, &m.LocationId, &m.MaterialId, &m.MaterialName, &m.BatchNumber, &m.SerialNumber, &m.LotNumber, &m.ExpiryDate, &m.ManufacturedDate, &m.Condition, &m.InspectionDueDate, &m.Quantity, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt)
 	if err != nil {
 		return nil, err
 	}
@@ -36,7 +40,7 @@ func (r *ItemInstanceRepository) List(ctx context.Context, opts model.ListOption
 	var args []any
 	argPos := 1
 
-	whereClauses = append(whereClauses, "deleted_at IS NULL")
+	whereClauses = append(whereClauses, "t.deleted_at IS NULL")
 	if opts.Search != "" {
 		searchPattern := "%" + opts.Search + "%"
 		whereClauses = append(whereClauses, fmt.Sprintf("(batch_number ILIKE $%[1]d OR serial_number ILIKE $%[1]d OR lot_number ILIKE $%[1]d)", argPos))
@@ -45,7 +49,7 @@ func (r *ItemInstanceRepository) List(ctx context.Context, opts model.ListOption
 	}
 
 	whereSql := strings.Join(whereClauses, " AND ")
-	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM inv_item_instances WHERE %s", whereSql)
+	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM inv_item_instances t WHERE %s", whereSql)
 	var total int
 	if err := r.DB.QueryRow(ctx, countQuery, args...).Scan(&total); err != nil {
 		return nil, 0, err
@@ -56,7 +60,11 @@ func (r *ItemInstanceRepository) List(ctx context.Context, opts model.ListOption
 	offset := opts.Offset
 	if offset < 0 { offset = 0 }
 
-	listQuery := fmt.Sprintf("SELECT instance_id, warehouse_id, location_id, material_id, batch_number, serial_number, lot_number, expiry_date, manufactured_date, condition, inspection_due_date, quantity, created_by, updated_by, deleted_by, created_at, updated_at, deleted_at FROM inv_item_instances WHERE %s ORDER BY created_at DESC LIMIT $%d OFFSET $%d", whereSql, argPos, argPos+1)
+	listQuery := fmt.Sprintf(`SELECT t.instance_id, t.warehouse_id, COALESCE(j_wh.warehouse_name, ''), t.location_id, t.material_id, COALESCE(j_mat.material_name, ''), t.batch_number, t.serial_number, t.lot_number, t.expiry_date, t.manufactured_date, t.condition, t.inspection_due_date, t.quantity, t.created_by, t.updated_by, t.deleted_by, t.created_at, t.updated_at, t.deleted_at
+	FROM inv_item_instances t
+	LEFT JOIN inv_warehouses j_wh ON j_wh.warehouse_id = t.warehouse_id
+	LEFT JOIN inv_materials j_mat ON j_mat.material_id = t.material_id
+	WHERE %s ORDER BY t.created_at DESC LIMIT $%d OFFSET $%d`, whereSql, argPos, argPos+1)
 	args = append(args, limit, offset)
 
 	rows, err := r.DB.Query(ctx, listQuery, args...)
@@ -68,7 +76,7 @@ func (r *ItemInstanceRepository) List(ctx context.Context, opts model.ListOption
 	var items []model.ItemInstance
 	for rows.Next() {
 		var m model.ItemInstance
-		if err := rows.Scan(&m.InstanceId, &m.WarehouseId, &m.LocationId, &m.MaterialId, &m.BatchNumber, &m.SerialNumber, &m.LotNumber, &m.ExpiryDate, &m.ManufacturedDate, &m.Condition, &m.InspectionDueDate, &m.Quantity, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt); err != nil {
+		if err := rows.Scan(&m.InstanceId, &m.WarehouseId, &m.WarehouseName, &m.LocationId, &m.MaterialId, &m.MaterialName, &m.BatchNumber, &m.SerialNumber, &m.LotNumber, &m.ExpiryDate, &m.ManufacturedDate, &m.Condition, &m.InspectionDueDate, &m.Quantity, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt); err != nil {
 			return nil, 0, err
 		}
 		items = append(items, m)

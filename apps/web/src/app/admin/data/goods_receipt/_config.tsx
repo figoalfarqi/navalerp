@@ -9,13 +9,12 @@ export const entityEndpoint = "/admin/goods_receipt";
 export const primaryKey = "receipt_id";
 
 export const columns: ColumnField[] = [
-  { key: "receipt_id", label: "Receipt Id" },
   { key: "receipt_number", label: "Receipt Number" },
-  { key: "po_id", label: "Po Id" },
-  { key: "warehouse_id", label: "Warehouse Id" },
+  { key: "po_number", label: "No. PO" },
+  { key: "warehouse_name", label: "Nama Gudang" },
   { key: "received_date", label: "Received Date" },
   { key: "delivery_order_number", label: "Delivery Order Number" },
-  { key: "inspected_by_user_id", label: "Inspected By User Id" },
+  { key: "inspector_name", label: "Inspektur" },
 ];
 
 export const filterFields: FilterField[] = [
@@ -30,17 +29,27 @@ export const formFields = (mode: string): FormField[] => [
     required: true,
     disabled: mode === "view",
   },
-  {
+    {
     name: "po_id",
-    label: "Po Id",
-    fieldType: "text",
+    label: "No. PO",
+    fieldType: "select",
+    options: {
+      url: "/admin/purchase_order?limit=100",
+      labelKey: "po_number",
+      valueKey: "po_id",
+    },
     required: true,
     disabled: mode === "view",
   },
-  {
+    {
     name: "warehouse_id",
-    label: "Warehouse Id",
-    fieldType: "text",
+    label: "Nama Gudang",
+    fieldType: "select",
+    options: {
+      url: "/admin/warehouse?limit=100",
+      labelKey: "warehouse_name",
+      valueKey: "warehouse_id",
+    },
     required: true,
     disabled: mode === "view",
   },
@@ -58,10 +67,15 @@ export const formFields = (mode: string): FormField[] => [
     required: false,
     disabled: mode === "view",
   },
-  {
+    {
     name: "inspected_by_user_id",
-    label: "Inspected By User Id",
-    fieldType: "text",
+    label: "Inspektur",
+    fieldType: "select",
+    options: {
+      url: "/admin/sys_user?limit=100",
+      labelKey: "full_name",
+      valueKey: "user_id",
+    },
     required: true,
     disabled: mode === "view",
   },

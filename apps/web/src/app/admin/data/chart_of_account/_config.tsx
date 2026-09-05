@@ -9,11 +9,10 @@ export const entityEndpoint = "/admin/chart_of_account";
 export const primaryKey = "account_id";
 
 export const columns: ColumnField[] = [
-  { key: "account_id", label: "Account Id" },
   { key: "account_code", label: "Account Code" },
   { key: "account_name", label: "Account Name" },
   { key: "account_type", label: "Account Type" },
-  { key: "parent_account_id", label: "Parent Account Id" },
+  { key: "parent_account_name", label: "Akun Induk" },
   { key: "is_active", label: "Is Active" },
   { key: "created_by", label: "Created By" },
 ];
@@ -44,10 +43,15 @@ export const formFields = (mode: string): FormField[] => [
     required: true,
     disabled: mode === "view",
   },
-  {
+    {
     name: "parent_account_id",
-    label: "Parent Account Id",
-    fieldType: "text",
+    label: "Akun Induk",
+    fieldType: "select",
+    options: {
+      url: "/admin/chart_of_account?limit=100",
+      labelKey: "account_name",
+      valueKey: "account_id",
+    },
     required: false,
     disabled: mode === "view",
   },

@@ -9,12 +9,11 @@ export const entityEndpoint = "/admin/budget_commitment";
 export const primaryKey = "commitment_id";
 
 export const columns: ColumnField[] = [
-  { key: "commitment_id", label: "Commitment Id" },
   { key: "commitment_number", label: "Commitment Number" },
   { key: "allocation_id", label: "Allocation Id" },
-  { key: "contract_id", label: "Contract Id" },
-  { key: "po_id", label: "Po Id" },
-  { key: "work_order_id", label: "Work Order Id" },
+  { key: "contract_number", label: "No. Kontrak" },
+  { key: "po_number", label: "No. PO" },
+  { key: "work_order_number", label: "Perintah Kerja (WO)" },
   { key: "committed_amount", label: "Committed Amount" },
 ];
 
@@ -37,24 +36,39 @@ export const formFields = (mode: string): FormField[] => [
     required: true,
     disabled: mode === "view",
   },
-  {
+    {
     name: "contract_id",
-    label: "Contract Id",
-    fieldType: "text",
+    label: "No. Kontrak",
+    fieldType: "select",
+    options: {
+      url: "/admin/contract?limit=100",
+      labelKey: "contract_number",
+      valueKey: "contract_id",
+    },
     required: false,
     disabled: mode === "view",
   },
-  {
+    {
     name: "po_id",
-    label: "Po Id",
-    fieldType: "text",
+    label: "No. PO",
+    fieldType: "select",
+    options: {
+      url: "/admin/purchase_order?limit=100",
+      labelKey: "po_number",
+      valueKey: "po_id",
+    },
     required: false,
     disabled: mode === "view",
   },
-  {
+    {
     name: "work_order_id",
-    label: "Work Order Id",
-    fieldType: "text",
+    label: "Perintah Kerja (WO)",
+    fieldType: "select",
+    options: {
+      url: "/admin/work_order?limit=100",
+      labelKey: "work_order_number",
+      valueKey: "work_order_id",
+    },
     required: false,
     disabled: mode === "view",
   },

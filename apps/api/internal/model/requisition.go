@@ -8,12 +8,14 @@ type Requisition struct {
 	RequisitionId string `json:"requisition_id"`
 	RequisitionNumber string `json:"requisition_number"`
 	OriginUnitId string `json:"origin_unit_id"`
+	UnitName *string `json:"unit_name,omitempty"`
 	WorkOrderId *string `json:"work_order_id,omitempty"`
 	Priority string `json:"priority"`
 	RequestedDate time.Time `json:"requested_date"`
 	RequiredByDate *time.Time `json:"required_by_date,omitempty"`
 	ApprovalStatus *string `json:"approval_status,omitempty"`
 	ApprovedByUserId *string `json:"approved_by_user_id,omitempty"`
+	ApproverName *string `json:"approver_name,omitempty"`
 	ApprovedAt *time.Time `json:"approved_at,omitempty"`
 	TotalEstimatedCost *float64 `json:"total_estimated_cost,omitempty"`
 	Justification *string `json:"justification,omitempty"`

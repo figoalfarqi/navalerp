@@ -124,7 +124,7 @@ export default function Table({
   filterFields,
   default_filter_values,
   filters: rawFilters,
-  columns,
+  columns: rawColumns,
   opendata,
   tableFor = "normal",
   detailAction,
@@ -147,6 +147,48 @@ export default function Table({
     .replace(/\/+$/, "");
   const isForDetail = tableFor === "detail";
   const isForSelect = tableFor === "select";
+
+  const isUUID = (val: any): boolean =>
+    typeof val === "string" &&
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(val);
+
+  // Filter out primary key UUID columns from table display
+  const columns = useMemo(() => {
+    return (rawColumns || []).filter(
+      (col) => col.key !== key_table && col.key !== `${table_name}_id`,
+    );
+  }, [rawColumns, key_table, table_name]);
+
+  const renderSafeCellValue = (item: any, colKey: string) => {
+    const val = item[colKey];
+    if (val === null || val === undefined) return "-";
+    if (typeof val === "boolean") return val ? "Aktif" : "Non-Aktif";
+    if (isUUID(val)) {
+      // Find candidate name in the same record
+      const baseKey = colKey.replace(/_id$/, "");
+      const candidates = [
+        `${baseKey}_name`,
+        `${baseKey}_code`,
+        `${baseKey}_number`,
+        `${baseKey}_title`,
+        baseKey.replace(/_user$/, "_name"),
+        baseKey.replace(/_user$/, ""),
+        "full_name",
+        "name",
+        "code",
+        "title",
+      ];
+      for (const k of candidates) {
+        const candVal = item[k];
+        if (candVal && !isUUID(candVal)) {
+          return String(candVal);
+        }
+      }
+      return "-";
+    }
+    return val;
+  };
+
   // Hitung di luar — jadi bisa digunakan di mana saja
   const hasIsActiveFilter = useMemo(
     () => filters.some((f) => f.name === "is_active"),
@@ -1454,7 +1496,7 @@ export default function Table({
                                         : "line-clamp-1"
                                     }`}
                                   >
-                                    {item[col.key]}
+                                    {renderSafeCellValue(item, col.key)}
                                   </div>
                                 )}
                               </td>

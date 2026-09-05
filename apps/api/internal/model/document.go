@@ -9,7 +9,9 @@ type Document struct {
 	DocumentNumber string `json:"document_number"`
 	Title string `json:"title"`
 	CategoryId string `json:"category_id"`
+	CategoryName *string `json:"category_name,omitempty"`
 	OriginatingUnitId *string `json:"originating_unit_id,omitempty"`
+	UnitName *string `json:"unit_name,omitempty"`
 	ClassificationLevel *string `json:"classification_level,omitempty"`
 	EffectiveDate time.Time `json:"effective_date"`
 	ExpiryDate *time.Time `json:"expiry_date,omitempty"`

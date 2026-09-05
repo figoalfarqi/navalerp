@@ -10,7 +10,9 @@ type Shipment struct {
 	RouteId string `json:"route_id"`
 	TransportUnitId string `json:"transport_unit_id"`
 	OriginWarehouseId string `json:"origin_warehouse_id"`
+	OriginWarehouseName *string `json:"origin_warehouse_name,omitempty"`
 	DestinationWarehouseId string `json:"destination_warehouse_id"`
+	DestinationWarehouseName *string `json:"destination_warehouse_name,omitempty"`
 	DepartureDate time.Time `json:"departure_date"`
 	ArrivalDate *time.Time `json:"arrival_date,omitempty"`
 	EscortSecurityLevel *string `json:"escort_security_level,omitempty"`

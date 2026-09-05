@@ -9,11 +9,10 @@ export const entityEndpoint = "/admin/document";
 export const primaryKey = "document_id";
 
 export const columns: ColumnField[] = [
-  { key: "document_id", label: "Document Id" },
   { key: "document_number", label: "Document Number" },
   { key: "title", label: "Title" },
-  { key: "category_id", label: "Category Id" },
-  { key: "originating_unit_id", label: "Originating Unit Id" },
+  { key: "category_name", label: "Kategori Dokumen" },
+  { key: "unit_name", label: "Satuan Asal" },
   { key: "classification_level", label: "Classification Level" },
   { key: "effective_date", label: "Effective Date" },
 ];
@@ -37,17 +36,27 @@ export const formFields = (mode: string): FormField[] => [
     required: true,
     disabled: mode === "view",
   },
-  {
+    {
     name: "category_id",
-    label: "Category Id",
-    fieldType: "text",
+    label: "Kategori Dokumen",
+    fieldType: "select",
+    options: {
+      url: "/admin/document_category?limit=100",
+      labelKey: "category_name",
+      valueKey: "category_id",
+    },
     required: true,
     disabled: mode === "view",
   },
-  {
+    {
     name: "originating_unit_id",
-    label: "Originating Unit Id",
-    fieldType: "text",
+    label: "Satuan Asal",
+    fieldType: "select",
+    options: {
+      url: "/admin/org_unit?limit=100",
+      labelKey: "unit_name",
+      valueKey: "unit_id",
+    },
     required: false,
     disabled: mode === "view",
   },
@@ -79,10 +88,15 @@ export const formFields = (mode: string): FormField[] => [
     required: false,
     disabled: mode === "view",
   },
-  {
+    {
     name: "approved_by_user_id",
-    label: "Approved By User Id",
-    fieldType: "text",
+    label: "Disetujui Oleh",
+    fieldType: "select",
+    options: {
+      url: "/admin/sys_user?limit=100",
+      labelKey: "full_name",
+      valueKey: "user_id",
+    },
     required: false,
     disabled: mode === "view",
   },

@@ -19,10 +19,14 @@ func NewWorkOrderRepository(db *pgxpool.Pool) *WorkOrderRepository {
 
 // Get retrieves a single work_order by work_order_id
 func (r *WorkOrderRepository) Get(ctx context.Context, id string) (*model.WorkOrder, error) {
-	query := `SELECT work_order_id, failure_report_id, pm_schedule_id, equipment_id, work_order_number, work_order_type, priority, scheduled_start_date, scheduled_end_date, actual_start_date, actual_end_date, lead_engineer_user_id, assigned_facility, status, total_labor_hours, estimated_cost, actual_cost, completion_notes, created_by, updated_by, deleted_by, created_at, updated_at, deleted_at FROM mro_work_orders WHERE work_order_id = $1 AND deleted_at IS NULL`
+	query := `SELECT t.work_order_id, t.failure_report_id, t.pm_schedule_id, t.equipment_id, COALESCE(j_eqp.equipment_name, ''), t.work_order_number, t.work_order_type, t.priority, t.scheduled_start_date, t.scheduled_end_date, t.actual_start_date, t.actual_end_date, t.lead_engineer_user_id, COALESCE(j_usr.full_name, ''), t.assigned_facility, t.status, t.total_labor_hours, t.estimated_cost, t.actual_cost, t.completion_notes, t.created_by, t.updated_by, t.deleted_by, t.created_at, t.updated_at, t.deleted_at
+	FROM mro_work_orders t
+	LEFT JOIN mro_equipments j_eqp ON j_eqp.equipment_id = t.equipment_id
+	LEFT JOIN sys_users j_usr ON j_usr.user_id = t.lead_engineer_user_id
+	WHERE t.work_order_id = $1 AND t.deleted_at IS NULL`
 
 	var m model.WorkOrder
-	err := r.DB.QueryRow(ctx, query, id).Scan(&m.WorkOrderId, &m.FailureReportId, &m.PmScheduleId, &m.EquipmentId, &m.WorkOrderNumber, &m.WorkOrderType, &m.Priority, &m.ScheduledStartDate, &m.ScheduledEndDate, &m.ActualStartDate, &m.ActualEndDate, &m.LeadEngineerUserId, &m.AssignedFacility, &m.Status, &m.TotalLaborHours, &m.EstimatedCost, &m.ActualCost, &m.CompletionNotes, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt)
+	err := r.DB.QueryRow(ctx, query, id).Scan(&m.WorkOrderId, &m.FailureReportId, &m.PmScheduleId, &m.EquipmentId, &m.EquipmentName, &m.WorkOrderNumber, &m.WorkOrderType, &m.Priority, &m.ScheduledStartDate, &m.ScheduledEndDate, &m.ActualStartDate, &m.ActualEndDate, &m.LeadEngineerUserId, &m.EngineerName, &m.AssignedFacility, &m.Status, &m.TotalLaborHours, &m.EstimatedCost, &m.ActualCost, &m.CompletionNotes, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt)
 	if err != nil {
 		return nil, err
 	}
@@ -60,7 +64,7 @@ func (r *WorkOrderRepository) List(ctx context.Context, opts model.ListOptions) 
 	var args []any
 	argPos := 1
 
-	whereClauses = append(whereClauses, "deleted_at IS NULL")
+	whereClauses = append(whereClauses, "t.deleted_at IS NULL")
 	if opts.Search != "" {
 		searchPattern := "%" + opts.Search + "%"
 		whereClauses = append(whereClauses, fmt.Sprintf("(work_order_number ILIKE $%[1]d OR assigned_facility ILIKE $%[1]d OR completion_notes ILIKE $%[1]d)", argPos))
@@ -69,7 +73,7 @@ func (r *WorkOrderRepository) List(ctx context.Context, opts model.ListOptions) 
 	}
 
 	whereSql := strings.Join(whereClauses, " AND ")
-	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM mro_work_orders WHERE %s", whereSql)
+	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM mro_work_orders t WHERE %s", whereSql)
 	var total int
 	if err := r.DB.QueryRow(ctx, countQuery, args...).Scan(&total); err != nil {
 		return nil, 0, err
@@ -80,7 +84,11 @@ func (r *WorkOrderRepository) List(ctx context.Context, opts model.ListOptions) 
 	offset := opts.Offset
 	if offset < 0 { offset = 0 }
 
-	listQuery := fmt.Sprintf("SELECT work_order_id, failure_report_id, pm_schedule_id, equipment_id, work_order_number, work_order_type, priority, scheduled_start_date, scheduled_end_date, actual_start_date, actual_end_date, lead_engineer_user_id, assigned_facility, status, total_labor_hours, estimated_cost, actual_cost, completion_notes, created_by, updated_by, deleted_by, created_at, updated_at, deleted_at FROM mro_work_orders WHERE %s ORDER BY created_at DESC LIMIT $%d OFFSET $%d", whereSql, argPos, argPos+1)
+	listQuery := fmt.Sprintf(`SELECT t.work_order_id, t.failure_report_id, t.pm_schedule_id, t.equipment_id, COALESCE(j_eqp.equipment_name, ''), t.work_order_number, t.work_order_type, t.priority, t.scheduled_start_date, t.scheduled_end_date, t.actual_start_date, t.actual_end_date, t.lead_engineer_user_id, COALESCE(j_usr.full_name, ''), t.assigned_facility, t.status, t.total_labor_hours, t.estimated_cost, t.actual_cost, t.completion_notes, t.created_by, t.updated_by, t.deleted_by, t.created_at, t.updated_at, t.deleted_at
+	FROM mro_work_orders t
+	LEFT JOIN mro_equipments j_eqp ON j_eqp.equipment_id = t.equipment_id
+	LEFT JOIN sys_users j_usr ON j_usr.user_id = t.lead_engineer_user_id
+	WHERE %s ORDER BY t.created_at DESC LIMIT $%d OFFSET $%d`, whereSql, argPos, argPos+1)
 	args = append(args, limit, offset)
 
 	rows, err := r.DB.Query(ctx, listQuery, args...)
@@ -92,7 +100,7 @@ func (r *WorkOrderRepository) List(ctx context.Context, opts model.ListOptions) 
 	var items []model.WorkOrder
 	for rows.Next() {
 		var m model.WorkOrder
-		if err := rows.Scan(&m.WorkOrderId, &m.FailureReportId, &m.PmScheduleId, &m.EquipmentId, &m.WorkOrderNumber, &m.WorkOrderType, &m.Priority, &m.ScheduledStartDate, &m.ScheduledEndDate, &m.ActualStartDate, &m.ActualEndDate, &m.LeadEngineerUserId, &m.AssignedFacility, &m.Status, &m.TotalLaborHours, &m.EstimatedCost, &m.ActualCost, &m.CompletionNotes, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt); err != nil {
+		if err := rows.Scan(&m.WorkOrderId, &m.FailureReportId, &m.PmScheduleId, &m.EquipmentId, &m.EquipmentName, &m.WorkOrderNumber, &m.WorkOrderType, &m.Priority, &m.ScheduledStartDate, &m.ScheduledEndDate, &m.ActualStartDate, &m.ActualEndDate, &m.LeadEngineerUserId, &m.EngineerName, &m.AssignedFacility, &m.Status, &m.TotalLaborHours, &m.EstimatedCost, &m.ActualCost, &m.CompletionNotes, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt); err != nil {
 			return nil, 0, err
 		}
 		items = append(items, m)

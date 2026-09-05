@@ -9,8 +9,7 @@ export const entityEndpoint = "/admin/mission";
 export const primaryKey = "mission_id";
 
 export const columns: ColumnField[] = [
-  { key: "mission_id", label: "Mission Id" },
-  { key: "theater_id", label: "Theater Id" },
+  { key: "theater_name", label: "Teater Operasi" },
   { key: "mission_code", label: "Mission Code" },
   { key: "mission_name", label: "Mission Name" },
   { key: "mission_type", label: "Mission Type" },
@@ -23,10 +22,15 @@ export const filterFields: FilterField[] = [
 ];
 
 export const formFields = (mode: string): FormField[] => [
-  {
+    {
     name: "theater_id",
-    label: "Theater Id",
-    fieldType: "text",
+    label: "Teater Operasi",
+    fieldType: "select",
+    options: {
+      url: "/admin/theater?limit=100",
+      labelKey: "theater_name",
+      valueKey: "theater_id",
+    },
     required: true,
     disabled: mode === "view",
   },
@@ -65,10 +69,15 @@ export const formFields = (mode: string): FormField[] => [
     required: false,
     disabled: mode === "view",
   },
-  {
+    {
     name: "commanding_officer_user_id",
-    label: "Commanding Officer User Id",
-    fieldType: "text",
+    label: "Komandan Operasi",
+    fieldType: "select",
+    options: {
+      url: "/admin/sys_user?limit=100",
+      labelKey: "full_name",
+      valueKey: "user_id",
+    },
     required: false,
     disabled: mode === "view",
   },

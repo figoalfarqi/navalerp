@@ -9,10 +9,9 @@ export const entityEndpoint = "/admin/theater";
 export const primaryKey = "theater_id";
 
 export const columns: ColumnField[] = [
-  { key: "theater_id", label: "Theater Id" },
   { key: "theater_code", label: "Theater Code" },
   { key: "theater_name", label: "Theater Name" },
-  { key: "responsible_command_unit_id", label: "Responsible Command Unit Id" },
+  { key: "command_unit_name", label: "Komando Pengendali" },
   { key: "threat_level", label: "Threat Level" },
   { key: "description", label: "Description" },
   { key: "created_at", label: "Created At" },
@@ -37,10 +36,15 @@ export const formFields = (mode: string): FormField[] => [
     required: true,
     disabled: mode === "view",
   },
-  {
+    {
     name: "responsible_command_unit_id",
-    label: "Responsible Command Unit Id",
-    fieldType: "text",
+    label: "Komando Pengendali",
+    fieldType: "select",
+    options: {
+      url: "/admin/org_unit?limit=100",
+      labelKey: "unit_name",
+      valueKey: "unit_id",
+    },
     required: true,
     disabled: mode === "view",
   },

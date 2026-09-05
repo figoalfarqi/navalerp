@@ -19,10 +19,14 @@ func NewDailyLogRepository(db *pgxpool.Pool) *DailyLogRepository {
 
 // Get retrieves a single daily_log by log_id
 func (r *DailyLogRepository) Get(ctx context.Context, id string) (*model.DailyLog, error) {
-	query := `SELECT log_id, ship_id, log_date, latitude, longitude, heading_degrees, speed_knots, sea_state, weather_condition, fuel_remaining_liters, fresh_water_remaining_tons, tactical_summary, logged_by_user_id, created_at FROM ops_daily_logs WHERE log_id = $1`
+	query := `SELECT t.log_id, t.ship_id, COALESCE(j_ship.ship_name, ''), t.log_date, t.latitude, t.longitude, t.heading_degrees, t.speed_knots, t.sea_state, t.weather_condition, t.fuel_remaining_liters, t.fresh_water_remaining_tons, t.tactical_summary, t.logged_by_user_id, COALESCE(j_usr.full_name, ''), t.created_at
+	FROM ops_daily_logs t
+	LEFT JOIN mro_ships j_ship ON j_ship.ship_id = t.ship_id
+	LEFT JOIN sys_users j_usr ON j_usr.user_id = t.logged_by_user_id
+	WHERE t.log_id = $1`
 
 	var m model.DailyLog
-	err := r.DB.QueryRow(ctx, query, id).Scan(&m.LogId, &m.ShipId, &m.LogDate, &m.Latitude, &m.Longitude, &m.HeadingDegrees, &m.SpeedKnots, &m.SeaState, &m.WeatherCondition, &m.FuelRemainingLiters, &m.FreshWaterRemainingTons, &m.TacticalSummary, &m.LoggedByUserId, &m.CreatedAt)
+	err := r.DB.QueryRow(ctx, query, id).Scan(&m.LogId, &m.ShipId, &m.ShipName, &m.LogDate, &m.Latitude, &m.Longitude, &m.HeadingDegrees, &m.SpeedKnots, &m.SeaState, &m.WeatherCondition, &m.FuelRemainingLiters, &m.FreshWaterRemainingTons, &m.TacticalSummary, &m.LoggedByUserId, &m.LoggerName, &m.CreatedAt)
 	if err != nil {
 		return nil, err
 	}
@@ -44,7 +48,7 @@ func (r *DailyLogRepository) List(ctx context.Context, opts model.ListOptions) (
 	}
 
 	whereSql := strings.Join(whereClauses, " AND ")
-	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM ops_daily_logs WHERE %s", whereSql)
+	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM ops_daily_logs t WHERE %s", whereSql)
 	var total int
 	if err := r.DB.QueryRow(ctx, countQuery, args...).Scan(&total); err != nil {
 		return nil, 0, err
@@ -55,7 +59,11 @@ func (r *DailyLogRepository) List(ctx context.Context, opts model.ListOptions) (
 	offset := opts.Offset
 	if offset < 0 { offset = 0 }
 
-	listQuery := fmt.Sprintf("SELECT log_id, ship_id, log_date, latitude, longitude, heading_degrees, speed_knots, sea_state, weather_condition, fuel_remaining_liters, fresh_water_remaining_tons, tactical_summary, logged_by_user_id, created_at FROM ops_daily_logs WHERE %s ORDER BY created_at DESC LIMIT $%d OFFSET $%d", whereSql, argPos, argPos+1)
+	listQuery := fmt.Sprintf(`SELECT t.log_id, t.ship_id, COALESCE(j_ship.ship_name, ''), t.log_date, t.latitude, t.longitude, t.heading_degrees, t.speed_knots, t.sea_state, t.weather_condition, t.fuel_remaining_liters, t.fresh_water_remaining_tons, t.tactical_summary, t.logged_by_user_id, COALESCE(j_usr.full_name, ''), t.created_at
+	FROM ops_daily_logs t
+	LEFT JOIN mro_ships j_ship ON j_ship.ship_id = t.ship_id
+	LEFT JOIN sys_users j_usr ON j_usr.user_id = t.logged_by_user_id
+	WHERE %s ORDER BY t.created_at DESC LIMIT $%d OFFSET $%d`, whereSql, argPos, argPos+1)
 	args = append(args, limit, offset)
 
 	rows, err := r.DB.Query(ctx, listQuery, args...)
@@ -67,7 +75,7 @@ func (r *DailyLogRepository) List(ctx context.Context, opts model.ListOptions) (
 	var items []model.DailyLog
 	for rows.Next() {
 		var m model.DailyLog
-		if err := rows.Scan(&m.LogId, &m.ShipId, &m.LogDate, &m.Latitude, &m.Longitude, &m.HeadingDegrees, &m.SpeedKnots, &m.SeaState, &m.WeatherCondition, &m.FuelRemainingLiters, &m.FreshWaterRemainingTons, &m.TacticalSummary, &m.LoggedByUserId, &m.CreatedAt); err != nil {
+		if err := rows.Scan(&m.LogId, &m.ShipId, &m.ShipName, &m.LogDate, &m.Latitude, &m.Longitude, &m.HeadingDegrees, &m.SpeedKnots, &m.SeaState, &m.WeatherCondition, &m.FuelRemainingLiters, &m.FreshWaterRemainingTons, &m.TacticalSummary, &m.LoggedByUserId, &m.LoggerName, &m.CreatedAt); err != nil {
 			return nil, 0, err
 		}
 		items = append(items, m)
@@ -116,7 +124,7 @@ func (r *DailyLogRepository) Update(ctx context.Context, id string, m *model.Dai
 
 // Delete removes or soft-deletes daily_log
 func (r *DailyLogRepository) Delete(ctx context.Context, id string) error {
-	query := `DELETE FROM ops_daily_logs WHERE log_id = $1`
+	query := `DELETE FROM ops_daily_logs t WHERE log_id = $1`
 	_, err := r.DB.Exec(ctx, query, id)
 	return err
 }

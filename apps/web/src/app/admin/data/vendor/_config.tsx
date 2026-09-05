@@ -9,7 +9,6 @@ export const entityEndpoint = "/admin/vendor";
 export const primaryKey = "vendor_id";
 
 export const columns: ColumnField[] = [
-  { key: "vendor_id", label: "Vendor Id" },
   { key: "vendor_code", label: "Vendor Code" },
   { key: "vendor_name", label: "Vendor Name" },
   { key: "tax_number", label: "Tax Number" },

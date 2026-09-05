@@ -9,7 +9,6 @@ export const entityEndpoint = "/admin/ship_class";
 export const primaryKey = "class_id";
 
 export const columns: ColumnField[] = [
-  { key: "class_id", label: "Class Id" },
   { key: "class_code", label: "Class Code" },
   { key: "class_name", label: "Class Name" },
   { key: "category", label: "Category" },

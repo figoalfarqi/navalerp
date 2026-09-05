@@ -9,8 +9,7 @@ export const entityEndpoint = "/admin/equipment";
 export const primaryKey = "equipment_id";
 
 export const columns: ColumnField[] = [
-  { key: "equipment_id", label: "Equipment Id" },
-  { key: "system_id", label: "System Id" },
+  { key: "system_name", label: "Sistem Kapal" },
   { key: "serial_number", label: "Serial Number" },
   { key: "equipment_tag", label: "Equipment Tag" },
   { key: "equipment_name", label: "Equipment Name" },
@@ -23,10 +22,15 @@ export const filterFields: FilterField[] = [
 ];
 
 export const formFields = (mode: string): FormField[] => [
-  {
+    {
     name: "system_id",
-    label: "System Id",
-    fieldType: "text",
+    label: "Sistem Kapal",
+    fieldType: "select",
+    options: {
+      url: "/admin/ship_system?limit=100",
+      labelKey: "system_name",
+      valueKey: "system_id",
+    },
     required: true,
     disabled: mode === "view",
   },

@@ -19,10 +19,13 @@ func NewOrgUnitRepository(db *pgxpool.Pool) *OrgUnitRepository {
 
 // Get retrieves a single org_unit by unit_id
 func (r *OrgUnitRepository) Get(ctx context.Context, id string) (*model.OrgUnit, error) {
-	query := `SELECT unit_id, parent_unit_id, unit_code, unit_name, unit_type, description, command_level, latitude, longitude, address, phone, is_active, created_by, updated_by, deleted_by, created_at, updated_at, deleted_at FROM org_units WHERE unit_id = $1 AND deleted_at IS NULL`
+	query := `SELECT t.unit_id, t.parent_unit_id, COALESCE(j_punit.unit_name, ''), t.unit_code, t.unit_name, t.unit_type, t.description, t.command_level, t.latitude, t.longitude, t.address, t.phone, t.is_active, t.created_by, t.updated_by, t.deleted_by, t.created_at, t.updated_at, t.deleted_at
+	FROM org_units t
+	LEFT JOIN org_units j_punit ON j_punit.unit_id = t.parent_unit_id
+	WHERE t.unit_id = $1 AND t.deleted_at IS NULL`
 
 	var m model.OrgUnit
-	err := r.DB.QueryRow(ctx, query, id).Scan(&m.UnitId, &m.ParentUnitId, &m.UnitCode, &m.UnitName, &m.UnitType, &m.Description, &m.CommandLevel, &m.Latitude, &m.Longitude, &m.Address, &m.Phone, &m.IsActive, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt)
+	err := r.DB.QueryRow(ctx, query, id).Scan(&m.UnitId, &m.ParentUnitId, &m.ParentUnitName, &m.UnitCode, &m.UnitName, &m.UnitType, &m.Description, &m.CommandLevel, &m.Latitude, &m.Longitude, &m.Address, &m.Phone, &m.IsActive, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt)
 	if err != nil {
 		return nil, err
 	}
@@ -36,7 +39,7 @@ func (r *OrgUnitRepository) List(ctx context.Context, opts model.ListOptions) ([
 	var args []any
 	argPos := 1
 
-	whereClauses = append(whereClauses, "deleted_at IS NULL")
+	whereClauses = append(whereClauses, "t.deleted_at IS NULL")
 	if opts.Search != "" {
 		searchPattern := "%" + opts.Search + "%"
 		whereClauses = append(whereClauses, fmt.Sprintf("(unit_code ILIKE $%[1]d OR unit_name ILIKE $%[1]d OR description ILIKE $%[1]d)", argPos))
@@ -45,7 +48,7 @@ func (r *OrgUnitRepository) List(ctx context.Context, opts model.ListOptions) ([
 	}
 
 	whereSql := strings.Join(whereClauses, " AND ")
-	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM org_units WHERE %s", whereSql)
+	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM org_units t WHERE %s", whereSql)
 	var total int
 	if err := r.DB.QueryRow(ctx, countQuery, args...).Scan(&total); err != nil {
 		return nil, 0, err
@@ -56,7 +59,10 @@ func (r *OrgUnitRepository) List(ctx context.Context, opts model.ListOptions) ([
 	offset := opts.Offset
 	if offset < 0 { offset = 0 }
 
-	listQuery := fmt.Sprintf("SELECT unit_id, parent_unit_id, unit_code, unit_name, unit_type, description, command_level, latitude, longitude, address, phone, is_active, created_by, updated_by, deleted_by, created_at, updated_at, deleted_at FROM org_units WHERE %s ORDER BY created_at DESC LIMIT $%d OFFSET $%d", whereSql, argPos, argPos+1)
+	listQuery := fmt.Sprintf(`SELECT t.unit_id, t.parent_unit_id, COALESCE(j_punit.unit_name, ''), t.unit_code, t.unit_name, t.unit_type, t.description, t.command_level, t.latitude, t.longitude, t.address, t.phone, t.is_active, t.created_by, t.updated_by, t.deleted_by, t.created_at, t.updated_at, t.deleted_at
+	FROM org_units t
+	LEFT JOIN org_units j_punit ON j_punit.unit_id = t.parent_unit_id
+	WHERE %s ORDER BY t.created_at DESC LIMIT $%d OFFSET $%d`, whereSql, argPos, argPos+1)
 	args = append(args, limit, offset)
 
 	rows, err := r.DB.Query(ctx, listQuery, args...)
@@ -68,7 +74,7 @@ func (r *OrgUnitRepository) List(ctx context.Context, opts model.ListOptions) ([
 	var items []model.OrgUnit
 	for rows.Next() {
 		var m model.OrgUnit
-		if err := rows.Scan(&m.UnitId, &m.ParentUnitId, &m.UnitCode, &m.UnitName, &m.UnitType, &m.Description, &m.CommandLevel, &m.Latitude, &m.Longitude, &m.Address, &m.Phone, &m.IsActive, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt); err != nil {
+		if err := rows.Scan(&m.UnitId, &m.ParentUnitId, &m.ParentUnitName, &m.UnitCode, &m.UnitName, &m.UnitType, &m.Description, &m.CommandLevel, &m.Latitude, &m.Longitude, &m.Address, &m.Phone, &m.IsActive, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt); err != nil {
 			return nil, 0, err
 		}
 		items = append(items, m)

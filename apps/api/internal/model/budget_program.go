@@ -12,6 +12,7 @@ type BudgetProgram struct {
 	ProgramName string `json:"program_name"`
 	TotalBudget float64 `json:"total_budget"`
 	ResponsibleUnitId string `json:"responsible_unit_id"`
+	ResponsibleUnitName *string `json:"responsible_unit_name,omitempty"`
 	Status *string `json:"status,omitempty"`
 	CreatedBy *string `json:"created_by,omitempty"`
 	UpdatedBy *string `json:"updated_by,omitempty"`

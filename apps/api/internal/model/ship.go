@@ -7,7 +7,9 @@ import (
 type Ship struct {
 	ShipId string `json:"ship_id"`
 	ClassId string `json:"class_id"`
+	ClassName *string `json:"class_name,omitempty"`
 	AssignedUnitId string `json:"assigned_unit_id"`
+	UnitName *string `json:"unit_name,omitempty"`
 	HullNumber string `json:"hull_number"`
 	ShipName string `json:"ship_name"`
 	CallSign *string `json:"call_sign,omitempty"`

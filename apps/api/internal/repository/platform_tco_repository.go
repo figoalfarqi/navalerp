@@ -19,10 +19,13 @@ func NewPlatformTcoRepository(db *pgxpool.Pool) *PlatformTcoRepository {
 
 // Get retrieves a single platform_tco by tco_id
 func (r *PlatformTcoRepository) Get(ctx context.Context, id string) (*model.PlatformTco, error) {
-	query := `SELECT tco_id, ship_id, fiscal_year, acquisition_amortization, fuel_lube_cost, mro_spareparts_cost, docking_services_cost, crew_payroll_allowances, modernization_upgrades_cost, total_annual_operating_cost, operating_hours_sea, cost_per_operating_hour, remarks, created_by, updated_by, deleted_by, created_at, updated_at, deleted_at FROM fin_platform_tco_summaries WHERE tco_id = $1 AND deleted_at IS NULL`
+	query := `SELECT t.tco_id, t.ship_id, COALESCE(j_ship.ship_name, ''), t.fiscal_year, t.acquisition_amortization, t.fuel_lube_cost, t.mro_spareparts_cost, t.docking_services_cost, t.crew_payroll_allowances, t.modernization_upgrades_cost, t.total_annual_operating_cost, t.operating_hours_sea, t.cost_per_operating_hour, t.remarks, t.created_by, t.updated_by, t.deleted_by, t.created_at, t.updated_at, t.deleted_at
+	FROM fin_platform_tco_summaries t
+	LEFT JOIN mro_ships j_ship ON j_ship.ship_id = t.ship_id
+	WHERE t.tco_id = $1 AND t.deleted_at IS NULL`
 
 	var m model.PlatformTco
-	err := r.DB.QueryRow(ctx, query, id).Scan(&m.TcoId, &m.ShipId, &m.FiscalYear, &m.AcquisitionAmortization, &m.FuelLubeCost, &m.MroSparepartsCost, &m.DockingServicesCost, &m.CrewPayrollAllowances, &m.ModernizationUpgradesCost, &m.TotalAnnualOperatingCost, &m.OperatingHoursSea, &m.CostPerOperatingHour, &m.Remarks, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt)
+	err := r.DB.QueryRow(ctx, query, id).Scan(&m.TcoId, &m.ShipId, &m.ShipName, &m.FiscalYear, &m.AcquisitionAmortization, &m.FuelLubeCost, &m.MroSparepartsCost, &m.DockingServicesCost, &m.CrewPayrollAllowances, &m.ModernizationUpgradesCost, &m.TotalAnnualOperatingCost, &m.OperatingHoursSea, &m.CostPerOperatingHour, &m.Remarks, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt)
 	if err != nil {
 		return nil, err
 	}
@@ -36,7 +39,7 @@ func (r *PlatformTcoRepository) List(ctx context.Context, opts model.ListOptions
 	var args []any
 	argPos := 1
 
-	whereClauses = append(whereClauses, "deleted_at IS NULL")
+	whereClauses = append(whereClauses, "t.deleted_at IS NULL")
 	if opts.Search != "" {
 		searchPattern := "%" + opts.Search + "%"
 		whereClauses = append(whereClauses, fmt.Sprintf("(remarks ILIKE $%[1]d)", argPos))
@@ -45,7 +48,7 @@ func (r *PlatformTcoRepository) List(ctx context.Context, opts model.ListOptions
 	}
 
 	whereSql := strings.Join(whereClauses, " AND ")
-	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM fin_platform_tco_summaries WHERE %s", whereSql)
+	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM fin_platform_tco_summaries t WHERE %s", whereSql)
 	var total int
 	if err := r.DB.QueryRow(ctx, countQuery, args...).Scan(&total); err != nil {
 		return nil, 0, err
@@ -56,7 +59,10 @@ func (r *PlatformTcoRepository) List(ctx context.Context, opts model.ListOptions
 	offset := opts.Offset
 	if offset < 0 { offset = 0 }
 
-	listQuery := fmt.Sprintf("SELECT tco_id, ship_id, fiscal_year, acquisition_amortization, fuel_lube_cost, mro_spareparts_cost, docking_services_cost, crew_payroll_allowances, modernization_upgrades_cost, total_annual_operating_cost, operating_hours_sea, cost_per_operating_hour, remarks, created_by, updated_by, deleted_by, created_at, updated_at, deleted_at FROM fin_platform_tco_summaries WHERE %s ORDER BY created_at DESC LIMIT $%d OFFSET $%d", whereSql, argPos, argPos+1)
+	listQuery := fmt.Sprintf(`SELECT t.tco_id, t.ship_id, COALESCE(j_ship.ship_name, ''), t.fiscal_year, t.acquisition_amortization, t.fuel_lube_cost, t.mro_spareparts_cost, t.docking_services_cost, t.crew_payroll_allowances, t.modernization_upgrades_cost, t.total_annual_operating_cost, t.operating_hours_sea, t.cost_per_operating_hour, t.remarks, t.created_by, t.updated_by, t.deleted_by, t.created_at, t.updated_at, t.deleted_at
+	FROM fin_platform_tco_summaries t
+	LEFT JOIN mro_ships j_ship ON j_ship.ship_id = t.ship_id
+	WHERE %s ORDER BY t.created_at DESC LIMIT $%d OFFSET $%d`, whereSql, argPos, argPos+1)
 	args = append(args, limit, offset)
 
 	rows, err := r.DB.Query(ctx, listQuery, args...)
@@ -68,7 +74,7 @@ func (r *PlatformTcoRepository) List(ctx context.Context, opts model.ListOptions
 	var items []model.PlatformTco
 	for rows.Next() {
 		var m model.PlatformTco
-		if err := rows.Scan(&m.TcoId, &m.ShipId, &m.FiscalYear, &m.AcquisitionAmortization, &m.FuelLubeCost, &m.MroSparepartsCost, &m.DockingServicesCost, &m.CrewPayrollAllowances, &m.ModernizationUpgradesCost, &m.TotalAnnualOperatingCost, &m.OperatingHoursSea, &m.CostPerOperatingHour, &m.Remarks, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt); err != nil {
+		if err := rows.Scan(&m.TcoId, &m.ShipId, &m.ShipName, &m.FiscalYear, &m.AcquisitionAmortization, &m.FuelLubeCost, &m.MroSparepartsCost, &m.DockingServicesCost, &m.CrewPayrollAllowances, &m.ModernizationUpgradesCost, &m.TotalAnnualOperatingCost, &m.OperatingHoursSea, &m.CostPerOperatingHour, &m.Remarks, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt); err != nil {
 			return nil, 0, err
 		}
 		items = append(items, m)

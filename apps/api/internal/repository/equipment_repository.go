@@ -19,10 +19,13 @@ func NewEquipmentRepository(db *pgxpool.Pool) *EquipmentRepository {
 
 // Get retrieves a single equipment by equipment_id
 func (r *EquipmentRepository) Get(ctx context.Context, id string) (*model.Equipment, error) {
-	query := `SELECT equipment_id, system_id, serial_number, equipment_tag, equipment_name, manufacturer, model_number, country_of_origin, installation_date, total_operating_hours, design_life_hours, criticality_level, health_status, created_by, updated_by, deleted_by, created_at, updated_at, deleted_at FROM mro_equipments WHERE equipment_id = $1 AND deleted_at IS NULL`
+	query := `SELECT t.equipment_id, t.system_id, COALESCE(j_sys.system_name, ''), t.serial_number, t.equipment_tag, t.equipment_name, t.manufacturer, t.model_number, t.country_of_origin, t.installation_date, t.total_operating_hours, t.design_life_hours, t.criticality_level, t.health_status, t.created_by, t.updated_by, t.deleted_by, t.created_at, t.updated_at, t.deleted_at
+	FROM mro_equipments t
+	LEFT JOIN mro_systems j_sys ON j_sys.system_id = t.system_id
+	WHERE t.equipment_id = $1 AND t.deleted_at IS NULL`
 
 	var m model.Equipment
-	err := r.DB.QueryRow(ctx, query, id).Scan(&m.EquipmentId, &m.SystemId, &m.SerialNumber, &m.EquipmentTag, &m.EquipmentName, &m.Manufacturer, &m.ModelNumber, &m.CountryOfOrigin, &m.InstallationDate, &m.TotalOperatingHours, &m.DesignLifeHours, &m.CriticalityLevel, &m.HealthStatus, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt)
+	err := r.DB.QueryRow(ctx, query, id).Scan(&m.EquipmentId, &m.SystemId, &m.SystemName, &m.SerialNumber, &m.EquipmentTag, &m.EquipmentName, &m.Manufacturer, &m.ModelNumber, &m.CountryOfOrigin, &m.InstallationDate, &m.TotalOperatingHours, &m.DesignLifeHours, &m.CriticalityLevel, &m.HealthStatus, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt)
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +51,7 @@ func (r *EquipmentRepository) List(ctx context.Context, opts model.ListOptions) 
 	var args []any
 	argPos := 1
 
-	whereClauses = append(whereClauses, "deleted_at IS NULL")
+	whereClauses = append(whereClauses, "t.deleted_at IS NULL")
 	if opts.Search != "" {
 		searchPattern := "%" + opts.Search + "%"
 		whereClauses = append(whereClauses, fmt.Sprintf("(serial_number ILIKE $%[1]d OR equipment_tag ILIKE $%[1]d OR equipment_name ILIKE $%[1]d)", argPos))
@@ -57,7 +60,7 @@ func (r *EquipmentRepository) List(ctx context.Context, opts model.ListOptions) 
 	}
 
 	whereSql := strings.Join(whereClauses, " AND ")
-	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM mro_equipments WHERE %s", whereSql)
+	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM mro_equipments t WHERE %s", whereSql)
 	var total int
 	if err := r.DB.QueryRow(ctx, countQuery, args...).Scan(&total); err != nil {
 		return nil, 0, err
@@ -68,7 +71,10 @@ func (r *EquipmentRepository) List(ctx context.Context, opts model.ListOptions) 
 	offset := opts.Offset
 	if offset < 0 { offset = 0 }
 
-	listQuery := fmt.Sprintf("SELECT equipment_id, system_id, serial_number, equipment_tag, equipment_name, manufacturer, model_number, country_of_origin, installation_date, total_operating_hours, design_life_hours, criticality_level, health_status, created_by, updated_by, deleted_by, created_at, updated_at, deleted_at FROM mro_equipments WHERE %s ORDER BY created_at DESC LIMIT $%d OFFSET $%d", whereSql, argPos, argPos+1)
+	listQuery := fmt.Sprintf(`SELECT t.equipment_id, t.system_id, COALESCE(j_sys.system_name, ''), t.serial_number, t.equipment_tag, t.equipment_name, t.manufacturer, t.model_number, t.country_of_origin, t.installation_date, t.total_operating_hours, t.design_life_hours, t.criticality_level, t.health_status, t.created_by, t.updated_by, t.deleted_by, t.created_at, t.updated_at, t.deleted_at
+	FROM mro_equipments t
+	LEFT JOIN mro_systems j_sys ON j_sys.system_id = t.system_id
+	WHERE %s ORDER BY t.created_at DESC LIMIT $%d OFFSET $%d`, whereSql, argPos, argPos+1)
 	args = append(args, limit, offset)
 
 	rows, err := r.DB.Query(ctx, listQuery, args...)
@@ -80,7 +86,7 @@ func (r *EquipmentRepository) List(ctx context.Context, opts model.ListOptions) 
 	var items []model.Equipment
 	for rows.Next() {
 		var m model.Equipment
-		if err := rows.Scan(&m.EquipmentId, &m.SystemId, &m.SerialNumber, &m.EquipmentTag, &m.EquipmentName, &m.Manufacturer, &m.ModelNumber, &m.CountryOfOrigin, &m.InstallationDate, &m.TotalOperatingHours, &m.DesignLifeHours, &m.CriticalityLevel, &m.HealthStatus, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt); err != nil {
+		if err := rows.Scan(&m.EquipmentId, &m.SystemId, &m.SystemName, &m.SerialNumber, &m.EquipmentTag, &m.EquipmentName, &m.Manufacturer, &m.ModelNumber, &m.CountryOfOrigin, &m.InstallationDate, &m.TotalOperatingHours, &m.DesignLifeHours, &m.CriticalityLevel, &m.HealthStatus, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt); err != nil {
 			return nil, 0, err
 		}
 		items = append(items, m)

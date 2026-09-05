@@ -9,10 +9,9 @@ export const entityEndpoint = "/admin/stock_transfer";
 export const primaryKey = "transfer_id";
 
 export const columns: ColumnField[] = [
-  { key: "transfer_id", label: "Transfer Id" },
   { key: "transfer_number", label: "Transfer Number" },
-  { key: "from_warehouse_id", label: "From Warehouse Id" },
-  { key: "to_warehouse_id", label: "To Warehouse Id" },
+  { key: "source_warehouse_name", label: "Gudang Asal" },
+  { key: "dest_warehouse_name", label: "Gudang Tujuan" },
   { key: "movement_type", label: "Movement Type" },
   { key: "scheduled_departure", label: "Scheduled Departure" },
   { key: "actual_departure", label: "Actual Departure" },
@@ -30,17 +29,27 @@ export const formFields = (mode: string): FormField[] => [
     required: true,
     disabled: mode === "view",
   },
-  {
+    {
     name: "from_warehouse_id",
-    label: "From Warehouse Id",
-    fieldType: "text",
+    label: "Gudang Asal",
+    fieldType: "select",
+    options: {
+      url: "/admin/warehouse?limit=100",
+      labelKey: "warehouse_name",
+      valueKey: "warehouse_id",
+    },
     required: true,
     disabled: mode === "view",
   },
-  {
+    {
     name: "to_warehouse_id",
-    label: "To Warehouse Id",
-    fieldType: "text",
+    label: "Gudang Tujuan",
+    fieldType: "select",
+    options: {
+      url: "/admin/warehouse?limit=100",
+      labelKey: "warehouse_name",
+      valueKey: "warehouse_id",
+    },
     required: true,
     disabled: mode === "view",
   },

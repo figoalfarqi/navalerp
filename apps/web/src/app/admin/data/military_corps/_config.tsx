@@ -9,7 +9,6 @@ export const entityEndpoint = "/admin/military_corps";
 export const primaryKey = "corps_id";
 
 export const columns: ColumnField[] = [
-  { key: "corps_id", label: "Corps Id" },
   { key: "corps_code", label: "Corps Code" },
   { key: "corps_name", label: "Corps Name" },
   { key: "description", label: "Description" },

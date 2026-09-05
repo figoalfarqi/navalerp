@@ -9,8 +9,7 @@ export const entityEndpoint = "/admin/base_facility";
 export const primaryKey = "facility_id";
 
 export const columns: ColumnField[] = [
-  { key: "facility_id", label: "Facility Id" },
-  { key: "base_unit_id", label: "Base Unit Id" },
+  { key: "unit_name", label: "Satuan Pangkalan" },
   { key: "facility_code", label: "Facility Code" },
   { key: "facility_name", label: "Facility Name" },
   { key: "facility_type", label: "Facility Type" },
@@ -23,10 +22,15 @@ export const filterFields: FilterField[] = [
 ];
 
 export const formFields = (mode: string): FormField[] => [
-  {
+    {
     name: "base_unit_id",
-    label: "Base Unit Id",
-    fieldType: "text",
+    label: "Satuan Pangkalan",
+    fieldType: "select",
+    options: {
+      url: "/admin/org_unit?limit=100",
+      labelKey: "unit_name",
+      valueKey: "unit_id",
+    },
     required: true,
     disabled: mode === "view",
   },

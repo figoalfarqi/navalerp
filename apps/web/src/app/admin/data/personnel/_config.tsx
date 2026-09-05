@@ -9,12 +9,11 @@ export const entityEndpoint = "/admin/personnel";
 export const primaryKey = "personnel_id";
 
 export const columns: ColumnField[] = [
-  { key: "personnel_id", label: "Personnel Id" },
   { key: "nrp", label: "Nrp" },
   { key: "full_name", label: "Full Name" },
-  { key: "rank_id", label: "Rank Id" },
-  { key: "corps_id", label: "Corps Id" },
-  { key: "current_unit_id", label: "Current Unit Id" },
+  { key: "rank_name", label: "Pangkat" },
+  { key: "corps_name", label: "Korps" },
+  { key: "unit_name", label: "Satuan Sekarang" },
   { key: "current_position", label: "Current Position" },
 ];
 
@@ -37,24 +36,39 @@ export const formFields = (mode: string): FormField[] => [
     required: true,
     disabled: mode === "view",
   },
-  {
+    {
     name: "rank_id",
-    label: "Rank Id",
-    fieldType: "text",
+    label: "Pangkat",
+    fieldType: "select",
+    options: {
+      url: "/admin/military_rank?limit=100",
+      labelKey: "rank_name",
+      valueKey: "rank_id",
+    },
     required: true,
     disabled: mode === "view",
   },
-  {
+    {
     name: "corps_id",
-    label: "Corps Id",
-    fieldType: "text",
+    label: "Korps",
+    fieldType: "select",
+    options: {
+      url: "/admin/military_corps?limit=100",
+      labelKey: "corps_name",
+      valueKey: "corps_id",
+    },
     required: true,
     disabled: mode === "view",
   },
-  {
+    {
     name: "current_unit_id",
-    label: "Current Unit Id",
-    fieldType: "text",
+    label: "Satuan Sekarang",
+    fieldType: "select",
+    options: {
+      url: "/admin/org_unit?limit=100",
+      labelKey: "unit_name",
+      valueKey: "unit_id",
+    },
     required: true,
     disabled: mode === "view",
   },
@@ -114,10 +128,15 @@ export const formFields = (mode: string): FormField[] => [
     required: true,
     disabled: mode === "view",
   },
-  {
+    {
     name: "user_id",
-    label: "User Id",
-    fieldType: "text",
+    label: "Pengguna",
+    fieldType: "select",
+    options: {
+      url: "/admin/sys_user?limit=100",
+      labelKey: "full_name",
+      valueKey: "user_id",
+    },
     required: false,
     disabled: mode === "view",
   },

@@ -9,11 +9,10 @@ export const entityEndpoint = "/admin/route";
 export const primaryKey = "route_id";
 
 export const columns: ColumnField[] = [
-  { key: "route_id", label: "Route Id" },
   { key: "route_code", label: "Route Code" },
   { key: "route_name", label: "Route Name" },
-  { key: "origin_facility_id", label: "Origin Facility Id" },
-  { key: "destination_facility_id", label: "Destination Facility Id" },
+  { key: "origin_facility_name", label: "Fasilitas Asal" },
+  { key: "destination_facility_name", label: "Fasilitas Tujuan" },
   { key: "distance_nautical_miles", label: "Distance Nautical Miles" },
   { key: "estimated_transit_hours", label: "Estimated Transit Hours" },
 ];
@@ -37,17 +36,27 @@ export const formFields = (mode: string): FormField[] => [
     required: true,
     disabled: mode === "view",
   },
-  {
+    {
     name: "origin_facility_id",
-    label: "Origin Facility Id",
-    fieldType: "text",
+    label: "Fasilitas Asal",
+    fieldType: "select",
+    options: {
+      url: "/admin/base_facility?limit=100",
+      labelKey: "facility_name",
+      valueKey: "facility_id",
+    },
     required: true,
     disabled: mode === "view",
   },
-  {
+    {
     name: "destination_facility_id",
-    label: "Destination Facility Id",
-    fieldType: "text",
+    label: "Fasilitas Tujuan",
+    fieldType: "select",
+    options: {
+      url: "/admin/base_facility?limit=100",
+      labelKey: "facility_name",
+      valueKey: "facility_id",
+    },
     required: true,
     disabled: mode === "view",
   },

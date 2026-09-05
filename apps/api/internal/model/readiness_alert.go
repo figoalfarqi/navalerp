@@ -7,7 +7,9 @@ import (
 type ReadinessAlert struct {
 	AlertId string `json:"alert_id"`
 	ShipId string `json:"ship_id"`
+	ShipName *string `json:"ship_name,omitempty"`
 	EquipmentId *string `json:"equipment_id,omitempty"`
+	EquipmentName *string `json:"equipment_name,omitempty"`
 	Severity string `json:"severity"`
 	AlertType string `json:"alert_type"`
 	AlertMessage string `json:"alert_message"`

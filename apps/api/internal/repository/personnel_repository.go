@@ -19,10 +19,15 @@ func NewPersonnelRepository(db *pgxpool.Pool) *PersonnelRepository {
 
 // Get retrieves a single personnel by personnel_id
 func (r *PersonnelRepository) Get(ctx context.Context, id string) (*model.Personnel, error) {
-	query := `SELECT personnel_id, nrp, full_name, rank_id, corps_id, current_unit_id, current_position, birth_place, birth_date, gender, blood_type, religion, education_level, service_entry_date, user_id, status, created_by, updated_by, deleted_by, created_at, updated_at, deleted_at FROM hcm_personnel WHERE personnel_id = $1 AND deleted_at IS NULL`
+	query := `SELECT t.personnel_id, t.nrp, t.full_name, t.rank_id, COALESCE(j_rnk.rank_name, ''), t.corps_id, COALESCE(j_crp.corps_name, ''), t.current_unit_id, COALESCE(j_unit.unit_name, ''), t.current_position, t.birth_place, t.birth_date, t.gender, t.blood_type, t.religion, t.education_level, t.service_entry_date, t.user_id, t.status, t.created_by, t.updated_by, t.deleted_by, t.created_at, t.updated_at, t.deleted_at
+	FROM hcm_personnel t
+	LEFT JOIN hcm_ranks j_rnk ON j_rnk.rank_id = t.rank_id
+	LEFT JOIN hcm_corps j_crp ON j_crp.corps_id = t.corps_id
+	LEFT JOIN org_units j_unit ON j_unit.unit_id = t.current_unit_id
+	WHERE t.personnel_id = $1 AND t.deleted_at IS NULL`
 
 	var m model.Personnel
-	err := r.DB.QueryRow(ctx, query, id).Scan(&m.PersonnelId, &m.Nrp, &m.FullName, &m.RankId, &m.CorpsId, &m.CurrentUnitId, &m.CurrentPosition, &m.BirthPlace, &m.BirthDate, &m.Gender, &m.BloodType, &m.Religion, &m.EducationLevel, &m.ServiceEntryDate, &m.UserId, &m.Status, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt)
+	err := r.DB.QueryRow(ctx, query, id).Scan(&m.PersonnelId, &m.Nrp, &m.FullName, &m.RankId, &m.RankName, &m.CorpsId, &m.CorpsName, &m.CurrentUnitId, &m.UnitName, &m.CurrentPosition, &m.BirthPlace, &m.BirthDate, &m.Gender, &m.BloodType, &m.Religion, &m.EducationLevel, &m.ServiceEntryDate, &m.UserId, &m.Status, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt)
 	if err != nil {
 		return nil, err
 	}
@@ -72,7 +77,7 @@ func (r *PersonnelRepository) List(ctx context.Context, opts model.ListOptions) 
 	var args []any
 	argPos := 1
 
-	whereClauses = append(whereClauses, "deleted_at IS NULL")
+	whereClauses = append(whereClauses, "t.deleted_at IS NULL")
 	if opts.Search != "" {
 		searchPattern := "%" + opts.Search + "%"
 		whereClauses = append(whereClauses, fmt.Sprintf("(nrp ILIKE $%[1]d OR full_name ILIKE $%[1]d OR current_position ILIKE $%[1]d)", argPos))
@@ -81,7 +86,7 @@ func (r *PersonnelRepository) List(ctx context.Context, opts model.ListOptions) 
 	}
 
 	whereSql := strings.Join(whereClauses, " AND ")
-	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM hcm_personnel WHERE %s", whereSql)
+	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM hcm_personnel t WHERE %s", whereSql)
 	var total int
 	if err := r.DB.QueryRow(ctx, countQuery, args...).Scan(&total); err != nil {
 		return nil, 0, err
@@ -92,7 +97,12 @@ func (r *PersonnelRepository) List(ctx context.Context, opts model.ListOptions) 
 	offset := opts.Offset
 	if offset < 0 { offset = 0 }
 
-	listQuery := fmt.Sprintf("SELECT personnel_id, nrp, full_name, rank_id, corps_id, current_unit_id, current_position, birth_place, birth_date, gender, blood_type, religion, education_level, service_entry_date, user_id, status, created_by, updated_by, deleted_by, created_at, updated_at, deleted_at FROM hcm_personnel WHERE %s ORDER BY created_at DESC LIMIT $%d OFFSET $%d", whereSql, argPos, argPos+1)
+	listQuery := fmt.Sprintf(`SELECT t.personnel_id, t.nrp, t.full_name, t.rank_id, COALESCE(j_rnk.rank_name, ''), t.corps_id, COALESCE(j_crp.corps_name, ''), t.current_unit_id, COALESCE(j_unit.unit_name, ''), t.current_position, t.birth_place, t.birth_date, t.gender, t.blood_type, t.religion, t.education_level, t.service_entry_date, t.user_id, t.status, t.created_by, t.updated_by, t.deleted_by, t.created_at, t.updated_at, t.deleted_at
+	FROM hcm_personnel t
+	LEFT JOIN hcm_ranks j_rnk ON j_rnk.rank_id = t.rank_id
+	LEFT JOIN hcm_corps j_crp ON j_crp.corps_id = t.corps_id
+	LEFT JOIN org_units j_unit ON j_unit.unit_id = t.current_unit_id
+	WHERE %s ORDER BY t.created_at DESC LIMIT $%d OFFSET $%d`, whereSql, argPos, argPos+1)
 	args = append(args, limit, offset)
 
 	rows, err := r.DB.Query(ctx, listQuery, args...)
@@ -104,7 +114,7 @@ func (r *PersonnelRepository) List(ctx context.Context, opts model.ListOptions) 
 	var items []model.Personnel
 	for rows.Next() {
 		var m model.Personnel
-		if err := rows.Scan(&m.PersonnelId, &m.Nrp, &m.FullName, &m.RankId, &m.CorpsId, &m.CurrentUnitId, &m.CurrentPosition, &m.BirthPlace, &m.BirthDate, &m.Gender, &m.BloodType, &m.Religion, &m.EducationLevel, &m.ServiceEntryDate, &m.UserId, &m.Status, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt); err != nil {
+		if err := rows.Scan(&m.PersonnelId, &m.Nrp, &m.FullName, &m.RankId, &m.RankName, &m.CorpsId, &m.CorpsName, &m.CurrentUnitId, &m.UnitName, &m.CurrentPosition, &m.BirthPlace, &m.BirthDate, &m.Gender, &m.BloodType, &m.Religion, &m.EducationLevel, &m.ServiceEntryDate, &m.UserId, &m.Status, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt); err != nil {
 			return nil, 0, err
 		}
 		items = append(items, m)

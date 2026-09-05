@@ -7,9 +7,11 @@ import (
 type StockAdjustment struct {
 	AdjustmentId string `json:"adjustment_id"`
 	WarehouseId string `json:"warehouse_id"`
+	WarehouseName *string `json:"warehouse_name,omitempty"`
 	AdjustmentNumber string `json:"adjustment_number"`
 	AdjustmentDate time.Time `json:"adjustment_date"`
 	ConductedByUserId *string `json:"conducted_by_user_id,omitempty"`
+	ConductorName *string `json:"conductor_name,omitempty"`
 	Reason string `json:"reason"`
 	Status *string `json:"status,omitempty"`
 	Remarks *string `json:"remarks,omitempty"`

@@ -7,6 +7,7 @@ import (
 type PlatformTco struct {
 	TcoId string `json:"tco_id"`
 	ShipId string `json:"ship_id"`
+	ShipName *string `json:"ship_name,omitempty"`
 	FiscalYear int `json:"fiscal_year"`
 	AcquisitionAmortization *float64 `json:"acquisition_amortization,omitempty"`
 	FuelLubeCost *float64 `json:"fuel_lube_cost,omitempty"`

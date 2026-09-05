@@ -19,10 +19,13 @@ func NewDockingRecordRepository(db *pgxpool.Pool) *DockingRecordRepository {
 
 // Get retrieves a single docking_record by docking_id
 func (r *DockingRecordRepository) Get(ctx context.Context, id string) (*model.DockingRecord, error) {
-	query := `SELECT docking_id, ship_id, shipyard_name, docking_type, entry_date, scheduled_exit_date, actual_exit_date, sea_trial_passed, classification_surveyor, certificate_number, total_docking_cost, docking_summary, created_by, updated_by, deleted_by, created_at, updated_at, deleted_at FROM mro_docking_records WHERE docking_id = $1 AND deleted_at IS NULL`
+	query := `SELECT t.docking_id, t.ship_id, COALESCE(j_ship.ship_name, ''), t.shipyard_name, t.docking_type, t.entry_date, t.scheduled_exit_date, t.actual_exit_date, t.sea_trial_passed, t.classification_surveyor, t.certificate_number, t.total_docking_cost, t.docking_summary, t.created_by, t.updated_by, t.deleted_by, t.created_at, t.updated_at, t.deleted_at
+	FROM mro_docking_records t
+	LEFT JOIN mro_ships j_ship ON j_ship.ship_id = t.ship_id
+	WHERE t.docking_id = $1 AND t.deleted_at IS NULL`
 
 	var m model.DockingRecord
-	err := r.DB.QueryRow(ctx, query, id).Scan(&m.DockingId, &m.ShipId, &m.ShipyardName, &m.DockingType, &m.EntryDate, &m.ScheduledExitDate, &m.ActualExitDate, &m.SeaTrialPassed, &m.ClassificationSurveyor, &m.CertificateNumber, &m.TotalDockingCost, &m.DockingSummary, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt)
+	err := r.DB.QueryRow(ctx, query, id).Scan(&m.DockingId, &m.ShipId, &m.ShipName, &m.ShipyardName, &m.DockingType, &m.EntryDate, &m.ScheduledExitDate, &m.ActualExitDate, &m.SeaTrialPassed, &m.ClassificationSurveyor, &m.CertificateNumber, &m.TotalDockingCost, &m.DockingSummary, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt)
 	if err != nil {
 		return nil, err
 	}
@@ -36,7 +39,7 @@ func (r *DockingRecordRepository) List(ctx context.Context, opts model.ListOptio
 	var args []any
 	argPos := 1
 
-	whereClauses = append(whereClauses, "deleted_at IS NULL")
+	whereClauses = append(whereClauses, "t.deleted_at IS NULL")
 	if opts.Search != "" {
 		searchPattern := "%" + opts.Search + "%"
 		whereClauses = append(whereClauses, fmt.Sprintf("(shipyard_name ILIKE $%[1]d OR classification_surveyor ILIKE $%[1]d OR certificate_number ILIKE $%[1]d)", argPos))
@@ -45,7 +48,7 @@ func (r *DockingRecordRepository) List(ctx context.Context, opts model.ListOptio
 	}
 
 	whereSql := strings.Join(whereClauses, " AND ")
-	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM mro_docking_records WHERE %s", whereSql)
+	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM mro_docking_records t WHERE %s", whereSql)
 	var total int
 	if err := r.DB.QueryRow(ctx, countQuery, args...).Scan(&total); err != nil {
 		return nil, 0, err
@@ -56,7 +59,10 @@ func (r *DockingRecordRepository) List(ctx context.Context, opts model.ListOptio
 	offset := opts.Offset
 	if offset < 0 { offset = 0 }
 
-	listQuery := fmt.Sprintf("SELECT docking_id, ship_id, shipyard_name, docking_type, entry_date, scheduled_exit_date, actual_exit_date, sea_trial_passed, classification_surveyor, certificate_number, total_docking_cost, docking_summary, created_by, updated_by, deleted_by, created_at, updated_at, deleted_at FROM mro_docking_records WHERE %s ORDER BY created_at DESC LIMIT $%d OFFSET $%d", whereSql, argPos, argPos+1)
+	listQuery := fmt.Sprintf(`SELECT t.docking_id, t.ship_id, COALESCE(j_ship.ship_name, ''), t.shipyard_name, t.docking_type, t.entry_date, t.scheduled_exit_date, t.actual_exit_date, t.sea_trial_passed, t.classification_surveyor, t.certificate_number, t.total_docking_cost, t.docking_summary, t.created_by, t.updated_by, t.deleted_by, t.created_at, t.updated_at, t.deleted_at
+	FROM mro_docking_records t
+	LEFT JOIN mro_ships j_ship ON j_ship.ship_id = t.ship_id
+	WHERE %s ORDER BY t.created_at DESC LIMIT $%d OFFSET $%d`, whereSql, argPos, argPos+1)
 	args = append(args, limit, offset)
 
 	rows, err := r.DB.Query(ctx, listQuery, args...)
@@ -68,7 +74,7 @@ func (r *DockingRecordRepository) List(ctx context.Context, opts model.ListOptio
 	var items []model.DockingRecord
 	for rows.Next() {
 		var m model.DockingRecord
-		if err := rows.Scan(&m.DockingId, &m.ShipId, &m.ShipyardName, &m.DockingType, &m.EntryDate, &m.ScheduledExitDate, &m.ActualExitDate, &m.SeaTrialPassed, &m.ClassificationSurveyor, &m.CertificateNumber, &m.TotalDockingCost, &m.DockingSummary, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt); err != nil {
+		if err := rows.Scan(&m.DockingId, &m.ShipId, &m.ShipName, &m.ShipyardName, &m.DockingType, &m.EntryDate, &m.ScheduledExitDate, &m.ActualExitDate, &m.SeaTrialPassed, &m.ClassificationSurveyor, &m.CertificateNumber, &m.TotalDockingCost, &m.DockingSummary, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt); err != nil {
 			return nil, 0, err
 		}
 		items = append(items, m)

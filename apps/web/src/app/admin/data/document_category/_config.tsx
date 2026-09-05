@@ -9,7 +9,6 @@ export const entityEndpoint = "/admin/document_category";
 export const primaryKey = "category_id";
 
 export const columns: ColumnField[] = [
-  { key: "category_id", label: "Category Id" },
   { key: "category_code", label: "Category Code" },
   { key: "category_name", label: "Category Name" },
   { key: "retention_years", label: "Retention Years" },

@@ -7,8 +7,10 @@ import (
 type ItemInstance struct {
 	InstanceId string `json:"instance_id"`
 	WarehouseId string `json:"warehouse_id"`
+	WarehouseName *string `json:"warehouse_name,omitempty"`
 	LocationId *string `json:"location_id,omitempty"`
 	MaterialId string `json:"material_id"`
+	MaterialName *string `json:"material_name,omitempty"`
 	BatchNumber *string `json:"batch_number,omitempty"`
 	SerialNumber *string `json:"serial_number,omitempty"`
 	LotNumber *string `json:"lot_number,omitempty"`

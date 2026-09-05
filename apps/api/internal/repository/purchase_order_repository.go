@@ -19,10 +19,16 @@ func NewPurchaseOrderRepository(db *pgxpool.Pool) *PurchaseOrderRepository {
 
 // Get retrieves a single purchase_order by po_id
 func (r *PurchaseOrderRepository) Get(ctx context.Context, id string) (*model.PurchaseOrder, error) {
-	query := `SELECT po_id, po_number, contract_id, vendor_id, issuing_unit_id, order_date, delivery_deadline, destination_warehouse_id, total_amount, tax_amount, grand_total, status, created_by, updated_by, deleted_by, created_at, updated_at, deleted_at FROM proc_purchase_orders WHERE po_id = $1 AND deleted_at IS NULL`
+	query := `SELECT t.po_id, t.po_number, t.contract_id, COALESCE(j_ctr.contract_number, ''), t.vendor_id, COALESCE(j_vnd.vendor_name, ''), t.issuing_unit_id, COALESCE(j_unit.unit_name, ''), t.order_date, t.delivery_deadline, t.destination_warehouse_id, COALESCE(j_dwh.warehouse_name, ''), t.total_amount, t.tax_amount, t.grand_total, t.status, t.created_by, t.updated_by, t.deleted_by, t.created_at, t.updated_at, t.deleted_at
+	FROM proc_purchase_orders t
+	LEFT JOIN proc_contracts j_ctr ON j_ctr.contract_id = t.contract_id
+	LEFT JOIN proc_vendors j_vnd ON j_vnd.vendor_id = t.vendor_id
+	LEFT JOIN org_units j_unit ON j_unit.unit_id = t.issuing_unit_id
+	LEFT JOIN inv_warehouses j_dwh ON j_dwh.warehouse_id = t.destination_warehouse_id
+	WHERE t.po_id = $1 AND t.deleted_at IS NULL`
 
 	var m model.PurchaseOrder
-	err := r.DB.QueryRow(ctx, query, id).Scan(&m.PoId, &m.PoNumber, &m.ContractId, &m.VendorId, &m.IssuingUnitId, &m.OrderDate, &m.DeliveryDeadline, &m.DestinationWarehouseId, &m.TotalAmount, &m.TaxAmount, &m.GrandTotal, &m.Status, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt)
+	err := r.DB.QueryRow(ctx, query, id).Scan(&m.PoId, &m.PoNumber, &m.ContractId, &m.ContractNumber, &m.VendorId, &m.VendorName, &m.IssuingUnitId, &m.UnitName, &m.OrderDate, &m.DeliveryDeadline, &m.DestinationWarehouseId, &m.DestinationWarehouseName, &m.TotalAmount, &m.TaxAmount, &m.GrandTotal, &m.Status, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt)
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +54,7 @@ func (r *PurchaseOrderRepository) List(ctx context.Context, opts model.ListOptio
 	var args []any
 	argPos := 1
 
-	whereClauses = append(whereClauses, "deleted_at IS NULL")
+	whereClauses = append(whereClauses, "t.deleted_at IS NULL")
 	if opts.Search != "" {
 		searchPattern := "%" + opts.Search + "%"
 		whereClauses = append(whereClauses, fmt.Sprintf("(po_number ILIKE $%[1]d)", argPos))
@@ -57,7 +63,7 @@ func (r *PurchaseOrderRepository) List(ctx context.Context, opts model.ListOptio
 	}
 
 	whereSql := strings.Join(whereClauses, " AND ")
-	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM proc_purchase_orders WHERE %s", whereSql)
+	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM proc_purchase_orders t WHERE %s", whereSql)
 	var total int
 	if err := r.DB.QueryRow(ctx, countQuery, args...).Scan(&total); err != nil {
 		return nil, 0, err
@@ -68,7 +74,13 @@ func (r *PurchaseOrderRepository) List(ctx context.Context, opts model.ListOptio
 	offset := opts.Offset
 	if offset < 0 { offset = 0 }
 
-	listQuery := fmt.Sprintf("SELECT po_id, po_number, contract_id, vendor_id, issuing_unit_id, order_date, delivery_deadline, destination_warehouse_id, total_amount, tax_amount, grand_total, status, created_by, updated_by, deleted_by, created_at, updated_at, deleted_at FROM proc_purchase_orders WHERE %s ORDER BY created_at DESC LIMIT $%d OFFSET $%d", whereSql, argPos, argPos+1)
+	listQuery := fmt.Sprintf(`SELECT t.po_id, t.po_number, t.contract_id, COALESCE(j_ctr.contract_number, ''), t.vendor_id, COALESCE(j_vnd.vendor_name, ''), t.issuing_unit_id, COALESCE(j_unit.unit_name, ''), t.order_date, t.delivery_deadline, t.destination_warehouse_id, COALESCE(j_dwh.warehouse_name, ''), t.total_amount, t.tax_amount, t.grand_total, t.status, t.created_by, t.updated_by, t.deleted_by, t.created_at, t.updated_at, t.deleted_at
+	FROM proc_purchase_orders t
+	LEFT JOIN proc_contracts j_ctr ON j_ctr.contract_id = t.contract_id
+	LEFT JOIN proc_vendors j_vnd ON j_vnd.vendor_id = t.vendor_id
+	LEFT JOIN org_units j_unit ON j_unit.unit_id = t.issuing_unit_id
+	LEFT JOIN inv_warehouses j_dwh ON j_dwh.warehouse_id = t.destination_warehouse_id
+	WHERE %s ORDER BY t.created_at DESC LIMIT $%d OFFSET $%d`, whereSql, argPos, argPos+1)
 	args = append(args, limit, offset)
 
 	rows, err := r.DB.Query(ctx, listQuery, args...)
@@ -80,7 +92,7 @@ func (r *PurchaseOrderRepository) List(ctx context.Context, opts model.ListOptio
 	var items []model.PurchaseOrder
 	for rows.Next() {
 		var m model.PurchaseOrder
-		if err := rows.Scan(&m.PoId, &m.PoNumber, &m.ContractId, &m.VendorId, &m.IssuingUnitId, &m.OrderDate, &m.DeliveryDeadline, &m.DestinationWarehouseId, &m.TotalAmount, &m.TaxAmount, &m.GrandTotal, &m.Status, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt); err != nil {
+		if err := rows.Scan(&m.PoId, &m.PoNumber, &m.ContractId, &m.ContractNumber, &m.VendorId, &m.VendorName, &m.IssuingUnitId, &m.UnitName, &m.OrderDate, &m.DeliveryDeadline, &m.DestinationWarehouseId, &m.DestinationWarehouseName, &m.TotalAmount, &m.TaxAmount, &m.GrandTotal, &m.Status, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt); err != nil {
 			return nil, 0, err
 		}
 		items = append(items, m)

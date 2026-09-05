@@ -9,7 +9,6 @@ export const entityEndpoint = "/admin/qualification";
 export const primaryKey = "qualification_id";
 
 export const columns: ColumnField[] = [
-  { key: "qualification_id", label: "Qualification Id" },
   { key: "qualification_code", label: "Qualification Code" },
   { key: "qualification_name", label: "Qualification Name" },
   { key: "qualification_category", label: "Qualification Category" },

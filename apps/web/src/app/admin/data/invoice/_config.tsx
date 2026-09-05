@@ -9,11 +9,10 @@ export const entityEndpoint = "/admin/invoice";
 export const primaryKey = "invoice_id";
 
 export const columns: ColumnField[] = [
-  { key: "invoice_id", label: "Invoice Id" },
   { key: "invoice_number", label: "Invoice Number" },
-  { key: "vendor_id", label: "Vendor Id" },
-  { key: "contract_id", label: "Contract Id" },
-  { key: "po_id", label: "Po Id" },
+  { key: "vendor_name", label: "Vendor" },
+  { key: "contract_number", label: "No. Kontrak" },
+  { key: "po_number", label: "No. PO" },
   { key: "invoice_date", label: "Invoice Date" },
   { key: "due_date", label: "Due Date" },
 ];
@@ -30,24 +29,39 @@ export const formFields = (mode: string): FormField[] => [
     required: true,
     disabled: mode === "view",
   },
-  {
+    {
     name: "vendor_id",
-    label: "Vendor Id",
-    fieldType: "text",
+    label: "Vendor",
+    fieldType: "select",
+    options: {
+      url: "/admin/vendor?limit=100",
+      labelKey: "vendor_name",
+      valueKey: "vendor_id",
+    },
     required: true,
     disabled: mode === "view",
   },
-  {
+    {
     name: "contract_id",
-    label: "Contract Id",
-    fieldType: "text",
+    label: "No. Kontrak",
+    fieldType: "select",
+    options: {
+      url: "/admin/contract?limit=100",
+      labelKey: "contract_number",
+      valueKey: "contract_id",
+    },
     required: false,
     disabled: mode === "view",
   },
-  {
+    {
     name: "po_id",
-    label: "Po Id",
-    fieldType: "text",
+    label: "No. PO",
+    fieldType: "select",
+    options: {
+      url: "/admin/purchase_order?limit=100",
+      labelKey: "po_number",
+      valueKey: "po_id",
+    },
     required: false,
     disabled: mode === "view",
   },
@@ -93,10 +107,15 @@ export const formFields = (mode: string): FormField[] => [
     required: false,
     disabled: mode === "view",
   },
-  {
+    {
     name: "verified_by_user_id",
-    label: "Verified By User Id",
-    fieldType: "text",
+    label: "Diverifikasi Oleh",
+    fieldType: "select",
+    options: {
+      url: "/admin/sys_user?limit=100",
+      labelKey: "full_name",
+      valueKey: "user_id",
+    },
     required: false,
     disabled: mode === "view",
   },

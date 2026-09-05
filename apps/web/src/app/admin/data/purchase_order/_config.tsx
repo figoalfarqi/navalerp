@@ -9,11 +9,10 @@ export const entityEndpoint = "/admin/purchase_order";
 export const primaryKey = "po_id";
 
 export const columns: ColumnField[] = [
-  { key: "po_id", label: "Po Id" },
   { key: "po_number", label: "Po Number" },
-  { key: "contract_id", label: "Contract Id" },
-  { key: "vendor_id", label: "Vendor Id" },
-  { key: "issuing_unit_id", label: "Issuing Unit Id" },
+  { key: "contract_number", label: "No. Kontrak" },
+  { key: "vendor_name", label: "Vendor" },
+  { key: "unit_name", label: "Satuan Penerbit" },
   { key: "order_date", label: "Order Date" },
   { key: "delivery_deadline", label: "Delivery Deadline" },
 ];
@@ -30,24 +29,39 @@ export const formFields = (mode: string): FormField[] => [
     required: true,
     disabled: mode === "view",
   },
-  {
+    {
     name: "contract_id",
-    label: "Contract Id",
-    fieldType: "text",
+    label: "No. Kontrak",
+    fieldType: "select",
+    options: {
+      url: "/admin/contract?limit=100",
+      labelKey: "contract_number",
+      valueKey: "contract_id",
+    },
     required: false,
     disabled: mode === "view",
   },
-  {
+    {
     name: "vendor_id",
-    label: "Vendor Id",
-    fieldType: "text",
+    label: "Vendor",
+    fieldType: "select",
+    options: {
+      url: "/admin/vendor?limit=100",
+      labelKey: "vendor_name",
+      valueKey: "vendor_id",
+    },
     required: true,
     disabled: mode === "view",
   },
-  {
+    {
     name: "issuing_unit_id",
-    label: "Issuing Unit Id",
-    fieldType: "text",
+    label: "Satuan Penerbit",
+    fieldType: "select",
+    options: {
+      url: "/admin/org_unit?limit=100",
+      labelKey: "unit_name",
+      valueKey: "unit_id",
+    },
     required: true,
     disabled: mode === "view",
   },
@@ -65,10 +79,15 @@ export const formFields = (mode: string): FormField[] => [
     required: false,
     disabled: mode === "view",
   },
-  {
+    {
     name: "destination_warehouse_id",
-    label: "Destination Warehouse Id",
-    fieldType: "text",
+    label: "Gudang Tujuan",
+    fieldType: "select",
+    options: {
+      url: "/admin/warehouse?limit=100",
+      labelKey: "warehouse_name",
+      valueKey: "warehouse_id",
+    },
     required: false,
     disabled: mode === "view",
   },

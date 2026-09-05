@@ -19,10 +19,14 @@ func NewShipmentRepository(db *pgxpool.Pool) *ShipmentRepository {
 
 // Get retrieves a single shipment by shipment_id
 func (r *ShipmentRepository) Get(ctx context.Context, id string) (*model.Shipment, error) {
-	query := `SELECT shipment_id, manifest_number, route_id, transport_unit_id, origin_warehouse_id, destination_warehouse_id, departure_date, arrival_date, escort_security_level, status, authorized_by_user_id, remarks, created_by, updated_by, deleted_by, created_at, updated_at, deleted_at FROM log_shipments WHERE shipment_id = $1 AND deleted_at IS NULL`
+	query := `SELECT t.shipment_id, t.manifest_number, t.route_id, t.transport_unit_id, t.origin_warehouse_id, COALESCE(j_owh.warehouse_name, ''), t.destination_warehouse_id, COALESCE(j_dwh.warehouse_name, ''), t.departure_date, t.arrival_date, t.escort_security_level, t.status, t.authorized_by_user_id, t.remarks, t.created_by, t.updated_by, t.deleted_by, t.created_at, t.updated_at, t.deleted_at
+	FROM log_shipments t
+	LEFT JOIN inv_warehouses j_owh ON j_owh.warehouse_id = t.origin_warehouse_id
+	LEFT JOIN inv_warehouses j_dwh ON j_dwh.warehouse_id = t.destination_warehouse_id
+	WHERE t.shipment_id = $1 AND t.deleted_at IS NULL`
 
 	var m model.Shipment
-	err := r.DB.QueryRow(ctx, query, id).Scan(&m.ShipmentId, &m.ManifestNumber, &m.RouteId, &m.TransportUnitId, &m.OriginWarehouseId, &m.DestinationWarehouseId, &m.DepartureDate, &m.ArrivalDate, &m.EscortSecurityLevel, &m.Status, &m.AuthorizedByUserId, &m.Remarks, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt)
+	err := r.DB.QueryRow(ctx, query, id).Scan(&m.ShipmentId, &m.ManifestNumber, &m.RouteId, &m.TransportUnitId, &m.OriginWarehouseId, &m.OriginWarehouseName, &m.DestinationWarehouseId, &m.DestinationWarehouseName, &m.DepartureDate, &m.ArrivalDate, &m.EscortSecurityLevel, &m.Status, &m.AuthorizedByUserId, &m.Remarks, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt)
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +52,7 @@ func (r *ShipmentRepository) List(ctx context.Context, opts model.ListOptions) (
 	var args []any
 	argPos := 1
 
-	whereClauses = append(whereClauses, "deleted_at IS NULL")
+	whereClauses = append(whereClauses, "t.deleted_at IS NULL")
 	if opts.Search != "" {
 		searchPattern := "%" + opts.Search + "%"
 		whereClauses = append(whereClauses, fmt.Sprintf("(manifest_number ILIKE $%[1]d OR remarks ILIKE $%[1]d)", argPos))
@@ -57,7 +61,7 @@ func (r *ShipmentRepository) List(ctx context.Context, opts model.ListOptions) (
 	}
 
 	whereSql := strings.Join(whereClauses, " AND ")
-	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM log_shipments WHERE %s", whereSql)
+	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM log_shipments t WHERE %s", whereSql)
 	var total int
 	if err := r.DB.QueryRow(ctx, countQuery, args...).Scan(&total); err != nil {
 		return nil, 0, err
@@ -68,7 +72,11 @@ func (r *ShipmentRepository) List(ctx context.Context, opts model.ListOptions) (
 	offset := opts.Offset
 	if offset < 0 { offset = 0 }
 
-	listQuery := fmt.Sprintf("SELECT shipment_id, manifest_number, route_id, transport_unit_id, origin_warehouse_id, destination_warehouse_id, departure_date, arrival_date, escort_security_level, status, authorized_by_user_id, remarks, created_by, updated_by, deleted_by, created_at, updated_at, deleted_at FROM log_shipments WHERE %s ORDER BY created_at DESC LIMIT $%d OFFSET $%d", whereSql, argPos, argPos+1)
+	listQuery := fmt.Sprintf(`SELECT t.shipment_id, t.manifest_number, t.route_id, t.transport_unit_id, t.origin_warehouse_id, COALESCE(j_owh.warehouse_name, ''), t.destination_warehouse_id, COALESCE(j_dwh.warehouse_name, ''), t.departure_date, t.arrival_date, t.escort_security_level, t.status, t.authorized_by_user_id, t.remarks, t.created_by, t.updated_by, t.deleted_by, t.created_at, t.updated_at, t.deleted_at
+	FROM log_shipments t
+	LEFT JOIN inv_warehouses j_owh ON j_owh.warehouse_id = t.origin_warehouse_id
+	LEFT JOIN inv_warehouses j_dwh ON j_dwh.warehouse_id = t.destination_warehouse_id
+	WHERE %s ORDER BY t.created_at DESC LIMIT $%d OFFSET $%d`, whereSql, argPos, argPos+1)
 	args = append(args, limit, offset)
 
 	rows, err := r.DB.Query(ctx, listQuery, args...)
@@ -80,7 +88,7 @@ func (r *ShipmentRepository) List(ctx context.Context, opts model.ListOptions) (
 	var items []model.Shipment
 	for rows.Next() {
 		var m model.Shipment
-		if err := rows.Scan(&m.ShipmentId, &m.ManifestNumber, &m.RouteId, &m.TransportUnitId, &m.OriginWarehouseId, &m.DestinationWarehouseId, &m.DepartureDate, &m.ArrivalDate, &m.EscortSecurityLevel, &m.Status, &m.AuthorizedByUserId, &m.Remarks, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt); err != nil {
+		if err := rows.Scan(&m.ShipmentId, &m.ManifestNumber, &m.RouteId, &m.TransportUnitId, &m.OriginWarehouseId, &m.OriginWarehouseName, &m.DestinationWarehouseId, &m.DestinationWarehouseName, &m.DepartureDate, &m.ArrivalDate, &m.EscortSecurityLevel, &m.Status, &m.AuthorizedByUserId, &m.Remarks, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt); err != nil {
 			return nil, 0, err
 		}
 		items = append(items, m)

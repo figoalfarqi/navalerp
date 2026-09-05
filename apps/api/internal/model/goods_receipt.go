@@ -8,10 +8,13 @@ type GoodsReceipt struct {
 	ReceiptId string `json:"receipt_id"`
 	ReceiptNumber string `json:"receipt_number"`
 	PoId string `json:"po_id"`
+	PoNumber *string `json:"po_number,omitempty"`
 	WarehouseId string `json:"warehouse_id"`
+	WarehouseName *string `json:"warehouse_name,omitempty"`
 	ReceivedDate time.Time `json:"received_date"`
 	DeliveryOrderNumber *string `json:"delivery_order_number,omitempty"`
 	InspectedByUserId string `json:"inspected_by_user_id"`
+	InspectorName *string `json:"inspector_name,omitempty"`
 	InspectionPassed *bool `json:"inspection_passed,omitempty"`
 	Remarks *string `json:"remarks,omitempty"`
 	CreatedBy *string `json:"created_by,omitempty"`

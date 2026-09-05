@@ -7,6 +7,7 @@ import (
 type Mission struct {
 	MissionId string `json:"mission_id"`
 	TheaterId string `json:"theater_id"`
+	TheaterName *string `json:"theater_name,omitempty"`
 	MissionCode string `json:"mission_code"`
 	MissionName string `json:"mission_name"`
 	MissionType string `json:"mission_type"`

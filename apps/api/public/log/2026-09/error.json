@@ -49,3 +49,14 @@
 {"timestamp":"2026-09-05T10:59:49+07:00","method":"GET","path":"/api/v1/admin/mission","status":401,"duration_ms":210,"ip":"[::1]:56456"}
 {"timestamp":"2026-09-05T10:59:49+07:00","method":"GET","path":"/api/v1/admin/material","status":401,"duration_ms":228,"ip":"[::1]:61994"}
 {"timestamp":"2026-09-05T10:59:49+07:00","method":"GET","path":"/api/v1/admin/work_order","status":401,"duration_ms":244,"ip":"[::1]:55748"}
+{"timestamp":"2026-09-05T13:43:19+07:00","method":"GET","path":"/api/v1/admin/warehouse","status":401,"duration_ms":8,"ip":"[::1]:63239"}
+{"timestamp":"2026-09-05T13:43:29+07:00","method":"POST","path":"/api/v1/admin/login","status":400,"duration_ms":3,"ip":"[::1]:52165"}
+{"timestamp":"2026-09-05T13:43:33+07:00","method":"POST","path":"/api/v1/admin/login","status":400,"duration_ms":2,"ip":"[::1]:52166"}
+{"timestamp":"2026-09-05T13:54:07+07:00","method":"GET","path":"/api/v1/admin/transport_unit","status":401,"duration_ms":0,"ip":"[::1]:56108"}
+{"timestamp":"2026-09-05T13:54:22+07:00","method":"GET","path":"/api/v1/admin/personnel","status":500,"duration_ms":89,"ip":"[::1]:56126"}
+{"timestamp":"2026-09-05T13:54:23+07:00","method":"GET","path":"/api/v1/admin/maintenance_schedule","status":404,"duration_ms":0,"ip":"[::1]:56126"}
+{"timestamp":"2026-09-05T13:54:30+07:00","method":"GET","path":"/api/v1/admin/personnel","status":500,"duration_ms":153,"ip":"[::1]:56131"}
+{"timestamp":"2026-09-05T13:54:30+07:00","method":"GET","path":"/api/v1/admin/maintenance_schedule","status":404,"duration_ms":0,"ip":"[::1]:56131"}
+{"timestamp":"2026-09-05T13:54:30+07:00","method":"GET","path":"/api/v1/admin/item_catalog","status":404,"duration_ms":0,"ip":"[::1]:56132"}
+{"timestamp":"2026-09-05T13:54:30+07:00","method":"GET","path":"/api/v1/admin/flight_sortie","status":404,"duration_ms":0,"ip":"[::1]:56131"}
+{"timestamp":"2026-09-05T13:54:31+07:00","method":"GET","path":"/api/v1/admin/ammunition","status":404,"duration_ms":0,"ip":"[::1]:56132"}

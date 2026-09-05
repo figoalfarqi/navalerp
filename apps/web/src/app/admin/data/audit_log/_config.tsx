@@ -9,8 +9,7 @@ export const entityEndpoint = "/admin/audit_log";
 export const primaryKey = "log_id";
 
 export const columns: ColumnField[] = [
-  { key: "log_id", label: "Log Id" },
-  { key: "user_id", label: "User Id" },
+  { key: "full_name", label: "Pengguna" },
   { key: "action", label: "Action" },
   { key: "entity_table", label: "Entity Table" },
   { key: "entity_id", label: "Entity Id" },
@@ -23,10 +22,15 @@ export const filterFields: FilterField[] = [
 ];
 
 export const formFields = (mode: string): FormField[] => [
-  {
+    {
     name: "user_id",
-    label: "User Id",
-    fieldType: "text",
+    label: "Pengguna",
+    fieldType: "select",
+    options: {
+      url: "/admin/sys_user?limit=100",
+      labelKey: "full_name",
+      valueKey: "user_id",
+    },
     required: false,
     disabled: mode === "view",
   },

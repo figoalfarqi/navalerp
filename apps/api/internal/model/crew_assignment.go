@@ -7,7 +7,9 @@ import (
 type CrewAssignment struct {
 	AssignmentId string `json:"assignment_id"`
 	ShipId string `json:"ship_id"`
+	ShipName *string `json:"ship_name,omitempty"`
 	PersonnelId string `json:"personnel_id"`
+	PersonnelName *string `json:"personnel_name,omitempty"`
 	CrewRole string `json:"crew_role"`
 	Department string `json:"department"`
 	WatchBillDuty *string `json:"watch_bill_duty,omitempty"`

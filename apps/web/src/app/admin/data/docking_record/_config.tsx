@@ -9,8 +9,7 @@ export const entityEndpoint = "/admin/docking_record";
 export const primaryKey = "docking_id";
 
 export const columns: ColumnField[] = [
-  { key: "docking_id", label: "Docking Id" },
-  { key: "ship_id", label: "Ship Id" },
+  { key: "ship_name", label: "Kapal KRI" },
   { key: "shipyard_name", label: "Shipyard Name" },
   { key: "docking_type", label: "Docking Type" },
   { key: "entry_date", label: "Entry Date" },
@@ -23,10 +22,15 @@ export const filterFields: FilterField[] = [
 ];
 
 export const formFields = (mode: string): FormField[] => [
-  {
+    {
     name: "ship_id",
-    label: "Ship Id",
-    fieldType: "text",
+    label: "Kapal KRI",
+    fieldType: "select",
+    options: {
+      url: "/admin/ship?limit=100",
+      labelKey: "ship_name",
+      valueKey: "ship_id",
+    },
     required: true,
     disabled: mode === "view",
   },

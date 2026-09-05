@@ -9,10 +9,9 @@ export const entityEndpoint = "/admin/stock_balance";
 export const primaryKey = "balance_id";
 
 export const columns: ColumnField[] = [
-  { key: "balance_id", label: "Balance Id" },
-  { key: "warehouse_id", label: "Warehouse Id" },
+  { key: "warehouse_name", label: "Nama Gudang" },
   { key: "location_id", label: "Location Id" },
-  { key: "material_id", label: "Material Id" },
+  { key: "material_name", label: "Material" },
   { key: "quantity_on_hand", label: "Quantity On Hand" },
   { key: "quantity_reserved", label: "Quantity Reserved" },
   { key: "quantity_in_transit", label: "Quantity In Transit" },
@@ -23,10 +22,15 @@ export const filterFields: FilterField[] = [
 ];
 
 export const formFields = (mode: string): FormField[] => [
-  {
+    {
     name: "warehouse_id",
-    label: "Warehouse Id",
-    fieldType: "text",
+    label: "Nama Gudang",
+    fieldType: "select",
+    options: {
+      url: "/admin/warehouse?limit=100",
+      labelKey: "warehouse_name",
+      valueKey: "warehouse_id",
+    },
     required: true,
     disabled: mode === "view",
   },
@@ -37,10 +41,15 @@ export const formFields = (mode: string): FormField[] => [
     required: false,
     disabled: mode === "view",
   },
-  {
+    {
     name: "material_id",
-    label: "Material Id",
-    fieldType: "text",
+    label: "Material",
+    fieldType: "select",
+    options: {
+      url: "/admin/material?limit=100",
+      labelKey: "material_name",
+      valueKey: "material_id",
+    },
     required: true,
     disabled: mode === "view",
   },

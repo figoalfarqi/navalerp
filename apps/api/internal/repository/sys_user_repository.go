@@ -19,10 +19,13 @@ func NewSysUserRepository(db *pgxpool.Pool) *SysUserRepository {
 
 // Get retrieves a single sys_user by user_id
 func (r *SysUserRepository) Get(ctx context.Context, id string) (*model.SysUser, error) {
-	query := `SELECT user_id, unit_id, username, password_hash, full_name, email, phone, military_id, rank_title, department, role, is_active, last_login_at, failed_login_attempts, created_by, updated_by, deleted_by, created_at, updated_at, deleted_at, auth_version FROM sys_users WHERE user_id = $1 AND deleted_at IS NULL`
+	query := `SELECT t.user_id, t.unit_id, COALESCE(j_unit.unit_name, ''), t.username, t.password_hash, t.full_name, t.email, t.phone, t.military_id, t.rank_title, t.department, t.role, t.is_active, t.last_login_at, t.failed_login_attempts, t.created_by, t.updated_by, t.deleted_by, t.created_at, t.updated_at, t.deleted_at, t.auth_version
+	FROM sys_users t
+	LEFT JOIN org_units j_unit ON j_unit.unit_id = t.unit_id
+	WHERE t.user_id = $1 AND t.deleted_at IS NULL`
 
 	var m model.SysUser
-	err := r.DB.QueryRow(ctx, query, id).Scan(&m.UserId, &m.UnitId, &m.Username, &m.PasswordHash, &m.FullName, &m.Email, &m.Phone, &m.MilitaryId, &m.RankTitle, &m.Department, &m.Role, &m.IsActive, &m.LastLoginAt, &m.FailedLoginAttempts, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt, &m.AuthVersion)
+	err := r.DB.QueryRow(ctx, query, id).Scan(&m.UserId, &m.UnitId, &m.UnitName, &m.Username, &m.PasswordHash, &m.FullName, &m.Email, &m.Phone, &m.MilitaryId, &m.RankTitle, &m.Department, &m.Role, &m.IsActive, &m.LastLoginAt, &m.FailedLoginAttempts, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt, &m.AuthVersion)
 	if err != nil {
 		return nil, err
 	}
@@ -36,7 +39,7 @@ func (r *SysUserRepository) List(ctx context.Context, opts model.ListOptions) ([
 	var args []any
 	argPos := 1
 
-	whereClauses = append(whereClauses, "deleted_at IS NULL")
+	whereClauses = append(whereClauses, "t.deleted_at IS NULL")
 	if opts.Search != "" {
 		searchPattern := "%" + opts.Search + "%"
 		whereClauses = append(whereClauses, fmt.Sprintf("(username ILIKE $%[1]d OR password_hash ILIKE $%[1]d OR full_name ILIKE $%[1]d)", argPos))
@@ -45,7 +48,7 @@ func (r *SysUserRepository) List(ctx context.Context, opts model.ListOptions) ([
 	}
 
 	whereSql := strings.Join(whereClauses, " AND ")
-	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM sys_users WHERE %s", whereSql)
+	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM sys_users t WHERE %s", whereSql)
 	var total int
 	if err := r.DB.QueryRow(ctx, countQuery, args...).Scan(&total); err != nil {
 		return nil, 0, err
@@ -56,7 +59,10 @@ func (r *SysUserRepository) List(ctx context.Context, opts model.ListOptions) ([
 	offset := opts.Offset
 	if offset < 0 { offset = 0 }
 
-	listQuery := fmt.Sprintf("SELECT user_id, unit_id, username, password_hash, full_name, email, phone, military_id, rank_title, department, role, is_active, last_login_at, failed_login_attempts, created_by, updated_by, deleted_by, created_at, updated_at, deleted_at, auth_version FROM sys_users WHERE %s ORDER BY created_at DESC LIMIT $%d OFFSET $%d", whereSql, argPos, argPos+1)
+	listQuery := fmt.Sprintf(`SELECT t.user_id, t.unit_id, COALESCE(j_unit.unit_name, ''), t.username, t.password_hash, t.full_name, t.email, t.phone, t.military_id, t.rank_title, t.department, t.role, t.is_active, t.last_login_at, t.failed_login_attempts, t.created_by, t.updated_by, t.deleted_by, t.created_at, t.updated_at, t.deleted_at, t.auth_version
+	FROM sys_users t
+	LEFT JOIN org_units j_unit ON j_unit.unit_id = t.unit_id
+	WHERE %s ORDER BY t.created_at DESC LIMIT $%d OFFSET $%d`, whereSql, argPos, argPos+1)
 	args = append(args, limit, offset)
 
 	rows, err := r.DB.Query(ctx, listQuery, args...)
@@ -68,7 +74,7 @@ func (r *SysUserRepository) List(ctx context.Context, opts model.ListOptions) ([
 	var items []model.SysUser
 	for rows.Next() {
 		var m model.SysUser
-		if err := rows.Scan(&m.UserId, &m.UnitId, &m.Username, &m.PasswordHash, &m.FullName, &m.Email, &m.Phone, &m.MilitaryId, &m.RankTitle, &m.Department, &m.Role, &m.IsActive, &m.LastLoginAt, &m.FailedLoginAttempts, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt, &m.AuthVersion); err != nil {
+		if err := rows.Scan(&m.UserId, &m.UnitId, &m.UnitName, &m.Username, &m.PasswordHash, &m.FullName, &m.Email, &m.Phone, &m.MilitaryId, &m.RankTitle, &m.Department, &m.Role, &m.IsActive, &m.LastLoginAt, &m.FailedLoginAttempts, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt, &m.AuthVersion); err != nil {
 			return nil, 0, err
 		}
 		items = append(items, m)

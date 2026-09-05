@@ -9,8 +9,7 @@ export const entityEndpoint = "/admin/daily_log";
 export const primaryKey = "log_id";
 
 export const columns: ColumnField[] = [
-  { key: "log_id", label: "Log Id" },
-  { key: "ship_id", label: "Ship Id" },
+  { key: "ship_name", label: "Kapal KRI" },
   { key: "log_date", label: "Log Date" },
   { key: "latitude", label: "Latitude" },
   { key: "longitude", label: "Longitude" },
@@ -23,10 +22,15 @@ export const filterFields: FilterField[] = [
 ];
 
 export const formFields = (mode: string): FormField[] => [
-  {
+    {
     name: "ship_id",
-    label: "Ship Id",
-    fieldType: "text",
+    label: "Kapal KRI",
+    fieldType: "select",
+    options: {
+      url: "/admin/ship?limit=100",
+      labelKey: "ship_name",
+      valueKey: "ship_id",
+    },
     required: true,
     disabled: mode === "view",
   },
@@ -100,10 +104,15 @@ export const formFields = (mode: string): FormField[] => [
     required: false,
     disabled: mode === "view",
   },
-  {
+    {
     name: "logged_by_user_id",
-    label: "Logged By User Id",
-    fieldType: "text",
+    label: "Petugas Jurnal",
+    fieldType: "select",
+    options: {
+      url: "/admin/sys_user?limit=100",
+      labelKey: "full_name",
+      valueKey: "user_id",
+    },
     required: true,
     disabled: mode === "view",
   },

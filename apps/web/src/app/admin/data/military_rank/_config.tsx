@@ -9,7 +9,6 @@ export const entityEndpoint = "/admin/military_rank";
 export const primaryKey = "rank_id";
 
 export const columns: ColumnField[] = [
-  { key: "rank_id", label: "Rank Id" },
   { key: "rank_code", label: "Rank Code" },
   { key: "rank_name", label: "Rank Name" },
   { key: "rank_category", label: "Rank Category" },

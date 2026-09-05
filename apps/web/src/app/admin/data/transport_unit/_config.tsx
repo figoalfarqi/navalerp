@@ -9,13 +9,12 @@ export const entityEndpoint = "/admin/transport_unit";
 export const primaryKey = "transport_unit_id";
 
 export const columns: ColumnField[] = [
-  { key: "transport_unit_id", label: "Transport Unit Id" },
   { key: "unit_code", label: "Unit Code" },
   { key: "unit_name", label: "Unit Name" },
   { key: "transport_type", label: "Transport Type" },
   { key: "cargo_capacity_tons", label: "Cargo Capacity Tons" },
   { key: "fuel_capacity_liters", label: "Fuel Capacity Liters" },
-  { key: "operating_unit_id", label: "Operating Unit Id" },
+  { key: "unit_name", label: "Satuan Operasi" },
 ];
 
 export const filterFields: FilterField[] = [
@@ -58,10 +57,15 @@ export const formFields = (mode: string): FormField[] => [
     required: false,
     disabled: mode === "view",
   },
-  {
+    {
     name: "operating_unit_id",
-    label: "Operating Unit Id",
-    fieldType: "text",
+    label: "Satuan Operasi",
+    fieldType: "select",
+    options: {
+      url: "/admin/org_unit?limit=100",
+      labelKey: "unit_name",
+      valueKey: "unit_id",
+    },
     required: true,
     disabled: mode === "view",
   },

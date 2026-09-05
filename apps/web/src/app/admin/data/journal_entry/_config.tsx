@@ -9,7 +9,6 @@ export const entityEndpoint = "/admin/journal_entry";
 export const primaryKey = "journal_id";
 
 export const columns: ColumnField[] = [
-  { key: "journal_id", label: "Journal Id" },
   { key: "entry_number", label: "Entry Number" },
   { key: "entry_date", label: "Entry Date" },
   { key: "description", label: "Description" },

@@ -9,9 +9,8 @@ export const entityEndpoint = "/admin/crew_assignment";
 export const primaryKey = "assignment_id";
 
 export const columns: ColumnField[] = [
-  { key: "assignment_id", label: "Assignment Id" },
-  { key: "ship_id", label: "Ship Id" },
-  { key: "personnel_id", label: "Personnel Id" },
+  { key: "ship_name", label: "Kapal KRI" },
+  { key: "personnel_name", label: "Nama Personel" },
   { key: "crew_role", label: "Crew Role" },
   { key: "department", label: "Department" },
   { key: "watch_bill_duty", label: "Watch Bill Duty" },
@@ -23,17 +22,27 @@ export const filterFields: FilterField[] = [
 ];
 
 export const formFields = (mode: string): FormField[] => [
-  {
+    {
     name: "ship_id",
-    label: "Ship Id",
-    fieldType: "text",
+    label: "Kapal KRI",
+    fieldType: "select",
+    options: {
+      url: "/admin/ship?limit=100",
+      labelKey: "ship_name",
+      valueKey: "ship_id",
+    },
     required: true,
     disabled: mode === "view",
   },
-  {
+    {
     name: "personnel_id",
-    label: "Personnel Id",
-    fieldType: "text",
+    label: "Nama Personel",
+    fieldType: "select",
+    options: {
+      url: "/admin/personnel?limit=100",
+      labelKey: "full_name",
+      valueKey: "personnel_id",
+    },
     required: true,
     disabled: mode === "view",
   },

@@ -19,10 +19,14 @@ func NewContractRepository(db *pgxpool.Pool) *ContractRepository {
 
 // Get retrieves a single contract by contract_id
 func (r *ContractRepository) Get(ctx context.Context, id string) (*model.Contract, error) {
-	query := `SELECT contract_id, tender_id, contract_number, vendor_id, contract_title, contract_value, currency, start_date, end_date, procurement_method, warranty_period_months, tot_clause_summary, status, created_by, updated_by, deleted_by, created_at, updated_at, deleted_at FROM proc_contracts WHERE contract_id = $1 AND deleted_at IS NULL`
+	query := `SELECT t.contract_id, t.tender_id, COALESCE(j_tnd.tender_number, ''), t.contract_number, t.vendor_id, COALESCE(j_vnd.vendor_name, ''), t.contract_title, t.contract_value, t.currency, t.start_date, t.end_date, t.procurement_method, t.warranty_period_months, t.tot_clause_summary, t.status, t.created_by, t.updated_by, t.deleted_by, t.created_at, t.updated_at, t.deleted_at
+	FROM proc_contracts t
+	LEFT JOIN proc_vendors j_vnd ON j_vnd.vendor_id = t.vendor_id
+	LEFT JOIN proc_tenders j_tnd ON j_tnd.tender_id = t.tender_id
+	WHERE t.contract_id = $1 AND t.deleted_at IS NULL`
 
 	var m model.Contract
-	err := r.DB.QueryRow(ctx, query, id).Scan(&m.ContractId, &m.TenderId, &m.ContractNumber, &m.VendorId, &m.ContractTitle, &m.ContractValue, &m.Currency, &m.StartDate, &m.EndDate, &m.ProcurementMethod, &m.WarrantyPeriodMonths, &m.TotClauseSummary, &m.Status, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt)
+	err := r.DB.QueryRow(ctx, query, id).Scan(&m.ContractId, &m.TenderId, &m.TenderNumber, &m.ContractNumber, &m.VendorId, &m.VendorName, &m.ContractTitle, &m.ContractValue, &m.Currency, &m.StartDate, &m.EndDate, &m.ProcurementMethod, &m.WarrantyPeriodMonths, &m.TotClauseSummary, &m.Status, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt)
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +52,7 @@ func (r *ContractRepository) List(ctx context.Context, opts model.ListOptions) (
 	var args []any
 	argPos := 1
 
-	whereClauses = append(whereClauses, "deleted_at IS NULL")
+	whereClauses = append(whereClauses, "t.deleted_at IS NULL")
 	if opts.Search != "" {
 		searchPattern := "%" + opts.Search + "%"
 		whereClauses = append(whereClauses, fmt.Sprintf("(contract_number ILIKE $%[1]d OR contract_title ILIKE $%[1]d OR currency ILIKE $%[1]d)", argPos))
@@ -57,7 +61,7 @@ func (r *ContractRepository) List(ctx context.Context, opts model.ListOptions) (
 	}
 
 	whereSql := strings.Join(whereClauses, " AND ")
-	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM proc_contracts WHERE %s", whereSql)
+	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM proc_contracts t WHERE %s", whereSql)
 	var total int
 	if err := r.DB.QueryRow(ctx, countQuery, args...).Scan(&total); err != nil {
 		return nil, 0, err
@@ -68,7 +72,11 @@ func (r *ContractRepository) List(ctx context.Context, opts model.ListOptions) (
 	offset := opts.Offset
 	if offset < 0 { offset = 0 }
 
-	listQuery := fmt.Sprintf("SELECT contract_id, tender_id, contract_number, vendor_id, contract_title, contract_value, currency, start_date, end_date, procurement_method, warranty_period_months, tot_clause_summary, status, created_by, updated_by, deleted_by, created_at, updated_at, deleted_at FROM proc_contracts WHERE %s ORDER BY created_at DESC LIMIT $%d OFFSET $%d", whereSql, argPos, argPos+1)
+	listQuery := fmt.Sprintf(`SELECT t.contract_id, t.tender_id, COALESCE(j_tnd.tender_number, ''), t.contract_number, t.vendor_id, COALESCE(j_vnd.vendor_name, ''), t.contract_title, t.contract_value, t.currency, t.start_date, t.end_date, t.procurement_method, t.warranty_period_months, t.tot_clause_summary, t.status, t.created_by, t.updated_by, t.deleted_by, t.created_at, t.updated_at, t.deleted_at
+	FROM proc_contracts t
+	LEFT JOIN proc_vendors j_vnd ON j_vnd.vendor_id = t.vendor_id
+	LEFT JOIN proc_tenders j_tnd ON j_tnd.tender_id = t.tender_id
+	WHERE %s ORDER BY t.created_at DESC LIMIT $%d OFFSET $%d`, whereSql, argPos, argPos+1)
 	args = append(args, limit, offset)
 
 	rows, err := r.DB.Query(ctx, listQuery, args...)
@@ -80,7 +88,7 @@ func (r *ContractRepository) List(ctx context.Context, opts model.ListOptions) (
 	var items []model.Contract
 	for rows.Next() {
 		var m model.Contract
-		if err := rows.Scan(&m.ContractId, &m.TenderId, &m.ContractNumber, &m.VendorId, &m.ContractTitle, &m.ContractValue, &m.Currency, &m.StartDate, &m.EndDate, &m.ProcurementMethod, &m.WarrantyPeriodMonths, &m.TotClauseSummary, &m.Status, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt); err != nil {
+		if err := rows.Scan(&m.ContractId, &m.TenderId, &m.TenderNumber, &m.ContractNumber, &m.VendorId, &m.VendorName, &m.ContractTitle, &m.ContractValue, &m.Currency, &m.StartDate, &m.EndDate, &m.ProcurementMethod, &m.WarrantyPeriodMonths, &m.TotClauseSummary, &m.Status, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt); err != nil {
 			return nil, 0, err
 		}
 		items = append(items, m)

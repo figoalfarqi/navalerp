@@ -7,6 +7,7 @@ import (
 type DockingRecord struct {
 	DockingId string `json:"docking_id"`
 	ShipId string `json:"ship_id"`
+	ShipName *string `json:"ship_name,omitempty"`
 	ShipyardName string `json:"shipyard_name"`
 	DockingType string `json:"docking_type"`
 	EntryDate time.Time `json:"entry_date"`

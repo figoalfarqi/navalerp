@@ -9,8 +9,7 @@ export const entityEndpoint = "/admin/platform_tco";
 export const primaryKey = "tco_id";
 
 export const columns: ColumnField[] = [
-  { key: "tco_id", label: "Tco Id" },
-  { key: "ship_id", label: "Ship Id" },
+  { key: "ship_name", label: "Kapal KRI" },
   { key: "fiscal_year", label: "Fiscal Year" },
   { key: "acquisition_amortization", label: "Acquisition Amortization" },
   { key: "fuel_lube_cost", label: "Fuel Lube Cost" },
@@ -23,10 +22,15 @@ export const filterFields: FilterField[] = [
 ];
 
 export const formFields = (mode: string): FormField[] => [
-  {
+    {
     name: "ship_id",
-    label: "Ship Id",
-    fieldType: "text",
+    label: "Kapal KRI",
+    fieldType: "select",
+    options: {
+      url: "/admin/ship?limit=100",
+      labelKey: "ship_name",
+      valueKey: "ship_id",
+    },
     required: true,
     disabled: mode === "view",
   },

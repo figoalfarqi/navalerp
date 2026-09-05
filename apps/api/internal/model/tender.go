@@ -15,6 +15,7 @@ type Tender struct {
 	ClosingDate time.Time `json:"closing_date"`
 	Status *string `json:"status,omitempty"`
 	WinnerVendorId *string `json:"winner_vendor_id,omitempty"`
+	WinnerVendorName *string `json:"winner_vendor_name,omitempty"`
 	CreatedBy *string `json:"created_by,omitempty"`
 	UpdatedBy *string `json:"updated_by,omitempty"`
 	DeletedBy *string `json:"deleted_by"`

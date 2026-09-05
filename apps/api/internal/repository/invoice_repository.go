@@ -19,10 +19,16 @@ func NewInvoiceRepository(db *pgxpool.Pool) *InvoiceRepository {
 
 // Get retrieves a single invoice by invoice_id
 func (r *InvoiceRepository) Get(ctx context.Context, id string) (*model.Invoice, error) {
-	query := `SELECT invoice_id, invoice_number, vendor_id, contract_id, po_id, invoice_date, due_date, tax_invoice_number, subtotal, tax_amount, total_amount, verification_status, verified_by_user_id, payment_status, created_by, updated_by, deleted_by, created_at, updated_at, deleted_at FROM fin_invoices WHERE invoice_id = $1 AND deleted_at IS NULL`
+	query := `SELECT t.invoice_id, t.invoice_number, t.vendor_id, COALESCE(j_vnd.vendor_name, ''), t.contract_id, COALESCE(j_ctr.contract_number, ''), t.po_id, COALESCE(j_po.po_number, ''), t.invoice_date, t.due_date, t.tax_invoice_number, t.subtotal, t.tax_amount, t.total_amount, t.verification_status, t.verified_by_user_id, COALESCE(j_usr.full_name, ''), t.payment_status, t.created_by, t.updated_by, t.deleted_by, t.created_at, t.updated_at, t.deleted_at
+	FROM fin_invoices t
+	LEFT JOIN proc_vendors j_vnd ON j_vnd.vendor_id = t.vendor_id
+	LEFT JOIN proc_contracts j_ctr ON j_ctr.contract_id = t.contract_id
+	LEFT JOIN proc_purchase_orders j_po ON j_po.po_id = t.po_id
+	LEFT JOIN sys_users j_usr ON j_usr.user_id = t.verified_by_user_id
+	WHERE t.invoice_id = $1 AND t.deleted_at IS NULL`
 
 	var m model.Invoice
-	err := r.DB.QueryRow(ctx, query, id).Scan(&m.InvoiceId, &m.InvoiceNumber, &m.VendorId, &m.ContractId, &m.PoId, &m.InvoiceDate, &m.DueDate, &m.TaxInvoiceNumber, &m.Subtotal, &m.TaxAmount, &m.TotalAmount, &m.VerificationStatus, &m.VerifiedByUserId, &m.PaymentStatus, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt)
+	err := r.DB.QueryRow(ctx, query, id).Scan(&m.InvoiceId, &m.InvoiceNumber, &m.VendorId, &m.VendorName, &m.ContractId, &m.ContractNumber, &m.PoId, &m.PoNumber, &m.InvoiceDate, &m.DueDate, &m.TaxInvoiceNumber, &m.Subtotal, &m.TaxAmount, &m.TotalAmount, &m.VerificationStatus, &m.VerifiedByUserId, &m.VerifierName, &m.PaymentStatus, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt)
 	if err != nil {
 		return nil, err
 	}
@@ -36,7 +42,7 @@ func (r *InvoiceRepository) List(ctx context.Context, opts model.ListOptions) ([
 	var args []any
 	argPos := 1
 
-	whereClauses = append(whereClauses, "deleted_at IS NULL")
+	whereClauses = append(whereClauses, "t.deleted_at IS NULL")
 	if opts.Search != "" {
 		searchPattern := "%" + opts.Search + "%"
 		whereClauses = append(whereClauses, fmt.Sprintf("(invoice_number ILIKE $%[1]d OR tax_invoice_number ILIKE $%[1]d)", argPos))
@@ -45,7 +51,7 @@ func (r *InvoiceRepository) List(ctx context.Context, opts model.ListOptions) ([
 	}
 
 	whereSql := strings.Join(whereClauses, " AND ")
-	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM fin_invoices WHERE %s", whereSql)
+	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM fin_invoices t WHERE %s", whereSql)
 	var total int
 	if err := r.DB.QueryRow(ctx, countQuery, args...).Scan(&total); err != nil {
 		return nil, 0, err
@@ -56,7 +62,13 @@ func (r *InvoiceRepository) List(ctx context.Context, opts model.ListOptions) ([
 	offset := opts.Offset
 	if offset < 0 { offset = 0 }
 
-	listQuery := fmt.Sprintf("SELECT invoice_id, invoice_number, vendor_id, contract_id, po_id, invoice_date, due_date, tax_invoice_number, subtotal, tax_amount, total_amount, verification_status, verified_by_user_id, payment_status, created_by, updated_by, deleted_by, created_at, updated_at, deleted_at FROM fin_invoices WHERE %s ORDER BY created_at DESC LIMIT $%d OFFSET $%d", whereSql, argPos, argPos+1)
+	listQuery := fmt.Sprintf(`SELECT t.invoice_id, t.invoice_number, t.vendor_id, COALESCE(j_vnd.vendor_name, ''), t.contract_id, COALESCE(j_ctr.contract_number, ''), t.po_id, COALESCE(j_po.po_number, ''), t.invoice_date, t.due_date, t.tax_invoice_number, t.subtotal, t.tax_amount, t.total_amount, t.verification_status, t.verified_by_user_id, COALESCE(j_usr.full_name, ''), t.payment_status, t.created_by, t.updated_by, t.deleted_by, t.created_at, t.updated_at, t.deleted_at
+	FROM fin_invoices t
+	LEFT JOIN proc_vendors j_vnd ON j_vnd.vendor_id = t.vendor_id
+	LEFT JOIN proc_contracts j_ctr ON j_ctr.contract_id = t.contract_id
+	LEFT JOIN proc_purchase_orders j_po ON j_po.po_id = t.po_id
+	LEFT JOIN sys_users j_usr ON j_usr.user_id = t.verified_by_user_id
+	WHERE %s ORDER BY t.created_at DESC LIMIT $%d OFFSET $%d`, whereSql, argPos, argPos+1)
 	args = append(args, limit, offset)
 
 	rows, err := r.DB.Query(ctx, listQuery, args...)
@@ -68,7 +80,7 @@ func (r *InvoiceRepository) List(ctx context.Context, opts model.ListOptions) ([
 	var items []model.Invoice
 	for rows.Next() {
 		var m model.Invoice
-		if err := rows.Scan(&m.InvoiceId, &m.InvoiceNumber, &m.VendorId, &m.ContractId, &m.PoId, &m.InvoiceDate, &m.DueDate, &m.TaxInvoiceNumber, &m.Subtotal, &m.TaxAmount, &m.TotalAmount, &m.VerificationStatus, &m.VerifiedByUserId, &m.PaymentStatus, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt); err != nil {
+		if err := rows.Scan(&m.InvoiceId, &m.InvoiceNumber, &m.VendorId, &m.VendorName, &m.ContractId, &m.ContractNumber, &m.PoId, &m.PoNumber, &m.InvoiceDate, &m.DueDate, &m.TaxInvoiceNumber, &m.Subtotal, &m.TaxAmount, &m.TotalAmount, &m.VerificationStatus, &m.VerifiedByUserId, &m.VerifierName, &m.PaymentStatus, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt); err != nil {
 			return nil, 0, err
 		}
 		items = append(items, m)

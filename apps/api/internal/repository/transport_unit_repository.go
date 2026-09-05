@@ -19,10 +19,13 @@ func NewTransportUnitRepository(db *pgxpool.Pool) *TransportUnitRepository {
 
 // Get retrieves a single transport_unit by transport_unit_id
 func (r *TransportUnitRepository) Get(ctx context.Context, id string) (*model.TransportUnit, error) {
-	query := `SELECT transport_unit_id, unit_code, unit_name, transport_type, cargo_capacity_tons, fuel_capacity_liters, operating_unit_id, status, created_by, updated_by, deleted_by, created_at, updated_at, deleted_at FROM log_transport_units WHERE transport_unit_id = $1 AND deleted_at IS NULL`
+	query := `SELECT t.transport_unit_id, t.unit_code, t.unit_name, t.transport_type, t.cargo_capacity_tons, t.fuel_capacity_liters, t.operating_unit_id, COALESCE(j_unit.unit_name, ''), t.status, t.created_by, t.updated_by, t.deleted_by, t.created_at, t.updated_at, t.deleted_at
+	FROM log_transport_units t
+	LEFT JOIN org_units j_unit ON j_unit.unit_id = t.operating_unit_id
+	WHERE t.transport_unit_id = $1 AND t.deleted_at IS NULL`
 
 	var m model.TransportUnit
-	err := r.DB.QueryRow(ctx, query, id).Scan(&m.TransportUnitId, &m.UnitCode, &m.UnitName, &m.TransportType, &m.CargoCapacityTons, &m.FuelCapacityLiters, &m.OperatingUnitId, &m.Status, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt)
+	err := r.DB.QueryRow(ctx, query, id).Scan(&m.TransportUnitId, &m.UnitCode, &m.UnitName, &m.TransportType, &m.CargoCapacityTons, &m.FuelCapacityLiters, &m.OperatingUnitId, &m.OperatingUnitName, &m.Status, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt)
 	if err != nil {
 		return nil, err
 	}
@@ -36,7 +39,7 @@ func (r *TransportUnitRepository) List(ctx context.Context, opts model.ListOptio
 	var args []any
 	argPos := 1
 
-	whereClauses = append(whereClauses, "deleted_at IS NULL")
+	whereClauses = append(whereClauses, "t.deleted_at IS NULL")
 	if opts.Search != "" {
 		searchPattern := "%" + opts.Search + "%"
 		whereClauses = append(whereClauses, fmt.Sprintf("(unit_code ILIKE $%[1]d OR unit_name ILIKE $%[1]d)", argPos))
@@ -45,7 +48,7 @@ func (r *TransportUnitRepository) List(ctx context.Context, opts model.ListOptio
 	}
 
 	whereSql := strings.Join(whereClauses, " AND ")
-	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM log_transport_units WHERE %s", whereSql)
+	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM log_transport_units t WHERE %s", whereSql)
 	var total int
 	if err := r.DB.QueryRow(ctx, countQuery, args...).Scan(&total); err != nil {
 		return nil, 0, err
@@ -56,7 +59,10 @@ func (r *TransportUnitRepository) List(ctx context.Context, opts model.ListOptio
 	offset := opts.Offset
 	if offset < 0 { offset = 0 }
 
-	listQuery := fmt.Sprintf("SELECT transport_unit_id, unit_code, unit_name, transport_type, cargo_capacity_tons, fuel_capacity_liters, operating_unit_id, status, created_by, updated_by, deleted_by, created_at, updated_at, deleted_at FROM log_transport_units WHERE %s ORDER BY created_at DESC LIMIT $%d OFFSET $%d", whereSql, argPos, argPos+1)
+	listQuery := fmt.Sprintf(`SELECT t.transport_unit_id, t.unit_code, t.unit_name, t.transport_type, t.cargo_capacity_tons, t.fuel_capacity_liters, t.operating_unit_id, COALESCE(j_unit.unit_name, ''), t.status, t.created_by, t.updated_by, t.deleted_by, t.created_at, t.updated_at, t.deleted_at
+	FROM log_transport_units t
+	LEFT JOIN org_units j_unit ON j_unit.unit_id = t.operating_unit_id
+	WHERE %s ORDER BY t.created_at DESC LIMIT $%d OFFSET $%d`, whereSql, argPos, argPos+1)
 	args = append(args, limit, offset)
 
 	rows, err := r.DB.Query(ctx, listQuery, args...)
@@ -68,7 +74,7 @@ func (r *TransportUnitRepository) List(ctx context.Context, opts model.ListOptio
 	var items []model.TransportUnit
 	for rows.Next() {
 		var m model.TransportUnit
-		if err := rows.Scan(&m.TransportUnitId, &m.UnitCode, &m.UnitName, &m.TransportType, &m.CargoCapacityTons, &m.FuelCapacityLiters, &m.OperatingUnitId, &m.Status, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt); err != nil {
+		if err := rows.Scan(&m.TransportUnitId, &m.UnitCode, &m.UnitName, &m.TransportType, &m.CargoCapacityTons, &m.FuelCapacityLiters, &m.OperatingUnitId, &m.OperatingUnitName, &m.Status, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt); err != nil {
 			return nil, 0, err
 		}
 		items = append(items, m)

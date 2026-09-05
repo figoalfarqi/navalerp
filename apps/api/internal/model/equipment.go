@@ -7,6 +7,7 @@ import (
 type Equipment struct {
 	EquipmentId string `json:"equipment_id"`
 	SystemId string `json:"system_id"`
+	SystemName *string `json:"system_name,omitempty"`
 	SerialNumber string `json:"serial_number"`
 	EquipmentTag *string `json:"equipment_tag,omitempty"`
 	EquipmentName string `json:"equipment_name"`

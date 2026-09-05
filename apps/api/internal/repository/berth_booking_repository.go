@@ -19,10 +19,14 @@ func NewBerthBookingRepository(db *pgxpool.Pool) *BerthBookingRepository {
 
 // Get retrieves a single berth_booking by booking_id
 func (r *BerthBookingRepository) Get(ctx context.Context, id string) (*model.BerthBooking, error) {
-	query := `SELECT booking_id, facility_id, ship_id, booking_purpose, eta, etd, actual_berth_time, actual_unberth_time, shore_power_kwh_used, fresh_water_ton_used, status, approved_by_user_id, remarks, created_by, updated_by, deleted_by, created_at, updated_at, deleted_at FROM infra_berth_bookings WHERE booking_id = $1 AND deleted_at IS NULL`
+	query := `SELECT t.booking_id, t.facility_id, COALESCE(j_fac.facility_name, ''), t.ship_id, COALESCE(j_ship.ship_name, ''), t.booking_purpose, t.eta, t.etd, t.actual_berth_time, t.actual_unberth_time, t.shore_power_kwh_used, t.fresh_water_ton_used, t.status, t.approved_by_user_id, t.remarks, t.created_by, t.updated_by, t.deleted_by, t.created_at, t.updated_at, t.deleted_at
+	FROM infra_berth_bookings t
+	LEFT JOIN infra_facilities j_fac ON j_fac.facility_id = t.facility_id
+	LEFT JOIN mro_ships j_ship ON j_ship.ship_id = t.ship_id
+	WHERE t.booking_id = $1 AND t.deleted_at IS NULL`
 
 	var m model.BerthBooking
-	err := r.DB.QueryRow(ctx, query, id).Scan(&m.BookingId, &m.FacilityId, &m.ShipId, &m.BookingPurpose, &m.Eta, &m.Etd, &m.ActualBerthTime, &m.ActualUnberthTime, &m.ShorePowerKwhUsed, &m.FreshWaterTonUsed, &m.Status, &m.ApprovedByUserId, &m.Remarks, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt)
+	err := r.DB.QueryRow(ctx, query, id).Scan(&m.BookingId, &m.FacilityId, &m.FacilityName, &m.ShipId, &m.ShipName, &m.BookingPurpose, &m.Eta, &m.Etd, &m.ActualBerthTime, &m.ActualUnberthTime, &m.ShorePowerKwhUsed, &m.FreshWaterTonUsed, &m.Status, &m.ApprovedByUserId, &m.Remarks, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt)
 	if err != nil {
 		return nil, err
 	}
@@ -36,7 +40,7 @@ func (r *BerthBookingRepository) List(ctx context.Context, opts model.ListOption
 	var args []any
 	argPos := 1
 
-	whereClauses = append(whereClauses, "deleted_at IS NULL")
+	whereClauses = append(whereClauses, "t.deleted_at IS NULL")
 	if opts.Search != "" {
 		searchPattern := "%" + opts.Search + "%"
 		whereClauses = append(whereClauses, fmt.Sprintf("(remarks ILIKE $%[1]d)", argPos))
@@ -45,7 +49,7 @@ func (r *BerthBookingRepository) List(ctx context.Context, opts model.ListOption
 	}
 
 	whereSql := strings.Join(whereClauses, " AND ")
-	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM infra_berth_bookings WHERE %s", whereSql)
+	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM infra_berth_bookings t WHERE %s", whereSql)
 	var total int
 	if err := r.DB.QueryRow(ctx, countQuery, args...).Scan(&total); err != nil {
 		return nil, 0, err
@@ -56,7 +60,11 @@ func (r *BerthBookingRepository) List(ctx context.Context, opts model.ListOption
 	offset := opts.Offset
 	if offset < 0 { offset = 0 }
 
-	listQuery := fmt.Sprintf("SELECT booking_id, facility_id, ship_id, booking_purpose, eta, etd, actual_berth_time, actual_unberth_time, shore_power_kwh_used, fresh_water_ton_used, status, approved_by_user_id, remarks, created_by, updated_by, deleted_by, created_at, updated_at, deleted_at FROM infra_berth_bookings WHERE %s ORDER BY created_at DESC LIMIT $%d OFFSET $%d", whereSql, argPos, argPos+1)
+	listQuery := fmt.Sprintf(`SELECT t.booking_id, t.facility_id, COALESCE(j_fac.facility_name, ''), t.ship_id, COALESCE(j_ship.ship_name, ''), t.booking_purpose, t.eta, t.etd, t.actual_berth_time, t.actual_unberth_time, t.shore_power_kwh_used, t.fresh_water_ton_used, t.status, t.approved_by_user_id, t.remarks, t.created_by, t.updated_by, t.deleted_by, t.created_at, t.updated_at, t.deleted_at
+	FROM infra_berth_bookings t
+	LEFT JOIN infra_facilities j_fac ON j_fac.facility_id = t.facility_id
+	LEFT JOIN mro_ships j_ship ON j_ship.ship_id = t.ship_id
+	WHERE %s ORDER BY t.created_at DESC LIMIT $%d OFFSET $%d`, whereSql, argPos, argPos+1)
 	args = append(args, limit, offset)
 
 	rows, err := r.DB.Query(ctx, listQuery, args...)
@@ -68,7 +76,7 @@ func (r *BerthBookingRepository) List(ctx context.Context, opts model.ListOption
 	var items []model.BerthBooking
 	for rows.Next() {
 		var m model.BerthBooking
-		if err := rows.Scan(&m.BookingId, &m.FacilityId, &m.ShipId, &m.BookingPurpose, &m.Eta, &m.Etd, &m.ActualBerthTime, &m.ActualUnberthTime, &m.ShorePowerKwhUsed, &m.FreshWaterTonUsed, &m.Status, &m.ApprovedByUserId, &m.Remarks, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt); err != nil {
+		if err := rows.Scan(&m.BookingId, &m.FacilityId, &m.FacilityName, &m.ShipId, &m.ShipName, &m.BookingPurpose, &m.Eta, &m.Etd, &m.ActualBerthTime, &m.ActualUnberthTime, &m.ShorePowerKwhUsed, &m.FreshWaterTonUsed, &m.Status, &m.ApprovedByUserId, &m.Remarks, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt); err != nil {
 			return nil, 0, err
 		}
 		items = append(items, m)

@@ -7,6 +7,7 @@ import (
 type OrgUnit struct {
 	UnitId string `json:"unit_id"`
 	ParentUnitId *string `json:"parent_unit_id,omitempty"`
+	ParentUnitName *string `json:"parent_unit_name,omitempty"`
 	UnitCode string `json:"unit_code"`
 	UnitName string `json:"unit_name"`
 	UnitType string `json:"unit_type"`

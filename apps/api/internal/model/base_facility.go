@@ -7,6 +7,7 @@ import (
 type BaseFacility struct {
 	FacilityId string `json:"facility_id"`
 	BaseUnitId string `json:"base_unit_id"`
+	UnitName *string `json:"unit_name,omitempty"`
 	FacilityCode string `json:"facility_code"`
 	FacilityName string `json:"facility_name"`
 	FacilityType string `json:"facility_type"`

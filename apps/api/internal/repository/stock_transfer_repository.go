@@ -19,10 +19,14 @@ func NewStockTransferRepository(db *pgxpool.Pool) *StockTransferRepository {
 
 // Get retrieves a single stock_transfer by transfer_id
 func (r *StockTransferRepository) Get(ctx context.Context, id string) (*model.StockTransfer, error) {
-	query := `SELECT transfer_id, transfer_number, from_warehouse_id, to_warehouse_id, movement_type, scheduled_departure, actual_departure, scheduled_arrival, actual_arrival, transporter_unit, status, created_by, updated_by, deleted_by, created_at, updated_at, deleted_at FROM inv_stock_transfers WHERE transfer_id = $1 AND deleted_at IS NULL`
+	query := `SELECT t.transfer_id, t.transfer_number, t.from_warehouse_id, COALESCE(j_fwh.warehouse_name, ''), t.to_warehouse_id, COALESCE(j_twh.warehouse_name, ''), t.movement_type, t.scheduled_departure, t.actual_departure, t.scheduled_arrival, t.actual_arrival, t.transporter_unit, t.status, t.created_by, t.updated_by, t.deleted_by, t.created_at, t.updated_at, t.deleted_at
+	FROM inv_stock_transfers t
+	LEFT JOIN inv_warehouses j_fwh ON j_fwh.warehouse_id = t.from_warehouse_id
+	LEFT JOIN inv_warehouses j_twh ON j_twh.warehouse_id = t.to_warehouse_id
+	WHERE t.transfer_id = $1 AND t.deleted_at IS NULL`
 
 	var m model.StockTransfer
-	err := r.DB.QueryRow(ctx, query, id).Scan(&m.TransferId, &m.TransferNumber, &m.FromWarehouseId, &m.ToWarehouseId, &m.MovementType, &m.ScheduledDeparture, &m.ActualDeparture, &m.ScheduledArrival, &m.ActualArrival, &m.TransporterUnit, &m.Status, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt)
+	err := r.DB.QueryRow(ctx, query, id).Scan(&m.TransferId, &m.TransferNumber, &m.FromWarehouseId, &m.SourceWarehouseName, &m.ToWarehouseId, &m.DestWarehouseName, &m.MovementType, &m.ScheduledDeparture, &m.ActualDeparture, &m.ScheduledArrival, &m.ActualArrival, &m.TransporterUnit, &m.Status, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt)
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +52,7 @@ func (r *StockTransferRepository) List(ctx context.Context, opts model.ListOptio
 	var args []any
 	argPos := 1
 
-	whereClauses = append(whereClauses, "deleted_at IS NULL")
+	whereClauses = append(whereClauses, "t.deleted_at IS NULL")
 	if opts.Search != "" {
 		searchPattern := "%" + opts.Search + "%"
 		whereClauses = append(whereClauses, fmt.Sprintf("(transfer_number ILIKE $%[1]d OR transporter_unit ILIKE $%[1]d)", argPos))
@@ -57,7 +61,7 @@ func (r *StockTransferRepository) List(ctx context.Context, opts model.ListOptio
 	}
 
 	whereSql := strings.Join(whereClauses, " AND ")
-	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM inv_stock_transfers WHERE %s", whereSql)
+	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM inv_stock_transfers t WHERE %s", whereSql)
 	var total int
 	if err := r.DB.QueryRow(ctx, countQuery, args...).Scan(&total); err != nil {
 		return nil, 0, err
@@ -68,7 +72,11 @@ func (r *StockTransferRepository) List(ctx context.Context, opts model.ListOptio
 	offset := opts.Offset
 	if offset < 0 { offset = 0 }
 
-	listQuery := fmt.Sprintf("SELECT transfer_id, transfer_number, from_warehouse_id, to_warehouse_id, movement_type, scheduled_departure, actual_departure, scheduled_arrival, actual_arrival, transporter_unit, status, created_by, updated_by, deleted_by, created_at, updated_at, deleted_at FROM inv_stock_transfers WHERE %s ORDER BY created_at DESC LIMIT $%d OFFSET $%d", whereSql, argPos, argPos+1)
+	listQuery := fmt.Sprintf(`SELECT t.transfer_id, t.transfer_number, t.from_warehouse_id, COALESCE(j_fwh.warehouse_name, ''), t.to_warehouse_id, COALESCE(j_twh.warehouse_name, ''), t.movement_type, t.scheduled_departure, t.actual_departure, t.scheduled_arrival, t.actual_arrival, t.transporter_unit, t.status, t.created_by, t.updated_by, t.deleted_by, t.created_at, t.updated_at, t.deleted_at
+	FROM inv_stock_transfers t
+	LEFT JOIN inv_warehouses j_fwh ON j_fwh.warehouse_id = t.from_warehouse_id
+	LEFT JOIN inv_warehouses j_twh ON j_twh.warehouse_id = t.to_warehouse_id
+	WHERE %s ORDER BY t.created_at DESC LIMIT $%d OFFSET $%d`, whereSql, argPos, argPos+1)
 	args = append(args, limit, offset)
 
 	rows, err := r.DB.Query(ctx, listQuery, args...)
@@ -80,7 +88,7 @@ func (r *StockTransferRepository) List(ctx context.Context, opts model.ListOptio
 	var items []model.StockTransfer
 	for rows.Next() {
 		var m model.StockTransfer
-		if err := rows.Scan(&m.TransferId, &m.TransferNumber, &m.FromWarehouseId, &m.ToWarehouseId, &m.MovementType, &m.ScheduledDeparture, &m.ActualDeparture, &m.ScheduledArrival, &m.ActualArrival, &m.TransporterUnit, &m.Status, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt); err != nil {
+		if err := rows.Scan(&m.TransferId, &m.TransferNumber, &m.FromWarehouseId, &m.SourceWarehouseName, &m.ToWarehouseId, &m.DestWarehouseName, &m.MovementType, &m.ScheduledDeparture, &m.ActualDeparture, &m.ScheduledArrival, &m.ActualArrival, &m.TransporterUnit, &m.Status, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt); err != nil {
 			return nil, 0, err
 		}
 		items = append(items, m)

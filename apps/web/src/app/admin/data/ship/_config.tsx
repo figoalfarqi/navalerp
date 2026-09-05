@@ -9,9 +9,8 @@ export const entityEndpoint = "/admin/ship";
 export const primaryKey = "ship_id";
 
 export const columns: ColumnField[] = [
-  { key: "ship_id", label: "Ship Id" },
-  { key: "class_id", label: "Class Id" },
-  { key: "assigned_unit_id", label: "Assigned Unit Id" },
+  { key: "class_name", label: "Kelas Kapal" },
+  { key: "unit_name", label: "Satuan / Pangkalan" },
   { key: "hull_number", label: "Hull Number" },
   { key: "ship_name", label: "Ship Name" },
   { key: "call_sign", label: "Call Sign" },
@@ -23,17 +22,27 @@ export const filterFields: FilterField[] = [
 ];
 
 export const formFields = (mode: string): FormField[] => [
-  {
+    {
     name: "class_id",
-    label: "Class Id",
-    fieldType: "text",
+    label: "Kelas Kapal",
+    fieldType: "select",
+    options: {
+      url: "/admin/ship_class?limit=100",
+      labelKey: "class_name",
+      valueKey: "class_id",
+    },
     required: true,
     disabled: mode === "view",
   },
-  {
+    {
     name: "assigned_unit_id",
-    label: "Assigned Unit Id",
-    fieldType: "text",
+    label: "Satuan / Pangkalan",
+    fieldType: "select",
+    options: {
+      url: "/admin/org_unit?limit=100",
+      labelKey: "unit_name",
+      valueKey: "unit_id",
+    },
     required: true,
     disabled: mode === "view",
   },

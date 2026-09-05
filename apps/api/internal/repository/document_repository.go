@@ -19,10 +19,14 @@ func NewDocumentRepository(db *pgxpool.Pool) *DocumentRepository {
 
 // Get retrieves a single document by document_id
 func (r *DocumentRepository) Get(ctx context.Context, id string) (*model.Document, error) {
-	query := `SELECT document_id, document_number, title, category_id, originating_unit_id, classification_level, effective_date, expiry_date, status, approved_by_user_id, created_by, updated_by, deleted_by, created_at, updated_at, deleted_at FROM doc_documents WHERE document_id = $1 AND deleted_at IS NULL`
+	query := `SELECT t.document_id, t.document_number, t.title, t.category_id, COALESCE(j_cat.category_name, ''), t.originating_unit_id, COALESCE(j_unit.unit_name, ''), t.classification_level, t.effective_date, t.expiry_date, t.status, t.approved_by_user_id, t.created_by, t.updated_by, t.deleted_by, t.created_at, t.updated_at, t.deleted_at
+	FROM doc_documents t
+	LEFT JOIN doc_categories j_cat ON j_cat.category_id = t.category_id
+	LEFT JOIN org_units j_unit ON j_unit.unit_id = t.originating_unit_id
+	WHERE t.document_id = $1 AND t.deleted_at IS NULL`
 
 	var m model.Document
-	err := r.DB.QueryRow(ctx, query, id).Scan(&m.DocumentId, &m.DocumentNumber, &m.Title, &m.CategoryId, &m.OriginatingUnitId, &m.ClassificationLevel, &m.EffectiveDate, &m.ExpiryDate, &m.Status, &m.ApprovedByUserId, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt)
+	err := r.DB.QueryRow(ctx, query, id).Scan(&m.DocumentId, &m.DocumentNumber, &m.Title, &m.CategoryId, &m.CategoryName, &m.OriginatingUnitId, &m.UnitName, &m.ClassificationLevel, &m.EffectiveDate, &m.ExpiryDate, &m.Status, &m.ApprovedByUserId, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt)
 	if err != nil {
 		return nil, err
 	}
@@ -60,7 +64,7 @@ func (r *DocumentRepository) List(ctx context.Context, opts model.ListOptions) (
 	var args []any
 	argPos := 1
 
-	whereClauses = append(whereClauses, "deleted_at IS NULL")
+	whereClauses = append(whereClauses, "t.deleted_at IS NULL")
 	if opts.Search != "" {
 		searchPattern := "%" + opts.Search + "%"
 		whereClauses = append(whereClauses, fmt.Sprintf("(document_number ILIKE $%[1]d OR title ILIKE $%[1]d)", argPos))
@@ -69,7 +73,7 @@ func (r *DocumentRepository) List(ctx context.Context, opts model.ListOptions) (
 	}
 
 	whereSql := strings.Join(whereClauses, " AND ")
-	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM doc_documents WHERE %s", whereSql)
+	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM doc_documents t WHERE %s", whereSql)
 	var total int
 	if err := r.DB.QueryRow(ctx, countQuery, args...).Scan(&total); err != nil {
 		return nil, 0, err
@@ -80,7 +84,11 @@ func (r *DocumentRepository) List(ctx context.Context, opts model.ListOptions) (
 	offset := opts.Offset
 	if offset < 0 { offset = 0 }
 
-	listQuery := fmt.Sprintf("SELECT document_id, document_number, title, category_id, originating_unit_id, classification_level, effective_date, expiry_date, status, approved_by_user_id, created_by, updated_by, deleted_by, created_at, updated_at, deleted_at FROM doc_documents WHERE %s ORDER BY created_at DESC LIMIT $%d OFFSET $%d", whereSql, argPos, argPos+1)
+	listQuery := fmt.Sprintf(`SELECT t.document_id, t.document_number, t.title, t.category_id, COALESCE(j_cat.category_name, ''), t.originating_unit_id, COALESCE(j_unit.unit_name, ''), t.classification_level, t.effective_date, t.expiry_date, t.status, t.approved_by_user_id, t.created_by, t.updated_by, t.deleted_by, t.created_at, t.updated_at, t.deleted_at
+	FROM doc_documents t
+	LEFT JOIN doc_categories j_cat ON j_cat.category_id = t.category_id
+	LEFT JOIN org_units j_unit ON j_unit.unit_id = t.originating_unit_id
+	WHERE %s ORDER BY t.created_at DESC LIMIT $%d OFFSET $%d`, whereSql, argPos, argPos+1)
 	args = append(args, limit, offset)
 
 	rows, err := r.DB.Query(ctx, listQuery, args...)
@@ -92,7 +100,7 @@ func (r *DocumentRepository) List(ctx context.Context, opts model.ListOptions) (
 	var items []model.Document
 	for rows.Next() {
 		var m model.Document
-		if err := rows.Scan(&m.DocumentId, &m.DocumentNumber, &m.Title, &m.CategoryId, &m.OriginatingUnitId, &m.ClassificationLevel, &m.EffectiveDate, &m.ExpiryDate, &m.Status, &m.ApprovedByUserId, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt); err != nil {
+		if err := rows.Scan(&m.DocumentId, &m.DocumentNumber, &m.Title, &m.CategoryId, &m.CategoryName, &m.OriginatingUnitId, &m.UnitName, &m.ClassificationLevel, &m.EffectiveDate, &m.ExpiryDate, &m.Status, &m.ApprovedByUserId, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt); err != nil {
 			return nil, 0, err
 		}
 		items = append(items, m)

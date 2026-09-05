@@ -8,8 +8,11 @@ type Invoice struct {
 	InvoiceId string `json:"invoice_id"`
 	InvoiceNumber string `json:"invoice_number"`
 	VendorId string `json:"vendor_id"`
+	VendorName *string `json:"vendor_name,omitempty"`
 	ContractId *string `json:"contract_id,omitempty"`
+	ContractNumber *string `json:"contract_number,omitempty"`
 	PoId *string `json:"po_id,omitempty"`
+	PoNumber *string `json:"po_number,omitempty"`
 	InvoiceDate time.Time `json:"invoice_date"`
 	DueDate time.Time `json:"due_date"`
 	TaxInvoiceNumber *string `json:"tax_invoice_number,omitempty"`
@@ -18,6 +21,7 @@ type Invoice struct {
 	TotalAmount *float64 `json:"total_amount,omitempty"`
 	VerificationStatus *string `json:"verification_status,omitempty"`
 	VerifiedByUserId *string `json:"verified_by_user_id,omitempty"`
+	VerifierName *string `json:"verifier_name,omitempty"`
 	PaymentStatus *string `json:"payment_status,omitempty"`
 	CreatedBy *string `json:"created_by,omitempty"`
 	UpdatedBy *string `json:"updated_by,omitempty"`

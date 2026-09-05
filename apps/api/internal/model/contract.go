@@ -7,8 +7,10 @@ import (
 type Contract struct {
 	ContractId string `json:"contract_id"`
 	TenderId *string `json:"tender_id,omitempty"`
+	TenderNumber *string `json:"tender_number,omitempty"`
 	ContractNumber string `json:"contract_number"`
 	VendorId string `json:"vendor_id"`
+	VendorName *string `json:"vendor_name,omitempty"`
 	ContractTitle string `json:"contract_title"`
 	ContractValue float64 `json:"contract_value"`
 	Currency *string `json:"currency,omitempty"`

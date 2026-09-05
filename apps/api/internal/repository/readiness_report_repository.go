@@ -19,10 +19,13 @@ func NewReadinessReportRepository(db *pgxpool.Pool) *ReadinessReportRepository {
 
 // Get retrieves a single readiness_report by snapshot_id
 func (r *ReadinessReportRepository) Get(ctx context.Context, id string) (*model.ReadinessReport, error) {
-	query := `SELECT snapshot_id, ship_id, snapshot_timestamp, readiness_category, mro_readiness_score, personnel_manning_score, logistics_supply_score, composite_readiness_index, remarks, created_at FROM ops_ship_readiness_snapshots WHERE snapshot_id = $1`
+	query := `SELECT t.snapshot_id, t.ship_id, COALESCE(j_ship.ship_name, ''), t.snapshot_timestamp, t.readiness_category, t.mro_readiness_score, t.personnel_manning_score, t.logistics_supply_score, t.composite_readiness_index, t.remarks, t.created_at
+	FROM ops_ship_readiness_snapshots t
+	LEFT JOIN mro_ships j_ship ON j_ship.ship_id = t.ship_id
+	WHERE t.snapshot_id = $1`
 
 	var m model.ReadinessReport
-	err := r.DB.QueryRow(ctx, query, id).Scan(&m.SnapshotId, &m.ShipId, &m.SnapshotTimestamp, &m.ReadinessCategory, &m.MroReadinessScore, &m.PersonnelManningScore, &m.LogisticsSupplyScore, &m.CompositeReadinessIndex, &m.Remarks, &m.CreatedAt)
+	err := r.DB.QueryRow(ctx, query, id).Scan(&m.SnapshotId, &m.ShipId, &m.ShipName, &m.SnapshotTimestamp, &m.ReadinessCategory, &m.MroReadinessScore, &m.PersonnelManningScore, &m.LogisticsSupplyScore, &m.CompositeReadinessIndex, &m.Remarks, &m.CreatedAt)
 	if err != nil {
 		return nil, err
 	}
@@ -44,7 +47,7 @@ func (r *ReadinessReportRepository) List(ctx context.Context, opts model.ListOpt
 	}
 
 	whereSql := strings.Join(whereClauses, " AND ")
-	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM ops_ship_readiness_snapshots WHERE %s", whereSql)
+	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM ops_ship_readiness_snapshots t WHERE %s", whereSql)
 	var total int
 	if err := r.DB.QueryRow(ctx, countQuery, args...).Scan(&total); err != nil {
 		return nil, 0, err
@@ -55,7 +58,10 @@ func (r *ReadinessReportRepository) List(ctx context.Context, opts model.ListOpt
 	offset := opts.Offset
 	if offset < 0 { offset = 0 }
 
-	listQuery := fmt.Sprintf("SELECT snapshot_id, ship_id, snapshot_timestamp, readiness_category, mro_readiness_score, personnel_manning_score, logistics_supply_score, composite_readiness_index, remarks, created_at FROM ops_ship_readiness_snapshots WHERE %s ORDER BY created_at DESC LIMIT $%d OFFSET $%d", whereSql, argPos, argPos+1)
+	listQuery := fmt.Sprintf(`SELECT t.snapshot_id, t.ship_id, COALESCE(j_ship.ship_name, ''), t.snapshot_timestamp, t.readiness_category, t.mro_readiness_score, t.personnel_manning_score, t.logistics_supply_score, t.composite_readiness_index, t.remarks, t.created_at
+	FROM ops_ship_readiness_snapshots t
+	LEFT JOIN mro_ships j_ship ON j_ship.ship_id = t.ship_id
+	WHERE %s ORDER BY t.created_at DESC LIMIT $%d OFFSET $%d`, whereSql, argPos, argPos+1)
 	args = append(args, limit, offset)
 
 	rows, err := r.DB.Query(ctx, listQuery, args...)
@@ -67,7 +73,7 @@ func (r *ReadinessReportRepository) List(ctx context.Context, opts model.ListOpt
 	var items []model.ReadinessReport
 	for rows.Next() {
 		var m model.ReadinessReport
-		if err := rows.Scan(&m.SnapshotId, &m.ShipId, &m.SnapshotTimestamp, &m.ReadinessCategory, &m.MroReadinessScore, &m.PersonnelManningScore, &m.LogisticsSupplyScore, &m.CompositeReadinessIndex, &m.Remarks, &m.CreatedAt); err != nil {
+		if err := rows.Scan(&m.SnapshotId, &m.ShipId, &m.ShipName, &m.SnapshotTimestamp, &m.ReadinessCategory, &m.MroReadinessScore, &m.PersonnelManningScore, &m.LogisticsSupplyScore, &m.CompositeReadinessIndex, &m.Remarks, &m.CreatedAt); err != nil {
 			return nil, 0, err
 		}
 		items = append(items, m)
@@ -116,7 +122,7 @@ func (r *ReadinessReportRepository) Update(ctx context.Context, id string, m *mo
 
 // Delete removes or soft-deletes readiness_report
 func (r *ReadinessReportRepository) Delete(ctx context.Context, id string) error {
-	query := `DELETE FROM ops_ship_readiness_snapshots WHERE snapshot_id = $1`
+	query := `DELETE FROM ops_ship_readiness_snapshots t WHERE snapshot_id = $1`
 	_, err := r.DB.Exec(ctx, query, id)
 	return err
 }

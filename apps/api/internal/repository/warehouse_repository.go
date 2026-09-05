@@ -19,10 +19,14 @@ func NewWarehouseRepository(db *pgxpool.Pool) *WarehouseRepository {
 
 // Get retrieves a single warehouse by warehouse_id
 func (r *WarehouseRepository) Get(ctx context.Context, id string) (*model.Warehouse, error) {
-	query := `SELECT warehouse_id, unit_id, warehouse_code, warehouse_name, warehouse_type, capacity_m3, manager_user_id, location_address, is_active, created_by, updated_by, deleted_by, created_at, updated_at, deleted_at FROM inv_warehouses WHERE warehouse_id = $1 AND deleted_at IS NULL`
+	query := `SELECT w.warehouse_id, w.unit_id, COALESCE(u_unit.unit_name, ''), w.warehouse_code, w.warehouse_name, w.warehouse_type, w.capacity_m3, w.manager_user_id, COALESCE(u_mgr.full_name, ''), w.location_address, w.is_active, w.created_by, w.updated_by, w.deleted_by, w.created_at, w.updated_at, w.deleted_at
+	FROM inv_warehouses w
+	LEFT JOIN org_units u_unit ON u_unit.unit_id = w.unit_id
+	LEFT JOIN sys_users u_mgr ON u_mgr.user_id = w.manager_user_id
+	WHERE w.warehouse_id = $1 AND w.deleted_at IS NULL`
 
 	var m model.Warehouse
-	err := r.DB.QueryRow(ctx, query, id).Scan(&m.WarehouseId, &m.UnitId, &m.WarehouseCode, &m.WarehouseName, &m.WarehouseType, &m.CapacityM3, &m.ManagerUserId, &m.LocationAddress, &m.IsActive, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt)
+	err := r.DB.QueryRow(ctx, query, id).Scan(&m.WarehouseId, &m.UnitId, &m.UnitName, &m.WarehouseCode, &m.WarehouseName, &m.WarehouseType, &m.CapacityM3, &m.ManagerUserId, &m.ManagerName, &m.LocationAddress, &m.IsActive, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt)
 	if err != nil {
 		return nil, err
 	}
@@ -48,16 +52,16 @@ func (r *WarehouseRepository) List(ctx context.Context, opts model.ListOptions) 
 	var args []any
 	argPos := 1
 
-	whereClauses = append(whereClauses, "deleted_at IS NULL")
+	whereClauses = append(whereClauses, "w.deleted_at IS NULL")
 	if opts.Search != "" {
 		searchPattern := "%" + opts.Search + "%"
-		whereClauses = append(whereClauses, fmt.Sprintf("(warehouse_code ILIKE $%[1]d OR warehouse_name ILIKE $%[1]d OR location_address ILIKE $%[1]d)", argPos))
+		whereClauses = append(whereClauses, fmt.Sprintf("(w.warehouse_code ILIKE $%[1]d OR w.warehouse_name ILIKE $%[1]d OR w.location_address ILIKE $%[1]d)", argPos))
 		args = append(args, searchPattern)
 		argPos++
 	}
 
 	whereSql := strings.Join(whereClauses, " AND ")
-	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM inv_warehouses WHERE %s", whereSql)
+	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM inv_warehouses w WHERE %s", whereSql)
 	var total int
 	if err := r.DB.QueryRow(ctx, countQuery, args...).Scan(&total); err != nil {
 		return nil, 0, err
@@ -68,7 +72,11 @@ func (r *WarehouseRepository) List(ctx context.Context, opts model.ListOptions) 
 	offset := opts.Offset
 	if offset < 0 { offset = 0 }
 
-	listQuery := fmt.Sprintf("SELECT warehouse_id, unit_id, warehouse_code, warehouse_name, warehouse_type, capacity_m3, manager_user_id, location_address, is_active, created_by, updated_by, deleted_by, created_at, updated_at, deleted_at FROM inv_warehouses WHERE %s ORDER BY created_at DESC LIMIT $%d OFFSET $%d", whereSql, argPos, argPos+1)
+	listQuery := fmt.Sprintf(`SELECT w.warehouse_id, w.unit_id, COALESCE(u_unit.unit_name, ''), w.warehouse_code, w.warehouse_name, w.warehouse_type, w.capacity_m3, w.manager_user_id, COALESCE(u_mgr.full_name, ''), w.location_address, w.is_active, w.created_by, w.updated_by, w.deleted_by, w.created_at, w.updated_at, w.deleted_at
+	FROM inv_warehouses w
+	LEFT JOIN org_units u_unit ON u_unit.unit_id = w.unit_id
+	LEFT JOIN sys_users u_mgr ON u_mgr.user_id = w.manager_user_id
+	WHERE %s ORDER BY w.created_at DESC LIMIT $%d OFFSET $%d`, whereSql, argPos, argPos+1)
 	args = append(args, limit, offset)
 
 	rows, err := r.DB.Query(ctx, listQuery, args...)
@@ -80,7 +88,7 @@ func (r *WarehouseRepository) List(ctx context.Context, opts model.ListOptions) 
 	var items []model.Warehouse
 	for rows.Next() {
 		var m model.Warehouse
-		if err := rows.Scan(&m.WarehouseId, &m.UnitId, &m.WarehouseCode, &m.WarehouseName, &m.WarehouseType, &m.CapacityM3, &m.ManagerUserId, &m.LocationAddress, &m.IsActive, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt); err != nil {
+		if err := rows.Scan(&m.WarehouseId, &m.UnitId, &m.UnitName, &m.WarehouseCode, &m.WarehouseName, &m.WarehouseType, &m.CapacityM3, &m.ManagerUserId, &m.ManagerName, &m.LocationAddress, &m.IsActive, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt); err != nil {
 			return nil, 0, err
 		}
 		items = append(items, m)

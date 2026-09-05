@@ -7,8 +7,10 @@ import (
 type StockBalance struct {
 	BalanceId string `json:"balance_id"`
 	WarehouseId string `json:"warehouse_id"`
+	WarehouseName *string `json:"warehouse_name,omitempty"`
 	LocationId *string `json:"location_id,omitempty"`
 	MaterialId string `json:"material_id"`
+	MaterialName *string `json:"material_name,omitempty"`
 	QuantityOnHand float64 `json:"quantity_on_hand"`
 	QuantityReserved float64 `json:"quantity_reserved"`
 	QuantityInTransit float64 `json:"quantity_in_transit"`

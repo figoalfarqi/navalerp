@@ -9,10 +9,9 @@ export const entityEndpoint = "/admin/contract";
 export const primaryKey = "contract_id";
 
 export const columns: ColumnField[] = [
-  { key: "contract_id", label: "Contract Id" },
-  { key: "tender_id", label: "Tender Id" },
+  { key: "tender_number", label: "No. Tender" },
   { key: "contract_number", label: "Contract Number" },
-  { key: "vendor_id", label: "Vendor Id" },
+  { key: "vendor_name", label: "Vendor" },
   { key: "contract_title", label: "Contract Title" },
   { key: "contract_value", label: "Contract Value" },
   { key: "currency", label: "Currency" },
@@ -23,10 +22,15 @@ export const filterFields: FilterField[] = [
 ];
 
 export const formFields = (mode: string): FormField[] => [
-  {
+    {
     name: "tender_id",
-    label: "Tender Id",
-    fieldType: "text",
+    label: "No. Tender",
+    fieldType: "select",
+    options: {
+      url: "/admin/tender?limit=100",
+      labelKey: "tender_number",
+      valueKey: "tender_id",
+    },
     required: false,
     disabled: mode === "view",
   },
@@ -37,10 +41,15 @@ export const formFields = (mode: string): FormField[] => [
     required: true,
     disabled: mode === "view",
   },
-  {
+    {
     name: "vendor_id",
-    label: "Vendor Id",
-    fieldType: "text",
+    label: "Vendor",
+    fieldType: "select",
+    options: {
+      url: "/admin/vendor?limit=100",
+      labelKey: "vendor_name",
+      valueKey: "vendor_id",
+    },
     required: true,
     disabled: mode === "view",
   },

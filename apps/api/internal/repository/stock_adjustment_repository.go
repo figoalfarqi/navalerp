@@ -19,10 +19,14 @@ func NewStockAdjustmentRepository(db *pgxpool.Pool) *StockAdjustmentRepository {
 
 // Get retrieves a single stock_adjustment by adjustment_id
 func (r *StockAdjustmentRepository) Get(ctx context.Context, id string) (*model.StockAdjustment, error) {
-	query := `SELECT adjustment_id, warehouse_id, adjustment_number, adjustment_date, conducted_by_user_id, reason, status, remarks, created_by, updated_by, deleted_by, created_at, updated_at, deleted_at FROM inv_stock_adjustments WHERE adjustment_id = $1 AND deleted_at IS NULL`
+	query := `SELECT t.adjustment_id, t.warehouse_id, COALESCE(j_wh.warehouse_name, ''), t.adjustment_number, t.adjustment_date, t.conducted_by_user_id, COALESCE(j_usr.full_name, ''), t.reason, t.status, t.remarks, t.created_by, t.updated_by, t.deleted_by, t.created_at, t.updated_at, t.deleted_at
+	FROM inv_stock_adjustments t
+	LEFT JOIN inv_warehouses j_wh ON j_wh.warehouse_id = t.warehouse_id
+	LEFT JOIN sys_users j_usr ON j_usr.user_id = t.conducted_by_user_id
+	WHERE t.adjustment_id = $1 AND t.deleted_at IS NULL`
 
 	var m model.StockAdjustment
-	err := r.DB.QueryRow(ctx, query, id).Scan(&m.AdjustmentId, &m.WarehouseId, &m.AdjustmentNumber, &m.AdjustmentDate, &m.ConductedByUserId, &m.Reason, &m.Status, &m.Remarks, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt)
+	err := r.DB.QueryRow(ctx, query, id).Scan(&m.AdjustmentId, &m.WarehouseId, &m.WarehouseName, &m.AdjustmentNumber, &m.AdjustmentDate, &m.ConductedByUserId, &m.ConductorName, &m.Reason, &m.Status, &m.Remarks, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt)
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +52,7 @@ func (r *StockAdjustmentRepository) List(ctx context.Context, opts model.ListOpt
 	var args []any
 	argPos := 1
 
-	whereClauses = append(whereClauses, "deleted_at IS NULL")
+	whereClauses = append(whereClauses, "t.deleted_at IS NULL")
 	if opts.Search != "" {
 		searchPattern := "%" + opts.Search + "%"
 		whereClauses = append(whereClauses, fmt.Sprintf("(adjustment_number ILIKE $%[1]d OR remarks ILIKE $%[1]d)", argPos))
@@ -57,7 +61,7 @@ func (r *StockAdjustmentRepository) List(ctx context.Context, opts model.ListOpt
 	}
 
 	whereSql := strings.Join(whereClauses, " AND ")
-	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM inv_stock_adjustments WHERE %s", whereSql)
+	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM inv_stock_adjustments t WHERE %s", whereSql)
 	var total int
 	if err := r.DB.QueryRow(ctx, countQuery, args...).Scan(&total); err != nil {
 		return nil, 0, err
@@ -68,7 +72,11 @@ func (r *StockAdjustmentRepository) List(ctx context.Context, opts model.ListOpt
 	offset := opts.Offset
 	if offset < 0 { offset = 0 }
 
-	listQuery := fmt.Sprintf("SELECT adjustment_id, warehouse_id, adjustment_number, adjustment_date, conducted_by_user_id, reason, status, remarks, created_by, updated_by, deleted_by, created_at, updated_at, deleted_at FROM inv_stock_adjustments WHERE %s ORDER BY created_at DESC LIMIT $%d OFFSET $%d", whereSql, argPos, argPos+1)
+	listQuery := fmt.Sprintf(`SELECT t.adjustment_id, t.warehouse_id, COALESCE(j_wh.warehouse_name, ''), t.adjustment_number, t.adjustment_date, t.conducted_by_user_id, COALESCE(j_usr.full_name, ''), t.reason, t.status, t.remarks, t.created_by, t.updated_by, t.deleted_by, t.created_at, t.updated_at, t.deleted_at
+	FROM inv_stock_adjustments t
+	LEFT JOIN inv_warehouses j_wh ON j_wh.warehouse_id = t.warehouse_id
+	LEFT JOIN sys_users j_usr ON j_usr.user_id = t.conducted_by_user_id
+	WHERE %s ORDER BY t.created_at DESC LIMIT $%d OFFSET $%d`, whereSql, argPos, argPos+1)
 	args = append(args, limit, offset)
 
 	rows, err := r.DB.Query(ctx, listQuery, args...)
@@ -80,7 +88,7 @@ func (r *StockAdjustmentRepository) List(ctx context.Context, opts model.ListOpt
 	var items []model.StockAdjustment
 	for rows.Next() {
 		var m model.StockAdjustment
-		if err := rows.Scan(&m.AdjustmentId, &m.WarehouseId, &m.AdjustmentNumber, &m.AdjustmentDate, &m.ConductedByUserId, &m.Reason, &m.Status, &m.Remarks, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt); err != nil {
+		if err := rows.Scan(&m.AdjustmentId, &m.WarehouseId, &m.WarehouseName, &m.AdjustmentNumber, &m.AdjustmentDate, &m.ConductedByUserId, &m.ConductorName, &m.Reason, &m.Status, &m.Remarks, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt); err != nil {
 			return nil, 0, err
 		}
 		items = append(items, m)

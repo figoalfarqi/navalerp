@@ -9,7 +9,6 @@ export const entityEndpoint = "/admin/tender";
 export const primaryKey = "tender_id";
 
 export const columns: ColumnField[] = [
-  { key: "tender_id", label: "Tender Id" },
   { key: "tender_number", label: "Tender Number" },
   { key: "title", label: "Title" },
   { key: "procurement_category", label: "Procurement Category" },
@@ -79,10 +78,15 @@ export const formFields = (mode: string): FormField[] => [
     required: false,
     disabled: mode === "view",
   },
-  {
+    {
     name: "winner_vendor_id",
-    label: "Winner Vendor Id",
-    fieldType: "text",
+    label: "Pemenang Tender",
+    fieldType: "select",
+    options: {
+      url: "/admin/vendor?limit=100",
+      labelKey: "vendor_name",
+      valueKey: "vendor_id",
+    },
     required: false,
     disabled: mode === "view",
   },

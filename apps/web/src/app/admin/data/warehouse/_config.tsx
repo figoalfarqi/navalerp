@@ -9,13 +9,12 @@ export const entityEndpoint = "/admin/warehouse";
 export const primaryKey = "warehouse_id";
 
 export const columns: ColumnField[] = [
-  { key: "warehouse_id", label: "Warehouse Id" },
-  { key: "unit_id", label: "Unit Id" },
+  { key: "unit_name", label: "Satuan / Unit" },
   { key: "warehouse_code", label: "Warehouse Code" },
   { key: "warehouse_name", label: "Warehouse Name" },
   { key: "warehouse_type", label: "Warehouse Type" },
   { key: "capacity_m3", label: "Capacity M3" },
-  { key: "manager_user_id", label: "Manager User Id" },
+  { key: "manager_name", label: "Manajer Gudang" },
 ];
 
 export const filterFields: FilterField[] = [
@@ -23,10 +22,15 @@ export const filterFields: FilterField[] = [
 ];
 
 export const formFields = (mode: string): FormField[] => [
-  {
+    {
     name: "unit_id",
-    label: "Unit Id",
-    fieldType: "text",
+    label: "Satuan / Unit",
+    fieldType: "select",
+    options: {
+      url: "/admin/org_unit?limit=100",
+      labelKey: "unit_name",
+      valueKey: "unit_id",
+    },
     required: true,
     disabled: mode === "view",
   },
@@ -58,10 +62,15 @@ export const formFields = (mode: string): FormField[] => [
     required: false,
     disabled: mode === "view",
   },
-  {
+    {
     name: "manager_user_id",
-    label: "Manager User Id",
-    fieldType: "text",
+    label: "Manajer Gudang",
+    fieldType: "select",
+    options: {
+      url: "/admin/sys_user?limit=100",
+      labelKey: "full_name",
+      valueKey: "user_id",
+    },
     required: false,
     disabled: mode === "view",
   },

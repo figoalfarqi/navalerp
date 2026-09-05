@@ -9,13 +9,12 @@ export const entityEndpoint = "/admin/budget_program";
 export const primaryKey = "program_id";
 
 export const columns: ColumnField[] = [
-  { key: "program_id", label: "Program Id" },
   { key: "fiscal_year", label: "Fiscal Year" },
   { key: "dipa_number", label: "Dipa Number" },
   { key: "program_code", label: "Program Code" },
   { key: "program_name", label: "Program Name" },
   { key: "total_budget", label: "Total Budget" },
-  { key: "responsible_unit_id", label: "Responsible Unit Id" },
+  { key: "responsible_unit_name", label: "Satuan Penanggung Jawab" },
 ];
 
 export const filterFields: FilterField[] = [
@@ -58,10 +57,15 @@ export const formFields = (mode: string): FormField[] => [
     required: true,
     disabled: mode === "view",
   },
-  {
+    {
     name: "responsible_unit_id",
-    label: "Responsible Unit Id",
-    fieldType: "text",
+    label: "Satuan Penanggung Jawab",
+    fieldType: "select",
+    options: {
+      url: "/admin/org_unit?limit=100",
+      labelKey: "unit_name",
+      valueKey: "unit_id",
+    },
     required: true,
     disabled: mode === "view",
   },

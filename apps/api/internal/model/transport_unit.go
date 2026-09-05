@@ -12,6 +12,7 @@ type TransportUnit struct {
 	CargoCapacityTons float64 `json:"cargo_capacity_tons"`
 	FuelCapacityLiters *float64 `json:"fuel_capacity_liters,omitempty"`
 	OperatingUnitId string `json:"operating_unit_id"`
+	OperatingUnitName *string `json:"operating_unit_name,omitempty"`
 	Status *string `json:"status,omitempty"`
 	CreatedBy *string `json:"created_by,omitempty"`
 	UpdatedBy *string `json:"updated_by,omitempty"`

@@ -10,6 +10,7 @@ type ChartOfAccount struct {
 	AccountName string `json:"account_name"`
 	AccountType string `json:"account_type"`
 	ParentAccountId *string `json:"parent_account_id,omitempty"`
+	ParentAccountName *string `json:"parent_account_name,omitempty"`
 	IsActive *bool `json:"is_active,omitempty"`
 	CreatedBy *string `json:"created_by,omitempty"`
 	UpdatedBy *string `json:"updated_by,omitempty"`

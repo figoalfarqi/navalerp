@@ -19,10 +19,13 @@ func NewBudgetProgramRepository(db *pgxpool.Pool) *BudgetProgramRepository {
 
 // Get retrieves a single budget_program by program_id
 func (r *BudgetProgramRepository) Get(ctx context.Context, id string) (*model.BudgetProgram, error) {
-	query := `SELECT program_id, fiscal_year, dipa_number, program_code, program_name, total_budget, responsible_unit_id, status, created_by, updated_by, deleted_by, created_at, updated_at, deleted_at FROM fin_budget_programs WHERE program_id = $1 AND deleted_at IS NULL`
+	query := `SELECT t.program_id, t.fiscal_year, t.dipa_number, t.program_code, t.program_name, t.total_budget, t.responsible_unit_id, COALESCE(j_unit.unit_name, ''), t.status, t.created_by, t.updated_by, t.deleted_by, t.created_at, t.updated_at, t.deleted_at
+	FROM fin_budget_programs t
+	LEFT JOIN org_units j_unit ON j_unit.unit_id = t.responsible_unit_id
+	WHERE t.program_id = $1 AND t.deleted_at IS NULL`
 
 	var m model.BudgetProgram
-	err := r.DB.QueryRow(ctx, query, id).Scan(&m.ProgramId, &m.FiscalYear, &m.DipaNumber, &m.ProgramCode, &m.ProgramName, &m.TotalBudget, &m.ResponsibleUnitId, &m.Status, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt)
+	err := r.DB.QueryRow(ctx, query, id).Scan(&m.ProgramId, &m.FiscalYear, &m.DipaNumber, &m.ProgramCode, &m.ProgramName, &m.TotalBudget, &m.ResponsibleUnitId, &m.ResponsibleUnitName, &m.Status, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt)
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +51,7 @@ func (r *BudgetProgramRepository) List(ctx context.Context, opts model.ListOptio
 	var args []any
 	argPos := 1
 
-	whereClauses = append(whereClauses, "deleted_at IS NULL")
+	whereClauses = append(whereClauses, "t.deleted_at IS NULL")
 	if opts.Search != "" {
 		searchPattern := "%" + opts.Search + "%"
 		whereClauses = append(whereClauses, fmt.Sprintf("(dipa_number ILIKE $%[1]d OR program_code ILIKE $%[1]d OR program_name ILIKE $%[1]d)", argPos))
@@ -57,7 +60,7 @@ func (r *BudgetProgramRepository) List(ctx context.Context, opts model.ListOptio
 	}
 
 	whereSql := strings.Join(whereClauses, " AND ")
-	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM fin_budget_programs WHERE %s", whereSql)
+	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM fin_budget_programs t WHERE %s", whereSql)
 	var total int
 	if err := r.DB.QueryRow(ctx, countQuery, args...).Scan(&total); err != nil {
 		return nil, 0, err
@@ -68,7 +71,10 @@ func (r *BudgetProgramRepository) List(ctx context.Context, opts model.ListOptio
 	offset := opts.Offset
 	if offset < 0 { offset = 0 }
 
-	listQuery := fmt.Sprintf("SELECT program_id, fiscal_year, dipa_number, program_code, program_name, total_budget, responsible_unit_id, status, created_by, updated_by, deleted_by, created_at, updated_at, deleted_at FROM fin_budget_programs WHERE %s ORDER BY created_at DESC LIMIT $%d OFFSET $%d", whereSql, argPos, argPos+1)
+	listQuery := fmt.Sprintf(`SELECT t.program_id, t.fiscal_year, t.dipa_number, t.program_code, t.program_name, t.total_budget, t.responsible_unit_id, COALESCE(j_unit.unit_name, ''), t.status, t.created_by, t.updated_by, t.deleted_by, t.created_at, t.updated_at, t.deleted_at
+	FROM fin_budget_programs t
+	LEFT JOIN org_units j_unit ON j_unit.unit_id = t.responsible_unit_id
+	WHERE %s ORDER BY t.created_at DESC LIMIT $%d OFFSET $%d`, whereSql, argPos, argPos+1)
 	args = append(args, limit, offset)
 
 	rows, err := r.DB.Query(ctx, listQuery, args...)
@@ -80,7 +86,7 @@ func (r *BudgetProgramRepository) List(ctx context.Context, opts model.ListOptio
 	var items []model.BudgetProgram
 	for rows.Next() {
 		var m model.BudgetProgram
-		if err := rows.Scan(&m.ProgramId, &m.FiscalYear, &m.DipaNumber, &m.ProgramCode, &m.ProgramName, &m.TotalBudget, &m.ResponsibleUnitId, &m.Status, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt); err != nil {
+		if err := rows.Scan(&m.ProgramId, &m.FiscalYear, &m.DipaNumber, &m.ProgramCode, &m.ProgramName, &m.TotalBudget, &m.ResponsibleUnitId, &m.ResponsibleUnitName, &m.Status, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt); err != nil {
 			return nil, 0, err
 		}
 		items = append(items, m)

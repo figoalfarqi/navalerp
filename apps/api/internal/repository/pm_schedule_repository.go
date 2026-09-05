@@ -19,10 +19,13 @@ func NewPmScheduleRepository(db *pgxpool.Pool) *PmScheduleRepository {
 
 // Get retrieves a single pm_schedule by pm_id
 func (r *PmScheduleRepository) Get(ctx context.Context, id string) (*model.PmSchedule, error) {
-	query := `SELECT pm_id, equipment_id, pm_code, pm_title, interval_hours, interval_days, last_performed_at, next_due_at, task_instructions, estimated_duration_hours, is_active, created_by, updated_by, deleted_by, created_at, updated_at, deleted_at FROM mro_pm_schedules WHERE pm_id = $1 AND deleted_at IS NULL`
+	query := `SELECT t.pm_id, t.equipment_id, COALESCE(j_eqp.equipment_name, ''), t.pm_code, t.pm_title, t.interval_hours, t.interval_days, t.last_performed_at, t.next_due_at, t.task_instructions, t.estimated_duration_hours, t.is_active, t.created_by, t.updated_by, t.deleted_by, t.created_at, t.updated_at, t.deleted_at
+	FROM mro_pm_schedules t
+	LEFT JOIN mro_equipments j_eqp ON j_eqp.equipment_id = t.equipment_id
+	WHERE t.pm_id = $1 AND t.deleted_at IS NULL`
 
 	var m model.PmSchedule
-	err := r.DB.QueryRow(ctx, query, id).Scan(&m.PmId, &m.EquipmentId, &m.PmCode, &m.PmTitle, &m.IntervalHours, &m.IntervalDays, &m.LastPerformedAt, &m.NextDueAt, &m.TaskInstructions, &m.EstimatedDurationHours, &m.IsActive, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt)
+	err := r.DB.QueryRow(ctx, query, id).Scan(&m.PmId, &m.EquipmentId, &m.EquipmentName, &m.PmCode, &m.PmTitle, &m.IntervalHours, &m.IntervalDays, &m.LastPerformedAt, &m.NextDueAt, &m.TaskInstructions, &m.EstimatedDurationHours, &m.IsActive, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt)
 	if err != nil {
 		return nil, err
 	}
@@ -36,7 +39,7 @@ func (r *PmScheduleRepository) List(ctx context.Context, opts model.ListOptions)
 	var args []any
 	argPos := 1
 
-	whereClauses = append(whereClauses, "deleted_at IS NULL")
+	whereClauses = append(whereClauses, "t.deleted_at IS NULL")
 	if opts.Search != "" {
 		searchPattern := "%" + opts.Search + "%"
 		whereClauses = append(whereClauses, fmt.Sprintf("(pm_code ILIKE $%[1]d OR pm_title ILIKE $%[1]d OR task_instructions ILIKE $%[1]d)", argPos))
@@ -45,7 +48,7 @@ func (r *PmScheduleRepository) List(ctx context.Context, opts model.ListOptions)
 	}
 
 	whereSql := strings.Join(whereClauses, " AND ")
-	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM mro_pm_schedules WHERE %s", whereSql)
+	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM mro_pm_schedules t WHERE %s", whereSql)
 	var total int
 	if err := r.DB.QueryRow(ctx, countQuery, args...).Scan(&total); err != nil {
 		return nil, 0, err
@@ -56,7 +59,10 @@ func (r *PmScheduleRepository) List(ctx context.Context, opts model.ListOptions)
 	offset := opts.Offset
 	if offset < 0 { offset = 0 }
 
-	listQuery := fmt.Sprintf("SELECT pm_id, equipment_id, pm_code, pm_title, interval_hours, interval_days, last_performed_at, next_due_at, task_instructions, estimated_duration_hours, is_active, created_by, updated_by, deleted_by, created_at, updated_at, deleted_at FROM mro_pm_schedules WHERE %s ORDER BY created_at DESC LIMIT $%d OFFSET $%d", whereSql, argPos, argPos+1)
+	listQuery := fmt.Sprintf(`SELECT t.pm_id, t.equipment_id, COALESCE(j_eqp.equipment_name, ''), t.pm_code, t.pm_title, t.interval_hours, t.interval_days, t.last_performed_at, t.next_due_at, t.task_instructions, t.estimated_duration_hours, t.is_active, t.created_by, t.updated_by, t.deleted_by, t.created_at, t.updated_at, t.deleted_at
+	FROM mro_pm_schedules t
+	LEFT JOIN mro_equipments j_eqp ON j_eqp.equipment_id = t.equipment_id
+	WHERE %s ORDER BY t.created_at DESC LIMIT $%d OFFSET $%d`, whereSql, argPos, argPos+1)
 	args = append(args, limit, offset)
 
 	rows, err := r.DB.Query(ctx, listQuery, args...)
@@ -68,7 +74,7 @@ func (r *PmScheduleRepository) List(ctx context.Context, opts model.ListOptions)
 	var items []model.PmSchedule
 	for rows.Next() {
 		var m model.PmSchedule
-		if err := rows.Scan(&m.PmId, &m.EquipmentId, &m.PmCode, &m.PmTitle, &m.IntervalHours, &m.IntervalDays, &m.LastPerformedAt, &m.NextDueAt, &m.TaskInstructions, &m.EstimatedDurationHours, &m.IsActive, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt); err != nil {
+		if err := rows.Scan(&m.PmId, &m.EquipmentId, &m.EquipmentName, &m.PmCode, &m.PmTitle, &m.IntervalHours, &m.IntervalDays, &m.LastPerformedAt, &m.NextDueAt, &m.TaskInstructions, &m.EstimatedDurationHours, &m.IsActive, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt); err != nil {
 			return nil, 0, err
 		}
 		items = append(items, m)

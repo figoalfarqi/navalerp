@@ -9,10 +9,9 @@ export const entityEndpoint = "/admin/work_order";
 export const primaryKey = "work_order_id";
 
 export const columns: ColumnField[] = [
-  { key: "work_order_id", label: "Work Order Id" },
-  { key: "failure_report_id", label: "Failure Report Id" },
-  { key: "pm_schedule_id", label: "Pm Schedule Id" },
-  { key: "equipment_id", label: "Equipment Id" },
+  { key: "failure_report_number", label: "Laporan Kerusakan" },
+  { key: "pm_title", label: "Jadwal PM" },
+  { key: "equipment_name", label: "Peralatan" },
   { key: "work_order_number", label: "Work Order Number" },
   { key: "work_order_type", label: "Work Order Type" },
   { key: "priority", label: "Priority" },
@@ -23,24 +22,39 @@ export const filterFields: FilterField[] = [
 ];
 
 export const formFields = (mode: string): FormField[] => [
-  {
+    {
     name: "failure_report_id",
-    label: "Failure Report Id",
-    fieldType: "text",
+    label: "Laporan Kerusakan",
+    fieldType: "select",
+    options: {
+      url: "/admin/failure_report?limit=100",
+      labelKey: "report_number",
+      valueKey: "report_id",
+    },
     required: false,
     disabled: mode === "view",
   },
-  {
+    {
     name: "pm_schedule_id",
-    label: "Pm Schedule Id",
-    fieldType: "text",
+    label: "Jadwal PM",
+    fieldType: "select",
+    options: {
+      url: "/admin/pm_schedule?limit=100",
+      labelKey: "pm_title",
+      valueKey: "pm_id",
+    },
     required: false,
     disabled: mode === "view",
   },
-  {
+    {
     name: "equipment_id",
-    label: "Equipment Id",
-    fieldType: "text",
+    label: "Peralatan",
+    fieldType: "select",
+    options: {
+      url: "/admin/equipment?limit=100",
+      labelKey: "equipment_name",
+      valueKey: "equipment_id",
+    },
     required: true,
     disabled: mode === "view",
   },
@@ -93,10 +107,15 @@ export const formFields = (mode: string): FormField[] => [
     required: false,
     disabled: mode === "view",
   },
-  {
+    {
     name: "lead_engineer_user_id",
-    label: "Lead Engineer User Id",
-    fieldType: "text",
+    label: "Insinyur Utama",
+    fieldType: "select",
+    options: {
+      url: "/admin/sys_user?limit=100",
+      labelKey: "full_name",
+      valueKey: "user_id",
+    },
     required: false,
     disabled: mode === "view",
   },

@@ -7,7 +7,9 @@ import (
 type BerthBooking struct {
 	BookingId string `json:"booking_id"`
 	FacilityId string `json:"facility_id"`
+	FacilityName *string `json:"facility_name,omitempty"`
 	ShipId string `json:"ship_id"`
+	ShipName *string `json:"ship_name,omitempty"`
 	BookingPurpose string `json:"booking_purpose"`
 	Eta time.Time `json:"eta"`
 	Etd time.Time `json:"etd"`

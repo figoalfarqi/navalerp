@@ -10,11 +10,13 @@ type Payment struct {
 	SppNumber *string `json:"spp_number,omitempty"`
 	SpmNumber *string `json:"spm_number,omitempty"`
 	InvoiceId string `json:"invoice_id"`
+	InvoiceNumber *string `json:"invoice_number,omitempty"`
 	PaymentDate time.Time `json:"payment_date"`
 	AmountPaid float64 `json:"amount_paid"`
 	PaymentMethod *string `json:"payment_method,omitempty"`
 	BankSourceAccount *string `json:"bank_source_account,omitempty"`
 	AuthorisedByUserId *string `json:"authorised_by_user_id,omitempty"`
+	AuthoriserName *string `json:"authoriser_name,omitempty"`
 	CreatedBy *string `json:"created_by,omitempty"`
 	UpdatedBy *string `json:"updated_by,omitempty"`
 	DeletedBy *string `json:"deleted_by"`

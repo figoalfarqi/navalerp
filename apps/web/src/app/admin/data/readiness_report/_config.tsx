@@ -9,8 +9,7 @@ export const entityEndpoint = "/admin/readiness_report";
 export const primaryKey = "snapshot_id";
 
 export const columns: ColumnField[] = [
-  { key: "snapshot_id", label: "Snapshot Id" },
-  { key: "ship_id", label: "Ship Id" },
+  { key: "ship_name", label: "Kapal KRI" },
   { key: "snapshot_timestamp", label: "Snapshot Timestamp" },
   { key: "readiness_category", label: "Readiness Category" },
   { key: "mro_readiness_score", label: "Mro Readiness Score" },
@@ -23,10 +22,15 @@ export const filterFields: FilterField[] = [
 ];
 
 export const formFields = (mode: string): FormField[] => [
-  {
+    {
     name: "ship_id",
-    label: "Ship Id",
-    fieldType: "text",
+    label: "Kapal KRI",
+    fieldType: "select",
+    options: {
+      url: "/admin/ship?limit=100",
+      labelKey: "ship_name",
+      valueKey: "ship_id",
+    },
     required: true,
     disabled: mode === "view",
   },

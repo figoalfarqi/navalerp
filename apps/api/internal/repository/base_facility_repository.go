@@ -19,10 +19,13 @@ func NewBaseFacilityRepository(db *pgxpool.Pool) *BaseFacilityRepository {
 
 // Get retrieves a single base_facility by facility_id
 func (r *BaseFacilityRepository) Get(ctx context.Context, id string) (*model.BaseFacility, error) {
-	query := `SELECT facility_id, base_unit_id, facility_code, facility_name, facility_type, length_meters, draft_depth_meters, max_displacement_tonnage, has_shore_power, has_fresh_water, has_fuel_bunker_line, status, created_by, updated_by, deleted_by, created_at, updated_at, deleted_at FROM infra_facilities WHERE facility_id = $1 AND deleted_at IS NULL`
+	query := `SELECT t.facility_id, t.base_unit_id, COALESCE(j_unit.unit_name, ''), t.facility_code, t.facility_name, t.facility_type, t.length_meters, t.draft_depth_meters, t.max_displacement_tonnage, t.has_shore_power, t.has_fresh_water, t.has_fuel_bunker_line, t.status, t.created_by, t.updated_by, t.deleted_by, t.created_at, t.updated_at, t.deleted_at
+	FROM infra_facilities t
+	LEFT JOIN org_units j_unit ON j_unit.unit_id = t.base_unit_id
+	WHERE t.facility_id = $1 AND t.deleted_at IS NULL`
 
 	var m model.BaseFacility
-	err := r.DB.QueryRow(ctx, query, id).Scan(&m.FacilityId, &m.BaseUnitId, &m.FacilityCode, &m.FacilityName, &m.FacilityType, &m.LengthMeters, &m.DraftDepthMeters, &m.MaxDisplacementTonnage, &m.HasShorePower, &m.HasFreshWater, &m.HasFuelBunkerLine, &m.Status, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt)
+	err := r.DB.QueryRow(ctx, query, id).Scan(&m.FacilityId, &m.BaseUnitId, &m.UnitName, &m.FacilityCode, &m.FacilityName, &m.FacilityType, &m.LengthMeters, &m.DraftDepthMeters, &m.MaxDisplacementTonnage, &m.HasShorePower, &m.HasFreshWater, &m.HasFuelBunkerLine, &m.Status, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt)
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +51,7 @@ func (r *BaseFacilityRepository) List(ctx context.Context, opts model.ListOption
 	var args []any
 	argPos := 1
 
-	whereClauses = append(whereClauses, "deleted_at IS NULL")
+	whereClauses = append(whereClauses, "t.deleted_at IS NULL")
 	if opts.Search != "" {
 		searchPattern := "%" + opts.Search + "%"
 		whereClauses = append(whereClauses, fmt.Sprintf("(facility_code ILIKE $%[1]d OR facility_name ILIKE $%[1]d)", argPos))
@@ -57,7 +60,7 @@ func (r *BaseFacilityRepository) List(ctx context.Context, opts model.ListOption
 	}
 
 	whereSql := strings.Join(whereClauses, " AND ")
-	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM infra_facilities WHERE %s", whereSql)
+	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM infra_facilities t WHERE %s", whereSql)
 	var total int
 	if err := r.DB.QueryRow(ctx, countQuery, args...).Scan(&total); err != nil {
 		return nil, 0, err
@@ -68,7 +71,10 @@ func (r *BaseFacilityRepository) List(ctx context.Context, opts model.ListOption
 	offset := opts.Offset
 	if offset < 0 { offset = 0 }
 
-	listQuery := fmt.Sprintf("SELECT facility_id, base_unit_id, facility_code, facility_name, facility_type, length_meters, draft_depth_meters, max_displacement_tonnage, has_shore_power, has_fresh_water, has_fuel_bunker_line, status, created_by, updated_by, deleted_by, created_at, updated_at, deleted_at FROM infra_facilities WHERE %s ORDER BY created_at DESC LIMIT $%d OFFSET $%d", whereSql, argPos, argPos+1)
+	listQuery := fmt.Sprintf(`SELECT t.facility_id, t.base_unit_id, COALESCE(j_unit.unit_name, ''), t.facility_code, t.facility_name, t.facility_type, t.length_meters, t.draft_depth_meters, t.max_displacement_tonnage, t.has_shore_power, t.has_fresh_water, t.has_fuel_bunker_line, t.status, t.created_by, t.updated_by, t.deleted_by, t.created_at, t.updated_at, t.deleted_at
+	FROM infra_facilities t
+	LEFT JOIN org_units j_unit ON j_unit.unit_id = t.base_unit_id
+	WHERE %s ORDER BY t.created_at DESC LIMIT $%d OFFSET $%d`, whereSql, argPos, argPos+1)
 	args = append(args, limit, offset)
 
 	rows, err := r.DB.Query(ctx, listQuery, args...)
@@ -80,7 +86,7 @@ func (r *BaseFacilityRepository) List(ctx context.Context, opts model.ListOption
 	var items []model.BaseFacility
 	for rows.Next() {
 		var m model.BaseFacility
-		if err := rows.Scan(&m.FacilityId, &m.BaseUnitId, &m.FacilityCode, &m.FacilityName, &m.FacilityType, &m.LengthMeters, &m.DraftDepthMeters, &m.MaxDisplacementTonnage, &m.HasShorePower, &m.HasFreshWater, &m.HasFuelBunkerLine, &m.Status, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt); err != nil {
+		if err := rows.Scan(&m.FacilityId, &m.BaseUnitId, &m.UnitName, &m.FacilityCode, &m.FacilityName, &m.FacilityType, &m.LengthMeters, &m.DraftDepthMeters, &m.MaxDisplacementTonnage, &m.HasShorePower, &m.HasFreshWater, &m.HasFuelBunkerLine, &m.Status, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt); err != nil {
 			return nil, 0, err
 		}
 		items = append(items, m)

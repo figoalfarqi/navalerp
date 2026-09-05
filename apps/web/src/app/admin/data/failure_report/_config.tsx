@@ -9,9 +9,8 @@ export const entityEndpoint = "/admin/failure_report";
 export const primaryKey = "report_id";
 
 export const columns: ColumnField[] = [
-  { key: "report_id", label: "Report Id" },
-  { key: "equipment_id", label: "Equipment Id" },
-  { key: "reported_by_user_id", label: "Reported By User Id" },
+  { key: "equipment_name", label: "Peralatan" },
+  { key: "reporter_name", label: "Pelapor" },
   { key: "report_number", label: "Report Number" },
   { key: "incident_date", label: "Incident Date" },
   { key: "severity", label: "Severity" },
@@ -23,17 +22,27 @@ export const filterFields: FilterField[] = [
 ];
 
 export const formFields = (mode: string): FormField[] => [
-  {
+    {
     name: "equipment_id",
-    label: "Equipment Id",
-    fieldType: "text",
+    label: "Peralatan",
+    fieldType: "select",
+    options: {
+      url: "/admin/equipment?limit=100",
+      labelKey: "equipment_name",
+      valueKey: "equipment_id",
+    },
     required: true,
     disabled: mode === "view",
   },
-  {
+    {
     name: "reported_by_user_id",
-    label: "Reported By User Id",
-    fieldType: "text",
+    label: "Pelapor",
+    fieldType: "select",
+    options: {
+      url: "/admin/sys_user?limit=100",
+      labelKey: "full_name",
+      valueKey: "user_id",
+    },
     required: true,
     disabled: mode === "view",
   },

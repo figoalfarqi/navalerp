@@ -7,6 +7,7 @@ import (
 type PmSchedule struct {
 	PmId string `json:"pm_id"`
 	EquipmentId string `json:"equipment_id"`
+	EquipmentName *string `json:"equipment_name,omitempty"`
 	PmCode string `json:"pm_code"`
 	PmTitle string `json:"pm_title"`
 	IntervalHours *int `json:"interval_hours,omitempty"`

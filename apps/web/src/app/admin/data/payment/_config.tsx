@@ -9,11 +9,10 @@ export const entityEndpoint = "/admin/payment";
 export const primaryKey = "payment_id";
 
 export const columns: ColumnField[] = [
-  { key: "payment_id", label: "Payment Id" },
   { key: "payment_reference_no", label: "Payment Reference No" },
   { key: "spp_number", label: "Spp Number" },
   { key: "spm_number", label: "Spm Number" },
-  { key: "invoice_id", label: "Invoice Id" },
+  { key: "invoice_number", label: "No. Invoice" },
   { key: "payment_date", label: "Payment Date" },
   { key: "amount_paid", label: "Amount Paid" },
 ];
@@ -44,10 +43,15 @@ export const formFields = (mode: string): FormField[] => [
     required: false,
     disabled: mode === "view",
   },
-  {
+    {
     name: "invoice_id",
-    label: "Invoice Id",
-    fieldType: "text",
+    label: "No. Invoice",
+    fieldType: "select",
+    options: {
+      url: "/admin/invoice?limit=100",
+      labelKey: "invoice_number",
+      valueKey: "invoice_id",
+    },
     required: true,
     disabled: mode === "view",
   },
@@ -79,10 +83,15 @@ export const formFields = (mode: string): FormField[] => [
     required: false,
     disabled: mode === "view",
   },
-  {
+    {
     name: "authorised_by_user_id",
-    label: "Authorised By User Id",
-    fieldType: "text",
+    label: "Diotorisasi Oleh",
+    fieldType: "select",
+    options: {
+      url: "/admin/sys_user?limit=100",
+      labelKey: "full_name",
+      valueKey: "user_id",
+    },
     required: false,
     disabled: mode === "view",
   },
