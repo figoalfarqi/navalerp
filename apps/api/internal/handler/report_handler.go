@@ -3,8 +3,8 @@ package handler
 import (
 	"net/http"
 
-	"github.com/figoalfarqi/apipml/internal/service"
-	"github.com/figoalfarqi/apipml/pkg/response"
+	"github.com/figoalfarqi/navalerp/internal/service"
+	"github.com/figoalfarqi/navalerp/pkg/response"
 )
 
 type ReportHandler struct{ Service *service.ReportService }

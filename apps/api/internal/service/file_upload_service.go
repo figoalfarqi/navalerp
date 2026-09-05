@@ -12,8 +12,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/figoalfarqi/apipml/config"
-	"github.com/figoalfarqi/apipml/internal/helper"
+	"github.com/figoalfarqi/navalerp/config"
+	"github.com/figoalfarqi/navalerp/internal/helper"
 )
 
 type FileUploadService struct {

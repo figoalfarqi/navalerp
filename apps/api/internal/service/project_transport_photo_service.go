@@ -5,8 +5,8 @@ import (
 	"errors"
 	"strings"
 
-	"github.com/figoalfarqi/apipml/internal/model"
-	"github.com/figoalfarqi/apipml/internal/repository"
+	"github.com/figoalfarqi/navalerp/internal/model"
+	"github.com/figoalfarqi/navalerp/internal/repository"
 )
 
 type ProjectTransportPhotoService struct {

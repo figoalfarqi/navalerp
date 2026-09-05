@@ -7,11 +7,11 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/figoalfarqi/apipml/config"
-	"github.com/figoalfarqi/apipml/internal/auth"
-	"github.com/figoalfarqi/apipml/internal/helper"
-	"github.com/figoalfarqi/apipml/pkg/database"
-	"github.com/figoalfarqi/apipml/pkg/response"
+	"github.com/figoalfarqi/navalerp/config"
+	"github.com/figoalfarqi/navalerp/internal/auth"
+	"github.com/figoalfarqi/navalerp/internal/helper"
+	"github.com/figoalfarqi/navalerp/pkg/database"
+	"github.com/figoalfarqi/navalerp/pkg/response"
 	"github.com/jackc/pgx/v5"
 )
 

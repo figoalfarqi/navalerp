@@ -145,7 +145,7 @@ export default function AdminReportPage() {
       ? `${selectedProject.project_code ? `${selectedProject.project_code} - ` : ""}${selectedProject.project_name}`
       : "Semua Project";
     document.setFontSize(16);
-    document.text("Laporan Operasional & Keuangan PML", 14, 15);
+    document.text("Laporan Operasional & Keuangan NavalERP", 14, 15);
     document.setFontSize(9);
     document.setTextColor(90);
     document.text(

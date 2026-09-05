@@ -3,7 +3,7 @@ package middleware
 import (
 	"testing"
 
-	"github.com/figoalfarqi/apipml/internal/helper"
+	"github.com/figoalfarqi/navalerp/internal/helper"
 )
 
 func TestIsRoleAllowed(t *testing.T) {

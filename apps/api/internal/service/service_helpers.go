@@ -5,8 +5,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/figoalfarqi/apipml/internal/model"
-	"github.com/figoalfarqi/apipml/internal/validation"
+	"github.com/figoalfarqi/navalerp/internal/model"
+	"github.com/figoalfarqi/navalerp/internal/validation"
 )
 
 func validateRequest(req any) (error, map[string]string) {

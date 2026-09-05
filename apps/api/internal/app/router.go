@@ -3,9 +3,9 @@ package app
 import (
 	"net/http"
 
-	"github.com/figoalfarqi/apipml/config"
-	"github.com/figoalfarqi/apipml/internal/app/middleware"
-	"github.com/figoalfarqi/apipml/internal/handler"
+	"github.com/figoalfarqi/navalerp/config"
+	"github.com/figoalfarqi/navalerp/internal/app/middleware"
+	"github.com/figoalfarqi/navalerp/internal/handler"
 )
 
 func SetupRouter(cfg *config.Config) http.Handler {

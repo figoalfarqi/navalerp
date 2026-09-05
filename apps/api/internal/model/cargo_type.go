@@ -3,7 +3,7 @@ package model
 import (
 	"time"
 
-	"github.com/figoalfarqi/apipml/internal/helper"
+	"github.com/figoalfarqi/navalerp/internal/helper"
 )
 
 type CargoType struct {

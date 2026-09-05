@@ -37,7 +37,7 @@ export default function Home() {
       }`}
     >
       <h1 className={`${isMobile ? "text-2xl" : "text-4xl"} font-bold`}>
-        Welcome to the PML
+        Welcome to NavalERP
       </h1>
 
       <Image

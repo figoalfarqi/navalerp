@@ -3,8 +3,8 @@ package handler
 import (
 	"testing"
 
-	"github.com/figoalfarqi/apipml/internal/helper"
-	"github.com/figoalfarqi/apipml/internal/model"
+	"github.com/figoalfarqi/navalerp/internal/helper"
+	"github.com/figoalfarqi/navalerp/internal/model"
 )
 
 func TestOwnerAndITDevCanManageEveryAdminUserType(t *testing.T) {

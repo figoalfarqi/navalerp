@@ -4,9 +4,9 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/figoalfarqi/apipml/config"
-	"github.com/figoalfarqi/apipml/internal/app"
-	"github.com/figoalfarqi/apipml/pkg/database"
+	"github.com/figoalfarqi/navalerp/config"
+	"github.com/figoalfarqi/navalerp/internal/app"
+	"github.com/figoalfarqi/navalerp/pkg/database"
 	"github.com/joho/godotenv"
 )
 

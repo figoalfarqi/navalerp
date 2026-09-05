@@ -5,7 +5,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/figoalfarqi/apipml/config"
+	"github.com/figoalfarqi/navalerp/config"
 )
 
 func TestSetupRouterRegistersRoutesWithoutConflict(t *testing.T) {

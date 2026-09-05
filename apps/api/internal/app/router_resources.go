@@ -1,11 +1,11 @@
 package app
 
 import (
-	"github.com/figoalfarqi/apipml/config"
-	"github.com/figoalfarqi/apipml/internal/handler"
-	"github.com/figoalfarqi/apipml/internal/repository"
-	"github.com/figoalfarqi/apipml/internal/service"
-	"github.com/figoalfarqi/apipml/pkg/database"
+	"github.com/figoalfarqi/navalerp/config"
+	"github.com/figoalfarqi/navalerp/internal/handler"
+	"github.com/figoalfarqi/navalerp/internal/repository"
+	"github.com/figoalfarqi/navalerp/internal/service"
+	"github.com/figoalfarqi/navalerp/pkg/database"
 )
 
 type routeHandlers struct {

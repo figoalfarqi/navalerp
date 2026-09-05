@@ -3,8 +3,8 @@ package handler
 import (
 	"net/http"
 
-	"github.com/figoalfarqi/apipml/internal/model"
-	"github.com/figoalfarqi/apipml/internal/service"
+	"github.com/figoalfarqi/navalerp/internal/model"
+	"github.com/figoalfarqi/navalerp/internal/service"
 )
 
 type PortHandler struct{ Service *service.PortService }

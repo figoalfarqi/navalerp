@@ -63,7 +63,7 @@ export default function Sidebar({
         >
           <Image
             src="/logo-bulat.png"
-            alt="PML"
+            alt="NavalERP"
             width={42}
             height={42}
             className="shrink-0"

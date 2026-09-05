@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/figoalfarqi/apipml/internal/model"
-	"github.com/figoalfarqi/apipml/internal/repository"
+	"github.com/figoalfarqi/navalerp/internal/model"
+	"github.com/figoalfarqi/navalerp/internal/repository"
 )
 
 type ReportService struct{ Repo *repository.ReportRepository }

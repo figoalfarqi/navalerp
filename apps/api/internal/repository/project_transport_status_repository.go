@@ -6,7 +6,7 @@ import (
 	"sort"
 	"time"
 
-	"github.com/figoalfarqi/apipml/internal/model"
+	"github.com/figoalfarqi/navalerp/internal/model"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )

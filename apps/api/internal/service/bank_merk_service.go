@@ -5,10 +5,10 @@ import (
 	"errors"
 	"time"
 
-	"github.com/figoalfarqi/apipml/internal/helper"
-	"github.com/figoalfarqi/apipml/internal/model"
-	"github.com/figoalfarqi/apipml/internal/repository"
-	"github.com/figoalfarqi/apipml/internal/validation"
+	"github.com/figoalfarqi/navalerp/internal/helper"
+	"github.com/figoalfarqi/navalerp/internal/model"
+	"github.com/figoalfarqi/navalerp/internal/repository"
+	"github.com/figoalfarqi/navalerp/internal/validation"
 )
 
 type BankMerkService struct {

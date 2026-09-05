@@ -1,4 +1,4 @@
-module github.com/figoalfarqi/apipml
+module github.com/figoalfarqi/navalerp
 
 go 1.24.2
 

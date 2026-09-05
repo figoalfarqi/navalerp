@@ -12,7 +12,7 @@ node_modules/
 
 # Go build artifacts
 apps/api/app
-apps/api/cmd/apipml/app
+apps/api/cmd/navalerp/app
 
 # OS and editor files
 .DS_Store
@@ -21,5 +21,5 @@ Thumbs.db
 
 # Local backup retained while the monorepo migration is verified
 .monorepo-migration-backup/
-/apipml/
-/apppml/
+/navalerp/
+/appnavalerp/

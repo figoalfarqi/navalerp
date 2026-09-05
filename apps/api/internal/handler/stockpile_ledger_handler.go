@@ -3,10 +3,10 @@ package handler
 import (
 	"net/http"
 
-	"github.com/figoalfarqi/apipml/config"
-	"github.com/figoalfarqi/apipml/internal/model"
-	"github.com/figoalfarqi/apipml/internal/service"
-	"github.com/figoalfarqi/apipml/pkg/response"
+	"github.com/figoalfarqi/navalerp/config"
+	"github.com/figoalfarqi/navalerp/internal/model"
+	"github.com/figoalfarqi/navalerp/internal/service"
+	"github.com/figoalfarqi/navalerp/pkg/response"
 )
 
 type StockpileLedgerHandler struct {

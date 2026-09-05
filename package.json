@@ -6,10 +6,10 @@
   "scripts": {
     "dev": "concurrently --names web,api --prefix-colors blue,green \"pnpm dev:web\" \"pnpm dev:api\"",
     "dev:web": "pnpm --filter @navalerp/web dev",
-    "dev:api": "go -C apps/api run ./cmd/apipml",
+    "dev:api": "go -C apps/api run ./cmd/navalerp",
     "build": "pnpm build:web && pnpm build:api",
     "build:web": "pnpm --filter @navalerp/web build",
-    "build:api": "go -C apps/api build -o app ./cmd/apipml",
+    "build:api": "go -C apps/api build -o app ./cmd/navalerp",
     "lint": "pnpm lint:web",
     "lint:web": "pnpm --filter @navalerp/web lint",
     "test": "pnpm test:api",

@@ -1,6 +1,6 @@
-# PML Frontend
+# NavalERP Frontend
 
-Frontend Next.js untuk aplikasi PML. Project ini berada di dalam pnpm
+Frontend Next.js untuk aplikasi NavalERP. Project ini berada di dalam pnpm
 monorepo dan dikonfigurasi untuk deployment di Vercel.
 
 ## Local development

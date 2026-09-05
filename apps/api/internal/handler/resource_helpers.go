@@ -10,9 +10,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/figoalfarqi/apipml/internal/app/middleware"
-	"github.com/figoalfarqi/apipml/internal/model"
-	"github.com/figoalfarqi/apipml/pkg/response"
+	"github.com/figoalfarqi/navalerp/internal/app/middleware"
+	"github.com/figoalfarqi/navalerp/internal/model"
+	"github.com/figoalfarqi/navalerp/pkg/response"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 )
