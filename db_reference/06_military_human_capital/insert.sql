@@ -1,4 +1,4 @@
--- =============================================================================
+﻿-- =============================================================================
 -- SEED DATA: MODUL 6 - MANAJEMEN PERSONEL & AWAK KAPAL (MILITARY HUMAN CAPITAL)
 -- FILE: 06_military_human_capital/insert.sql
 -- =============================================================================
@@ -15,7 +15,9 @@ INSERT INTO hcm_ranks (rank_id, rank_code, rank_name, rank_category, nato_rank_c
 ('80000000-0000-0000-0000-000000000008', 'LETTU',   'Letnan Satu Laut',     'PAMA',  'OF-1', 9),
 ('80000000-0000-0000-0000-000000000009', 'SERKA',   'Sersan Kepala',        'BINTARA', 'OR-6', 15),
 ('80000000-0000-0000-0000-000000000010', 'KLK',     'Kelasi Kepala',        'TAMTAMA', 'OR-4', 21)
-ON CONFLICT (rank_id) DO NOTHING;
+ON CONFLICT (rank_id) DO UPDATE SET
+    rank_name = EXCLUDED.rank_name,
+    seniority_order = EXCLUDED.seniority_order;
 
 -- 2. Master Korps TNI AL
 INSERT INTO hcm_corps (corps_id, corps_code, corps_name, description) VALUES
@@ -34,47 +36,47 @@ INSERT INTO hcm_personnel (
 ) VALUES
 (
     '81000000-0000-0000-0000-000000000001',
-    '11223/P',
-    'Surya Pratama, S.E., M.M.',
-    '80000000-0000-0000-0000-000000000002', -- Laksda
+    'NRP-987654',
+    'Laksamana Pertama TNI Judijanto',
+    '80000000-0000-0000-0000-000000000003', -- Laksma
     '80500000-0000-0000-0000-000000000001', -- Korps Pelaut
-    '10000000-0000-0000-0000-000000000002', -- Koarmada II
-    'Panglima Komando Armada II',
+    '10000000-0000-0000-0000-000000000001', -- Mabesal
+    'Panglima Komando Operasi',
     'Surabaya', '1970-08-17', 'MALE', 'O', 'ISLAM', 'AAL 1993', '1989-08-01',
     '20000000-0000-0000-0000-000000000002', -- linked user
     'ACTIVE'
 ),
 (
     '81000000-0000-0000-0000-000000000002',
-    '13450/T',
-    'Budi Santoso, S.T., M.Tr.Opsla',
-    '80000000-0000-0000-0000-000000000004', -- Kolonel Laut (T)
-    '80500000-0000-0000-0000-000000000002', -- Korps Teknik
-    '10000000-0000-0000-0000-000000000002', -- Koarmada II
-    'Asisten Logistik Pangkoarmada II',
+    'NRP-765432',
+    'Letkol Laut (S) Bambang Prasetyo',
+    '80000000-0000-0000-0000-000000000005', -- Letkol Laut (S)
+    '80500000-0000-0000-0000-000000000004', -- Korps Suplai
+    '10000000-0000-0000-0000-000000000006', -- Lantamal V
+    'Perwira Logistik & Pembekalan',
     'Semarang', '1976-03-24', 'MALE', 'A', 'ISLAM', 'AAL 1998', '1994-08-01',
-    '20000000-0000-0000-0000-000000000003', -- linked user
-    'ACTIVE'
-),
-(
-    '81000000-0000-0000-0000-000000000003',
-    '15200/P',
-    'Ahmad Dahlan, M.Tr.Hanla',
-    '80000000-0000-0000-0000-000000000005', -- Letkol Laut (P)
-    '80500000-0000-0000-0000-000000000001', -- Korps Pelaut
-    '10000000-0000-0000-0000-000000000004', -- KRI REM-331
-    'Komandan KRI Raden Eddy Martadinata-331',
-    'Jakarta', '1981-11-10', 'MALE', 'B', 'ISLAM', 'AAL 2003', '1999-08-01',
     '20000000-0000-0000-0000-000000000004', -- linked user
     'ACTIVE'
 ),
 (
+    '81000000-0000-0000-0000-000000000003',
+    'NRP-876543',
+    'Kolonel Laut (P) Hendra Kurniawan',
+    '80000000-0000-0000-0000-000000000004', -- Kolonel Laut (P)
+    '80500000-0000-0000-0000-000000000001', -- Korps Pelaut
+    '10000000-0000-0000-0000-000000000007', -- Satkor Koarmada II
+    'Komandan KRI Raden Eddy Martadinata-331',
+    'Jakarta', '1981-11-10', 'MALE', 'B', 'ISLAM', 'AAL 2003', '1999-08-01',
+    '20000000-0000-0000-0000-000000000003', -- linked user
+    'ACTIVE'
+),
+(
     '81000000-0000-0000-0000-000000000004',
-    '16780/T',
-    'Tri Wibowo, S.T.',
+    'NRP-654321',
+    'Mayor Laut (T) Arif Wijaya',
     '80000000-0000-0000-0000-000000000006', -- Mayor Laut (T)
     '80500000-0000-0000-0000-000000000002', -- Korps Teknik
-    '10000000-0000-0000-0000-000000000004', -- KRI REM-331
+    '10000000-0000-0000-0000-000000000007', -- Satkor Koarmada II
     'Kepala Departemen Mesin (Kadepsin) KRI REM-331',
     'Yogyakarta', '1986-05-15', 'MALE', 'O', 'ISLAM', 'AAL 2008', '2004-08-01',
     '20000000-0000-0000-0000-000000000005', -- linked user
@@ -82,29 +84,32 @@ INSERT INTO hcm_personnel (
 ),
 (
     '81000000-0000-0000-0000-000000000005',
-    '17890/S',
-    'Hendra Kusuma, S.Sos.',
-    '80000000-0000-0000-0000-000000000007', -- Kapten Laut (S)
-    '80500000-0000-0000-0000-000000000004', -- Korps Suplai
-    '10000000-0000-0000-0000-000000000002', -- Koarmada II
-    'Perwira Administrasi Personel (Spers Koarmada II)',
-    'Bandung', '1990-02-28', 'MALE', 'AB', 'ISLAM', 'AAL 2012', '2008-08-01',
-    '20000000-0000-0000-0000-000000000006', -- linked user
+    'NRP-843219',
+    'Kolonel Laut (E) Agus Santoso',
+    '80000000-0000-0000-0000-000000000004', -- Kolonel Laut (E)
+    '80500000-0000-0000-0000-000000000003', -- Korps Elektronika
+    '10000000-0000-0000-0000-000000000001', -- Mabesal
+    'Perwira Personel & Pembinaan Tenaga Manusia',
+    'Bandung', '1980-02-28', 'MALE', 'AB', 'ISLAM', 'AAL 2002', '1998-08-01',
+    '20000000-0000-0000-0000-000000000007', -- linked user
     'ACTIVE'
 ),
 (
     '81000000-0000-0000-0000-000000000006',
-    '102340',
-    'Didik Supriyadi',
+    'NRP-102938',
+    'Serka Nav Dwi Prasetyo',
     '80000000-0000-0000-0000-000000000009', -- Serka
-    '80500000-0000-0000-0000-000000000002', -- Korps Teknik
-    '10000000-0000-0000-0000-000000000004', -- KRI REM-331
-    'Bintara Utama Mesin Pokok (Bama Divisi Mesin)',
+    '80500000-0000-0000-0000-000000000001', -- Korps Pelaut
+    '10000000-0000-0000-0000-000000000007', -- Satkor Koarmada II
+    'Bintara Radar & Navigasi KRI REM-331',
     'Malang', '1992-07-12', 'MALE', 'O', 'ISLAM', 'Secaba 2013', '2013-03-01',
-    NULL,
+    '20000000-0000-0000-0000-000000000009', -- linked user
     'ACTIVE'
 )
-ON CONFLICT (personnel_id) DO NOTHING;
+ON CONFLICT (personnel_id) DO UPDATE SET
+    full_name = EXCLUDED.full_name,
+    current_position = EXCLUDED.current_position,
+    status = EXCLUDED.status;
 
 -- 4. Riwayat Penugasan Militer
 INSERT INTO hcm_service_records (
@@ -113,11 +118,11 @@ INSERT INTO hcm_service_records (
 ) VALUES
 (
     '81500000-0000-0000-0000-000000000001',
-    '81000000-0000-0000-0000-000000000003', -- Letkol Ahmad Dahlan
+    '81000000-0000-0000-0000-000000000003', -- Kolonel Hendra Kurniawan
     'Kep/120/V/2024',
     'PROMOTION',
-    '10000000-0000-0000-0000-000000000002',
-    '10000000-0000-0000-0000-000000000004',
+    '10000000-0000-0000-0000-000000000003', -- Koarmada II
+    '10000000-0000-0000-0000-000000000007', -- Satkor Koarmada II
     'Komandan KRI Raden Eddy Martadinata-331',
     '2024-05-15',
     NULL,
@@ -226,7 +231,7 @@ INSERT INTO hcm_crew_assignments (
 (
     '83500000-0000-0000-0000-000000000001',
     '41000000-0000-0000-0000-000000000001', -- KRI REM-331
-    '81000000-0000-0000-0000-000000000003', -- Letkol Ahmad Dahlan
+    '81000000-0000-0000-0000-000000000003', -- Kolonel Hendra Kurniawan
     'KOMANDAN KRI',
     'DEPOPS',
     'COMMAND_POST',
@@ -236,7 +241,7 @@ INSERT INTO hcm_crew_assignments (
 (
     '83500000-0000-0000-0000-000000000002',
     '41000000-0000-0000-0000-000000000001', -- KRI REM-331
-    '81000000-0000-0000-0000-000000000004', -- Mayor Tri Wibowo
+    '81000000-0000-0000-0000-000000000004', -- Mayor Arif Wijaya
     'KEPALA DEPARTEMEN MESIN (KADEPSIN)',
     'DEPSIN',
     'ENGINEERING_CONTROL_ROOM',
@@ -246,9 +251,9 @@ INSERT INTO hcm_crew_assignments (
 (
     '83500000-0000-0000-0000-000000000003',
     '41000000-0000-0000-0000-000000000001', -- KRI REM-331
-    '81000000-0000-0000-0000-000000000006', -- Serka Didik Supriyadi
-    'BINTARA MESIN POKOK',
-    'DEPSIN',
+    '81000000-0000-0000-0000-000000000006', -- Serka Dwi Prasetyo
+    'BINTARA RADAR & NAVIGASI',
+    'DEPOPS',
     'VIGOUR_A',
     '2024-06-01',
     TRUE
@@ -285,4 +290,3 @@ INSERT INTO hcm_sea_duty_allowances (
     'TR-LAYAR-2026-0041'
 )
 ON CONFLICT (allowance_id) DO NOTHING;
-

@@ -1,4 +1,4 @@
--- =============================================================================
+﻿-- =============================================================================
 -- SEED DATA: MODUL 7 - INFRASTRUKTUR PANGKALAN & LABUH (BASE & PORT INFRASTRUCTURE)
 -- FILE: 07_base_infrastructure/insert.sql
 -- =============================================================================
@@ -11,7 +11,7 @@ INSERT INTO infra_facilities (
 ) VALUES
 (
     '85000000-0000-0000-0000-000000000001',
-    '10000000-0000-0000-0000-000000000002', -- Koarmada II
+    '10000000-0000-0000-0000-000000000003', -- Koarmada II
     'FAC-DERM-MADURA',
     'Dermaga Madura Koarmada II Ujung',
     'BERTH_JETTY',
@@ -25,7 +25,7 @@ INSERT INTO infra_facilities (
 ),
 (
     '85000000-0000-0000-0000-000000000002',
-    '10000000-0000-0000-0000-000000000002', -- Koarmada II
+    '10000000-0000-0000-0000-000000000003', -- Koarmada II
     'FAC-DERM-SEMARANG',
     'Dermaga Semarang Koarmada II Ujung',
     'BERTH_JETTY',
@@ -39,7 +39,7 @@ INSERT INTO infra_facilities (
 ),
 (
     '85000000-0000-0000-0000-000000000003',
-    '10000000-0000-0000-0000-000000000005', -- Fasharkan Surabaya
+    '10000000-0000-0000-0000-000000000009', -- Fasharkan Surabaya
     'FAC-DOCK-GRAVING-1',
     'Graving Dock I Fasharkan Surabaya',
     'GRAVING_DOCK',
@@ -53,7 +53,7 @@ INSERT INTO infra_facilities (
 ),
 (
     '85000000-0000-0000-0000-000000000004',
-    '10000000-0000-0000-0000-000000000003', -- Lantamal V
+    '10000000-0000-0000-0000-000000000006', -- Lantamal V
     'FAC-BUNKER-UJUNG',
     'Instalasi Tangki Timbun BBM Disbekal Lantamal V',
     'FUEL_STORAGE',
@@ -65,7 +65,9 @@ INSERT INTO infra_facilities (
     TRUE,
     'OPERATIONAL'
 )
-ON CONFLICT (facility_id) DO NOTHING;
+ON CONFLICT (facility_id) DO UPDATE SET
+    facility_name = EXCLUDED.facility_name,
+    status = EXCLUDED.status;
 
 -- 2. Penjadwalan & Riwayat Sandar Kapal
 INSERT INTO infra_berth_bookings (
@@ -85,13 +87,13 @@ INSERT INTO infra_berth_bookings (
     14500.00,
     85.00,
     'COMPLETED',
-    '20000000-0000-0000-0000-000000000003', -- Aslog
+    '20000000-0000-0000-0000-000000000004', -- Perwira Logistik
     'Sandar untuk bekal ulang amunisi, bahan bakar, dan air tawar persiapan Operasi Siaga Tempur Laut Natuna.'
 ),
 (
     '85500000-0000-0000-0000-000000000002',
     '85000000-0000-0000-0000-000000000003', -- Graving Dock I
-    '41000000-0000-0000-0000-000000000002', -- KRI DPO-365
+    '41000000-0000-0000-0000-000000000003', -- KRI DPO-365
     'MRO_REPAIR',
     '2026-03-01 07:00:00+07',
     '2026-03-25 17:00:00+07',
@@ -100,7 +102,7 @@ INSERT INTO infra_berth_bookings (
     28000.00,
     40.00,
     'BERTHED',
-    '20000000-0000-0000-0000-000000000003',
+    '20000000-0000-0000-0000-000000000004',
     'Docking berkala, sandblasting lambung dan pembersihan sea chest di Dok Fasharkan.'
 )
 ON CONFLICT (booking_id) DO NOTHING;
@@ -122,7 +124,7 @@ INSERT INTO infra_fuel_bunker_records (
     '2026-02-26 09:00:00+07',
     '2026-02-26 13:00:00+07',
     'BPM/KOARMADA2/2026/0289',
-    '20000000-0000-0000-0000-000000000005' -- Diotorisasi Kadepsin Tri Wibowo
+    '20000000-0000-0000-0000-000000000005' -- Diotorisasi Kadepsin Arif Wijaya
 )
 ON CONFLICT (bunker_id) DO NOTHING;
 
@@ -143,4 +145,3 @@ INSERT INTO infra_facility_maintenances (
     'Pengerukan kolam pelabuhan Dermaga Madura untuk memastikan kedalaman aman -11.5m LWS bagi Frigat SIGMA.'
 )
 ON CONFLICT (maint_id) DO NOTHING;
-

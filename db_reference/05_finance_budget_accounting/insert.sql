@@ -1,4 +1,4 @@
--- =============================================================================
+﻿-- =============================================================================
 -- SEED DATA: MODUL 5 - KEUANGAN, ANGGARAN & AKUNTANSI PERTAHANAN (FINANCE & TCO)
 -- FILE: 05_finance_budget_accounting/insert.sql
 -- =============================================================================
@@ -56,7 +56,9 @@ INSERT INTO fin_chart_of_accounts (
     'EXPENSE',
     TRUE
 )
-ON CONFLICT (account_id) DO NOTHING;
+ON CONFLICT (account_id) DO UPDATE SET
+    account_name = EXCLUDED.account_name,
+    account_type = EXCLUDED.account_type;
 
 -- 2. Program Kerja & Anggaran Pertahanan (DIPA)
 INSERT INTO fin_budget_programs (
@@ -70,7 +72,7 @@ INSERT INTO fin_budget_programs (
     '012.01.WA',
     'Program Modernisasi Alutsista & Dukungan Kesiapan Operasi Laut Koarmada II',
     450000000000.00,
-    '10000000-0000-0000-0000-000000000002', -- Koarmada II
+    '10000000-0000-0000-0000-000000000003', -- Koarmada II
     'ACTIVE'
 )
 ON CONFLICT (program_id) DO NOTHING;
@@ -85,7 +87,7 @@ INSERT INTO fin_budget_allocations (
     '71000000-0000-0000-0000-000000000001',
     'WA.5231.001',
     'Pemeliharaan Terencana dan Perbaikan KRI REM-331 TA 2026',
-    '10000000-0000-0000-0000-000000000004', -- KRI REM-331
+    '10000000-0000-0000-0000-000000000007', -- Satkor Koarmada II
     '41000000-0000-0000-0000-000000000001', -- KRI REM-331
     '70000000-0000-0000-0000-000000000007', -- Belanja Pemeliharaan
     25000000000.00,
@@ -96,7 +98,7 @@ INSERT INTO fin_budget_allocations (
     '71000000-0000-0000-0000-000000000001',
     'WA.5218.002',
     'Pengadaan Suku Cadang Mesin Pendorong Pokok MTU Kelas Martadinata',
-    '10000000-0000-0000-0000-000000000002', -- Koarmada II
+    '10000000-0000-0000-0000-000000000003', -- Koarmada II
     '41000000-0000-0000-0000-000000000001',
     '70000000-0000-0000-0000-000000000006', -- Belanja Persediaan
     15000000000.00,
@@ -107,8 +109,8 @@ INSERT INTO fin_budget_allocations (
     '71000000-0000-0000-0000-000000000001',
     'WA.5231.003',
     'Docking Rutin & Pelapisan Antifouling KRI DPO-365',
-    '10000000-0000-0000-0000-000000000005', -- Fasharkan Surabaya
-    '41000000-0000-0000-0000-000000000002', -- KRI DPO-365
+    '10000000-0000-0000-0000-000000000009', -- Fasharkan Surabaya
+    '41000000-0000-0000-0000-000000000003', -- KRI DPO-365
     '70000000-0000-0000-0000-000000000007',
     12500000000.00,
     0.00
@@ -150,7 +152,7 @@ INSERT INTO fin_invoices (
     346000000.00,
     38060000.00,
     'VERIFIED',
-    '20000000-0000-0000-0000-000000000003', -- Kolonel Aslog
+    '20000000-0000-0000-0000-000000000006', -- Letkol Deni Mulyadi (Perwira Keuangan)
     'PAID'
 )
 ON CONFLICT (invoice_id) DO NOTHING;
@@ -171,7 +173,7 @@ INSERT INTO fin_payments (
     384060000.00,
     'KPPN_TREASURY',
     'KPPN Jakarta II - Rekening Kas Negara 000.12345.1',
-    '20000000-0000-0000-0000-000000000002' -- Pangkoarmada II
+    '20000000-0000-0000-0000-000000000002' -- Panglima
 )
 ON CONFLICT (payment_id) DO NOTHING;
 
@@ -248,4 +250,3 @@ INSERT INTO fin_platform_tco_summaries (
     'TCO Proyeksi Pagu TA 2026 KRI REM-331 - Kesiapan Tempur Penuh Natuna'
 )
 ON CONFLICT (tco_id) DO NOTHING;
-

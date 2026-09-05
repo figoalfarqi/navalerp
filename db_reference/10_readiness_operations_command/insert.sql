@@ -12,7 +12,7 @@ INSERT INTO ops_theaters (
     '91000000-0000-0000-0000-000000000001',
     'THEATER-NATUNA',
     'Teater Operasi Laut Natuna Utara & Selat Karimata',
-    '10000000-0000-0000-0000-000000000002', -- Koarmada II (BKO Kogabwilhan I)
+    '10000000-0000-0000-0000-000000000003', -- Koarmada II (BKO Kogabwilhan I)
     'DEFCON_2',
     'Wilayah pengamanan ZEE perbatasan laut strategis dengan intensitas patroli tinggi'
 ),
@@ -20,11 +20,21 @@ INSERT INTO ops_theaters (
     '91000000-0000-0000-0000-000000000002',
     'THEATER-AMBALAT',
     'Teater Operasi Laut Sulawesi & Blok Ambalat',
-    '10000000-0000-0000-0000-000000000002', -- Koarmada II
+    '10000000-0000-0000-0000-000000000003', -- Koarmada II
     'DEFCON_3',
     'Wilayah kedaulatan maritim blok migas perbatasan Indonesia - Malaysia'
+),
+(
+    '91000000-0000-0000-0000-000000000003',
+    'THEATER-MALAKA',
+    'Teater Operasi Selat Malaka & Selat Singapura',
+    '10000000-0000-0000-0000-000000000002', -- Koarmada I
+    'DEFCON_4',
+    'Jalur Sea Lines of Communication (SLOC) perdagangan internasional tersibuk di dunia'
 )
-ON CONFLICT (theater_id) DO NOTHING;
+ON CONFLICT (theater_id) DO UPDATE SET
+    theater_name = EXCLUDED.theater_name,
+    threat_level = EXCLUDED.threat_level;
 
 -- 2. Operasi & Misi Tempur Militer
 INSERT INTO ops_missions (
@@ -39,7 +49,18 @@ INSERT INTO ops_missions (
     'COMBAT_PATROL',
     '2026-03-01',
     '2026-06-30',
-    '20000000-0000-0000-0000-000000000002', -- Pangkoarmada II
+    '20000000-0000-0000-0000-000000000002', -- Panglima
+    'ACTIVE'
+),
+(
+    '91500000-0000-0000-0000-000000000002',
+    '91000000-0000-0000-0000-000000000003', -- Selat Malaka
+    'OPS-PATKOR-MALINDO-26',
+    'Patroli Terkoordinasi Malindo Wilayah Selat Malaka',
+    'COMBAT_PATROL',
+    '2026-02-15',
+    '2026-05-15',
+    '20000000-0000-0000-0000-000000000002',
     'ACTIVE'
 )
 ON CONFLICT (mission_id) DO NOTHING;
@@ -55,6 +76,15 @@ INSERT INTO ops_mission_ship_assignments (
     '41000000-0000-0000-0000-000000000001', -- KRI REM-331
     'BRAVO-ONE',
     'FLAGSHIP',
+    '2026-03-01',
+    'ACTIVE'
+),
+(
+    '91800000-0000-0000-0000-000000000002',
+    '91500000-0000-0000-0000-000000000001',
+    '41000000-0000-0000-0000-000000000002', -- KRI INR-332
+    'BRAVO-TWO',
+    'ESCORT_SURFACE',
     '2026-03-01',
     'ACTIVE'
 )
@@ -80,7 +110,22 @@ INSERT INTO ops_daily_logs (
     112500.00,
     78.00,
     'Patroli sektor Alpha Laut Natuna Utara. Kontak radar permukaan terpantau normal. Seluruh sensor CMS TACTICOS dan mesin MTU beroperasi optimal.',
-    '20000000-0000-0000-0000-000000000004' -- Letkol Ahmad Dahlan (Dan KRI)
+    '20000000-0000-0000-0000-000000000003' -- Kolonel Hendra Kurniawan (Dan KRI REM-331)
+),
+(
+    '92000000-0000-0000-0000-000000000002',
+    '41000000-0000-0000-0000-000000000002', -- KRI INR-332
+    '2026-03-04',
+    4.421000,
+    108.512000,
+    48,
+    17.0,
+    3,
+    'Cerah Berawan, Jarak Pandang 10 NM',
+    135000.00,
+    82.00,
+    'Manuver taktis formasi Line of Bearing mendampingi KRI REM-331.',
+    '20000000-0000-0000-0000-000000000008' -- Kolonel Faisal Anwar (Dan KRI INR-332)
 )
 ON CONFLICT (log_id) DO NOTHING;
 
@@ -101,7 +146,7 @@ INSERT INTO ops_ship_readiness_snapshots (
 ),
 (
     '92500000-0000-0000-0000-000000000002',
-    '41000000-0000-0000-0000-000000000002', -- KRI DPO-365
+    '41000000-0000-0000-0000-000000000003', -- KRI DPO-365
     '2026-03-04 08:00:00+07',
     'C-4', -- Docking / Non-Operasional Sementara
     60.00,
@@ -124,8 +169,7 @@ INSERT INTO ops_readiness_alerts (
     'CASREP_DEFECT',
     'Jam kerja mesin MTU Port telah mencapai 4.250 jam. Persiapkan jadwal perawatan berkala 500 jam berikutnya (PMS Level 2).',
     TRUE,
-    '20000000-0000-0000-0000-000000000005', -- Kadepsin Tri Wibowo
+    '20000000-0000-0000-0000-000000000005', -- Kadepsin Arif Wijaya
     '2026-03-04 10:00:00+07'
 )
 ON CONFLICT (alert_id) DO NOTHING;
-

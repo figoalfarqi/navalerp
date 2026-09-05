@@ -1,4 +1,4 @@
--- =============================================================================
+﻿-- =============================================================================
 -- SEED DATA: MODUL 8 - LOGISTIK & TRANSPORTASI MILITER (LOGISTICS & TRANSPORTATION)
 -- FILE: 08_logistics_transportation/insert.sql
 -- =============================================================================
@@ -15,7 +15,7 @@ INSERT INTO log_transport_units (
     'NAVAL_AUXILIARY_VESSEL',
     5500.00,
     1150000.00,
-    '10000000-0000-0000-0000-000000000002', -- Koarmada II
+    '10000000-0000-0000-0000-000000000003', -- Koarmada II
     'AVAILABLE'
 ),
 (
@@ -25,7 +25,7 @@ INSERT INTO log_transport_units (
     'NAVAL_AUXILIARY_VESSEL',
     4300.00,
     450000.00,
-    '10000000-0000-0000-0000-000000000002',
+    '10000000-0000-0000-0000-000000000005', -- Kolinlamil
     'AVAILABLE'
 ),
 (
@@ -35,10 +35,12 @@ INSERT INTO log_transport_units (
     'LAND_TRUCK',
     25.00,
     400.00,
-    '10000000-0000-0000-0000-000000000003', -- Lantamal V
+    '10000000-0000-0000-0000-000000000006', -- Lantamal V
     'AVAILABLE'
 )
-ON CONFLICT (transport_unit_id) DO NOTHING;
+ON CONFLICT (transport_unit_id) DO UPDATE SET
+    unit_name = EXCLUDED.unit_name,
+    status = EXCLUDED.status;
 
 -- 2. Rute Distribusi Laut Militer
 INSERT INTO log_routes (
@@ -50,19 +52,19 @@ INSERT INTO log_routes (
     'RTE-SBY-NATUNA',
     'Jalur Pangkalan Utama Surabaya - Pangkalan Aju Ranai Natuna',
     '85000000-0000-0000-0000-000000000001', -- Dermaga Madura Sby
-    '85000000-0000-0000-0000-000000000001', -- (Ref Dermaga Madura as endpoint dummy)
+    '85000000-0000-0000-0000-000000000001', -- Ref Dermaga Madura
     720.00,
     48.00,
     'HIGH_SEA'
 ),
 (
     '87500000-0000-0000-0000-000000000002',
-    'RTE-SBY-TARAKAN',
-    'Jalur Pangkalan Utama Surabaya - Lantamal XIII Tarakan',
+    'RTE-SBY-BATAM',
+    'Jalur Pangkalan Surabaya - Lantamal IV Batam',
     '85000000-0000-0000-0000-000000000001',
     '85000000-0000-0000-0000-000000000002',
-    850.00,
-    56.00,
+    650.00,
+    42.00,
     'NORMAL'
 )
 ON CONFLICT (route_id) DO NOTHING;
@@ -78,13 +80,13 @@ INSERT INTO log_shipments (
     'MAN-LOG-2026-0033',
     '87500000-0000-0000-0000-000000000001',
     '87000000-0000-0000-0000-000000000001', -- KRI Tarakan-905
-    '50000000-0000-0000-0000-000000000001', -- Gudang Disbekal Surabaya
+    '50000000-0000-0000-0000-000000000001', -- Gudang Bekpal Ujung Surabaya
     '50000000-0000-0000-0000-000000000004', -- Gudang Kapal KRI REM-331 (titik aju)
     '2026-02-27 10:00:00+07',
     '2026-03-01 14:00:00+07',
     'WARSHIP_ESCORT',
     'DELIVERED',
-    '20000000-0000-0000-0000-000000000003', -- Kolonel Aslog
+    '20000000-0000-0000-0000-000000000004', -- Perwira Logistik
     'Dukungan logistik garis depan (sea replenishment) pelumas dan filter cadangan siaga tempur.'
 )
 ON CONFLICT (shipment_id) DO NOTHING;
@@ -97,17 +99,17 @@ INSERT INTO log_shipment_items (
 (
     '88500000-0000-0000-0000-000000000001',
     '88000000-0000-0000-0000-000000000001',
-    '51000000-0000-0000-0000-000000000004', -- Oli Mil-L-9000
-    10.00,
-    10.00,
+    '51000000-0000-0000-0000-000000000004', -- BBM F-76
+    10000.00,
+    10000.00,
     'DRUM',
-    2100.00,
-    'Drum kedap oli mesin pendorong'
+    8500.00,
+    'Drum kedap BBM HSD standar militer'
 ),
 (
     '88500000-0000-0000-0000-000000000002',
     '88000000-0000-0000-0000-000000000001',
-    '51000000-0000-0000-0000-000000000001', -- Oil Filter MTU
+    '51000000-0000-0000-0000-000000000002', -- Oil Filter MTU
     4.00,
     4.00,
     'CRATE',
@@ -115,4 +117,3 @@ INSERT INTO log_shipment_items (
     'Peti kayu mil-spec tahan air laut'
 )
 ON CONFLICT (shipment_item_id) DO NOTHING;
-

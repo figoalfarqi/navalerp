@@ -1,4 +1,4 @@
--- =============================================================================
+﻿-- =============================================================================
 -- SEED DATA: MODUL 9 - MANAJEMEN DOKUMEN ELEKTRONIK & DIGITAL THREAD (EDRMS)
 -- FILE: 09_edrms_documents/insert.sql
 -- =============================================================================
@@ -40,7 +40,9 @@ INSERT INTO doc_categories (
     'RAHASIA_NEGARA',
     'Perjanjian hukum pengadaan alutsista dengan klausul pertahanan strategis'
 )
-ON CONFLICT (category_id) DO NOTHING;
+ON CONFLICT (category_id) DO UPDATE SET
+    category_name = EXCLUDED.category_name,
+    description = EXCLUDED.description;
 
 -- 2. Master Dokumen
 INSERT INTO doc_documents (
@@ -53,12 +55,12 @@ INSERT INTO doc_documents (
     'MNL-MTU-20V4000-M53B',
     'Technical & Maintenance Manual MTU 20V 4000 M53B Marine Diesel Engine',
     '89000000-0000-0000-0000-000000000001', -- TECH_MANUAL
-    '10000000-0000-0000-0000-000000000005', -- Fasharkan Sby
+    '10000000-0000-0000-0000-000000000009', -- Fasharkan Sby
     'TERBATAS',
     '2024-01-01',
     '2034-12-31',
     'APPROVED',
-    '20000000-0000-0000-0000-000000000003'  -- Aslog
+    '20000000-0000-0000-0000-000000000004'  -- Perwira Logistik
 ),
 (
     '90000000-0000-0000-0000-000000000002',
@@ -70,19 +72,19 @@ INSERT INTO doc_documents (
     '2026-01-10',
     '2027-01-10',
     'APPROVED',
-    '20000000-0000-0000-0000-000000000002'  -- Pangkoarmada II
+    '20000000-0000-0000-0000-000000000002'  -- Panglima
 ),
 (
     '90000000-0000-0000-0000-000000000003',
     'DWG-SIGMA-CMS-004',
     'Interconnection Wiring Schematic TACTICOS CMS to SMART-S Mk2 Radar',
     '89000000-0000-0000-0000-000000000003', -- BLUEPRINT_CAD
-    '10000000-0000-0000-0000-000000000004', -- KRI REM-331
+    '10000000-0000-0000-0000-000000000007', -- Satkor Koarmada II
     'RAHASIA',
     '2023-05-15',
     NULL,
     'APPROVED',
-    '20000000-0000-0000-0000-000000000004'  -- Dan KRI
+    '20000000-0000-0000-0000-000000000003'  -- Dan KRI
 )
 ON CONFLICT (document_id) DO NOTHING;
 
@@ -113,7 +115,7 @@ INSERT INTO doc_document_versions (
     'dca148408a287964b4458f4679720478051ec7495029e2f4705cbab29a6745ef',
     'application/pdf',
     'Sertifikat Kelaikan Penuh Hasil Uji Petik & Uji Laut Dislaikmatal',
-    '20000000-0000-0000-0000-000000000003'
+    '20000000-0000-0000-0000-000000000004'
 ),
 (
     '90500000-0000-0000-0000-000000000003',
@@ -125,7 +127,7 @@ INSERT INTO doc_document_versions (
     '9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08',
     'application/acad',
     'Revisi integrasi protokol data bus mil-std-1553B',
-    '20000000-0000-0000-0000-000000000004'
+    '20000000-0000-0000-0000-000000000003'
 )
 ON CONFLICT (version_id) DO NOTHING;
 
@@ -155,4 +157,3 @@ INSERT INTO doc_document_links (
     'WIRING_DIAGRAM'
 )
 ON CONFLICT (link_id) DO NOTHING;
-

@@ -1,4 +1,4 @@
--- =============================================================================
+﻿-- =============================================================================
 -- SEED DATA: MODUL 4 - PENGADAAN PERTAHANAN (DEFENCE PROCUREMENT) (NAVALERP)
 -- FILE: 04_defence_procurement/insert.sql
 -- =============================================================================
@@ -94,7 +94,10 @@ INSERT INTO proc_vendors (
     4.88,
     TRUE
 )
-ON CONFLICT (vendor_id) DO NOTHING;
+ON CONFLICT (vendor_id) DO UPDATE SET
+    vendor_name = EXCLUDED.vendor_name,
+    performance_rating = EXCLUDED.performance_rating,
+    is_approved = TRUE;
 
 -- 2. Penilaian Kinerja Vendor Pertahanan
 INSERT INTO proc_vendor_ratings (
@@ -105,7 +108,7 @@ INSERT INTO proc_vendor_ratings (
     '60100000-0000-0000-0000-000000000001',
     '60000000-0000-0000-0000-000000000001',
     '2025-12-15',
-    '20000000-0000-0000-0000-000000000003', -- Kolonel Aslog
+    '20000000-0000-0000-0000-000000000004', -- Letkol Bambang (Perwira Logistik)
     92.50, 88.00, 95.00, 85.00, 90.12,
     'Sangat memuaskan pada pekerjaan docking KRI REM-331 dan kepatuhan mil-spec galangan nasional.'
 ),
@@ -113,7 +116,7 @@ INSERT INTO proc_vendor_ratings (
     '60100000-0000-0000-0000-000000000002',
     '60000000-0000-0000-0000-000000000004',
     '2025-11-20',
-    '20000000-0000-0000-0000-000000000003',
+    '20000000-0000-0000-0000-000000000004', -- Letkol Bambang (Perwira Logistik)
     98.00, 94.00, 96.00, 82.00, 92.50,
     'Kualitas spare parts OEM MTU 20V 4000 sangat tinggi, sertifikat Certificate of Conformity lengkap.'
 )
@@ -128,13 +131,13 @@ INSERT INTO proc_requisitions (
 (
     '61000000-0000-0000-0000-000000000001',
     'REQ-2026-001',
-    '10000000-0000-0000-0000-000000000004', -- KRI REM-331
+    '10000000-0000-0000-0000-000000000007', -- Satkor Koarmada II
     '45000000-0000-0000-0000-000000000001', -- WO Corrective Repair
     'HIGH',
     '2026-01-10',
     '2026-02-15',
     'APPROVED',
-    '20000000-0000-0000-0000-000000000003', -- Approved by Aslog
+    '20000000-0000-0000-0000-000000000004', -- Approved by Perwira Logistik
     '2026-01-12 10:30:00+07',
     346000000.00,
     'Pengadaan suku cadang kritis MTU 20V 4000 M53B untuk kesiapan Operasi Siaga Tempur Laut Natuna'
@@ -147,26 +150,26 @@ INSERT INTO proc_requisition_items (
 (
     '61100000-0000-0000-0000-000000000001',
     '61000000-0000-0000-0000-000000000001',
-    '51000000-0000-0000-0000-000000000001', -- Oil Filter MTU
+    '51000000-0000-0000-0000-000000000001', -- Injector kit
     8.00,
-    3500000.00,
+    22500000.00,
     'Penggantian berkala Main Engine Port & Stbd'
 ),
 (
     '61100000-0000-0000-0000-000000000002',
     '61000000-0000-0000-0000-000000000001',
-    '51000000-0000-0000-0000-000000000002', -- Fuel Filter
+    '51000000-0000-0000-0000-000000000002', -- Oil Filter
     12.00,
-    2750000.00,
-    'Filter separator BBM B35 standar TNI AL'
+    3500000.00,
+    'Filter pelumas standar MTU 20V 4000'
 ),
 (
     '61100000-0000-0000-0000-000000000003',
     '61000000-0000-0000-0000-000000000001',
-    '51000000-0000-0000-0000-000000000003', -- Injector Nozzle
+    '51000000-0000-0000-0000-000000000003', -- Amunisi 76mm
     10.00,
-    28500000.00,
-    'Injector nozzle common rail MTU 20V 4000'
+    18500000.00,
+    'Amunisi latihan penembakan tempur permukaan'
 )
 ON CONFLICT (req_item_id) DO NOTHING;
 
@@ -240,21 +243,6 @@ INSERT INTO proc_contracts (
 )
 ON CONFLICT (contract_id) DO NOTHING;
 
-INSERT INTO proc_contract_amendments (
-    amendment_id, contract_id, amendment_number, amendment_date, description,
-    additional_value, extended_end_date
-) VALUES
-(
-    '62100000-0000-0000-0000-000000000001',
-    '62000000-0000-0000-0000-000000000001',
-    'AMD-CTR-2026-014-01',
-    '2026-06-01',
-    'Penambahan cakupan kalibrasi ECU MTU ADEC pada uji laut (sea trial)',
-    150000000.00,
-    '2027-02-28'
-)
-ON CONFLICT (amendment_id) DO NOTHING;
-
 -- 6. Purchase Orders
 INSERT INTO proc_purchase_orders (
     po_id, po_number, contract_id, vendor_id, issuing_unit_id,
@@ -266,12 +254,12 @@ INSERT INTO proc_purchase_orders (
     'PO-2026-0089',
     '62000000-0000-0000-0000-000000000001',
     '60000000-0000-0000-0000-000000000004', -- MTU
-    '10000000-0000-0000-0000-000000000002', -- Koarmada II
+    '10000000-0000-0000-0000-000000000003', -- Koarmada II
     '2026-02-15',
     '2026-03-15',
-    '50000000-0000-0000-0000-000000000001', -- Gudang Disbekal
+    '50000000-0000-0000-0000-000000000001', -- Gudang Bekpal Ujung
     346000000.00,
-    38060000.00, -- PPN 11%
+    38060000.00,
     'COMPLETED'
 )
 ON CONFLICT (po_id) DO NOTHING;
@@ -284,28 +272,20 @@ INSERT INTO proc_purchase_order_items (
     '63000000-0000-0000-0000-000000000001',
     '51000000-0000-0000-0000-000000000001',
     8.00,
-    3500000.00,
-    'Oil Filter Element 20V 4000'
+    22500000.00,
+    'Fuel Injector Assembly MTU 20V 4000'
 ),
 (
     '63100000-0000-0000-0000-000000000002',
     '63000000-0000-0000-0000-000000000001',
     '51000000-0000-0000-0000-000000000002',
     12.00,
-    2750000.00,
-    'Fuel Filter Water Separator'
-),
-(
-    '63100000-0000-0000-0000-000000000003',
-    '63000000-0000-0000-0000-000000000001',
-    '51000000-0000-0000-0000-000000000003',
-    10.00,
-    28500000.00,
-    'Main Engine High-Pressure Common Rail Injector'
+    3500000.00,
+    'Lube Oil Filter Element'
 )
 ON CONFLICT (po_item_id) DO NOTHING;
 
--- 7. Goods Receipt (BAPHP: Berita Acara Penerimaan Hasil Pekerjaan)
+-- 7. Goods Receipt (BAPHP)
 INSERT INTO proc_goods_receipts (
     receipt_id, receipt_number, po_id, warehouse_id,
     received_date, delivery_order_number, inspected_by_user_id,
@@ -315,10 +295,10 @@ INSERT INTO proc_goods_receipts (
     '64000000-0000-0000-0000-000000000001',
     'BAPHP-2026-0045',
     '63000000-0000-0000-0000-000000000001',
-    '50000000-0000-0000-0000-000000000001', -- Gudang Disbekal
+    '50000000-0000-0000-0000-000000000001', -- Gudang Bekpal Ujung
     '2026-03-02 09:30:00+07',
     'DO-MTU-SGP-99120',
-    '20000000-0000-0000-0000-000000000005', -- Diperiksa oleh Mayor Tri Wibowo (Maint Officer)
+    '20000000-0000-0000-0000-000000000005', -- Diperiksa oleh Mayor Arif Wijaya (Kadepsin)
     TRUE,
     'Barang diterima lengkap sesuai spesifikasi militer OEM MTU, segel utuh dan lulus uji fungsi awal.'
 )
@@ -345,16 +325,6 @@ INSERT INTO proc_goods_receipt_items (
     '51000000-0000-0000-0000-000000000002',
     12.00,
     12.00,
-    0.00,
-    NULL
-),
-(
-    '64100000-0000-0000-0000-000000000003',
-    '64000000-0000-0000-0000-000000000001',
-    '63100000-0000-0000-0000-000000000003',
-    '51000000-0000-0000-0000-000000000003',
-    10.00,
-    10.00,
     0.00,
     NULL
 )
