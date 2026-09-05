@@ -11,6 +11,7 @@ import {
 } from "react";
 import { useRouter } from "next/navigation";
 import TableToolbar from "./TableToolbar";
+import TablePagination from "./TablePagination";
 import Modal from "../Modal";
 import Button from "../form/Button";
 import { useToast } from "../ToastContext";
@@ -170,6 +171,21 @@ export default function Table({
   const orderByParam = getParam("order_by");
   const sortParam = getParam("sort");
   const globalLimitParam = getParam("global_limit");
+  const pageParam = getParam("page");
+  const initialPage = useMemo(() => {
+    if (pageParam) {
+      const parsed = parseInt(pageParam, 10);
+      if (!isNaN(parsed) && parsed > 0) return parsed;
+    }
+    return 1;
+  }, []);
+  const [currentPage, setCurrentPage] = useState<number>(initialPage);
+  const [totalItems, setTotalItems] = useState<number>(0);
+  const currentPageRef = useRef(currentPage);
+  useEffect(() => {
+    currentPageRef.current = currentPage;
+  }, [currentPage]);
+
   const isValidSort = (v: string): v is "asc" | "desc" =>
     v === "asc" || v === "desc";
   const defaultSort = useMemo(() => {
@@ -396,11 +412,7 @@ export default function Table({
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const [globalLimit, setGlobalLimit] = useState<number>(defaultLimit);
-  const [cursorKey, setCursorKey] = useState<number | null>(null); // id terakhir
-  const [cursorValue, setCursorValue] = useState<any | null>(null); // value sort terakhir
-  const [hasMore, setHasMore] = useState(true); // apakah masih bisa load
   const [isLoading, setIsLoading] = useState(url ? true : false);
-  const [isFetchingMore, setIsFetchingMore] = useState(url ? true : false);
   const [error, setError] = useState<string | null>(null);
 
   const router = useRouter();
@@ -410,24 +422,17 @@ export default function Table({
 
   const abortControllerRef = useRef<AbortController | null>(null);
 
-  const nullCursor = () => {
-    setCursorKey(null);
-    setCursorValue(null);
-  };
-
   // 🔹 Ambil data dari API
   const fetchData = useCallback(
-    async ({
-      merge = false,
-    }: {
-      merge?: boolean;
-      callFrom?: string;
-    }) => {
+    async (pageToFetch?: number) => {
+      const targetPage = pageToFetch ?? currentPageRef.current;
       if (!url) {
         setIsLoading(false);
-        setIsFetchingMore(false);
         if (table_data) {
-          setDataItems(table_data);
+          const start = (targetPage - 1) * globalLimit;
+          const end = start + globalLimit;
+          setDataItems(table_data.slice(start, end));
+          setTotalItems(table_data.length);
         }
         return;
       }
@@ -436,8 +441,7 @@ export default function Table({
       }
       const controller = new AbortController();
       abortControllerRef.current = controller;
-      setIsLoading(!merge);
-      setIsFetchingMore(merge);
+      setIsLoading(true);
       setError(null);
 
       try {
@@ -447,11 +451,7 @@ export default function Table({
             : "";
         const params = new URLSearchParams();
         if (queryString) params.append("query", queryString);
-        if (merge && cursorKey) params.append("cursor_key", String(cursorKey));
-        if (merge && cursorValue)
-          params.append("cursor_value", String(cursorValue));
-        if (merge && cursorValue)
-          params.append("cursor_type", typeof cursorValue);
+        params.append("page", String(targetPage));
         if (globalLimit) params.append("limit", String(globalLimit));
         if (sortValues.order_by) {
           params.append("order_by", sortValues.order_by);
@@ -468,26 +468,12 @@ export default function Table({
           signal: controller.signal,
         });
         if (res.code === 200 && res.data) {
-          const fetchItems = res.data.items;
-          setDataItems((prev) =>
-            merge ? [...prev, ...fetchItems] : fetchItems,
-          );
-          if (fetchItems.length > 0) {
-            const lastItem = fetchItems[fetchItems.length - 1];
-            setCursorKey(lastItem[`${table_name}_id`] || cursorKey);
-            if (sortValues.order_by) {
-              setCursorValue(lastItem[sortValues.order_by]);
-            } else {
-              setCursorValue(lastItem.created_at);
-            }
-          } else {
-            nullCursor();
-          }
-          setHasMore(fetchItems.length >= globalLimit);
+          const fetchItems = res.data.items ?? [];
+          setDataItems(fetchItems);
+          setTotalItems(res.data.total ?? fetchItems.length);
         } else {
           setDataItems([]);
-          nullCursor();
-          setHasMore(false);
+          setTotalItems(0);
         }
       } catch (err: any) {
         if (err.name === "AbortError") return;
@@ -495,7 +481,6 @@ export default function Table({
         setError("Error fetching table data");
       } finally {
         setIsLoading(false);
-        setIsFetchingMore(false);
       }
     },
     [
@@ -503,23 +488,36 @@ export default function Table({
       filterValues,
       globalLimit,
       sortValues,
-      cursorKey,
-      cursorValue,
-      table_name,
       table_data,
+      getAPI,
     ],
   );
 
+  const handlePageChange = useCallback(
+    (newPage: number) => {
+      const totalPages = Math.max(1, Math.ceil(totalItems / (globalLimit || 10)));
+      if (newPage < 1 || newPage > totalPages || newPage === currentPage) return;
+      setSelectedRows([]);
+      if (scrollRef.current) scrollRef.current.scrollTop = 0;
+      setCurrentPage(newPage);
+      if (!isForDetail) {
+        setParams({ page: newPage > 1 ? String(newPage) : "" });
+      }
+      fetchData(newPage);
+    },
+    [totalItems, globalLimit, currentPage, isForDetail, setParams, fetchData],
+  );
+
   const throttledTrailingFetchData = useThrottleLeadingTrailing(
-    (args: { merge?: boolean; callFrom?: string }) => {
-      fetchData({ merge: args.merge, callFrom: args.callFrom });
+    (targetPage?: number) => {
+      fetchData(targetPage ?? 1);
     },
     500,
   );
 
   const debouncedFetchData = useDebounceFn(
-    (args: { merge?: boolean; callFrom?: string }) => {
-      fetchData({ merge: args.merge, callFrom: args.callFrom });
+    (targetPage?: number) => {
+      fetchData(targetPage ?? 1);
     },
     200,
   );
@@ -527,17 +525,23 @@ export default function Table({
   const didMountFilter = useRef(filters.length === 0 ? true : false);
   const didMountSort = useRef(false);
 
+  // Initial fetch on mount
+  useEffect(() => {
+    fetchData(currentPage);
+  }, []);
+
   useEffect(() => {
     if (!didMountFilter.current) {
       didMountFilter.current = true;
       return;
     }
     if (scrollRef.current) scrollRef.current.scrollTop = 0;
-    nullCursor();
-    throttledTrailingFetchData({
-      merge: false,
-      callFrom: "filter",
-    });
+    setSelectedRows([]);
+    if (currentPage !== 1) {
+      setCurrentPage(1);
+      if (!isForDetail) setParams({ page: "" });
+    }
+    throttledTrailingFetchData(1);
   }, [filterValues, globalLimit]);
 
   useEffect(() => {
@@ -546,28 +550,13 @@ export default function Table({
       return;
     }
     if (scrollRef.current) scrollRef.current.scrollTop = 0;
-    nullCursor();
-    debouncedFetchData({ merge: false, callFrom: "sort" });
-  }, [sortValues]);
-
-  const handleScroll = useCallback(async () => {
-    if (!scrollRef.current || isFetchingMore || !hasMore) return;
-
-    const { scrollTop, scrollHeight, clientHeight } = scrollRef.current;
-    const isNearBottom = scrollTop + clientHeight >= scrollHeight - 100;
-
-    if (isNearBottom) {
-      await fetchData({ merge: true, callFrom: "near bottom (cursor)" });
+    setSelectedRows([]);
+    if (currentPage !== 1) {
+      setCurrentPage(1);
+      if (!isForDetail) setParams({ page: "" });
     }
-  }, [cursorKey, hasMore, isFetchingMore]);
-
-  // 🧭 Pasang listener scroll
-  useEffect(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    el.addEventListener("scroll", handleScroll);
-    return () => el.removeEventListener("scroll", handleScroll);
-  }, [handleScroll]);
+    debouncedFetchData(1);
+  }, [sortValues]);
 
   // 🔹 Pilih row
   const handleSelectRow = (item: any) => {
@@ -639,7 +628,17 @@ export default function Table({
     } finally {
       setLoadingAction(false);
       setModalDeleteOpen(false);
-      await fetchData({ merge: false, callFrom: "handleDelete" }); // refresh table
+      const remaining = dataItems.length - selectedRows.length;
+      const targetPage =
+        remaining <= 0 && currentPageRef.current > 1
+          ? currentPageRef.current - 1
+          : currentPageRef.current;
+      if (targetPage !== currentPageRef.current) {
+        setCurrentPage(targetPage);
+        if (!isForDetail)
+          setParams({ page: targetPage > 1 ? String(targetPage) : "" });
+      }
+      await fetchData(targetPage); // refresh table
     }
   };
 
@@ -654,8 +653,9 @@ export default function Table({
         { authToken: "admin" },
         { activate_ids, is_active: activateData ? "1" : "0" },
       );
+
       if (res.code !== 200 && res.code !== 204) {
-        throw new Error(res.message || "Failed to delete");
+        throw new Error(res.message || "Failed to activate/deactivate");
       }
 
       setSelectedRows([]);
@@ -664,7 +664,7 @@ export default function Table({
         "success",
         `Item berhasil ${activateData ? "diactivate" : "dideactivate"}!`,
       );
-      await fetchData({ merge: false, callFrom: "activate" }); // refresh table
+      await fetchData(currentPageRef.current); // refresh table
     } catch (err) {
       console.error(err);
       showToast(
@@ -677,7 +677,7 @@ export default function Table({
       setLoadingAction(false);
       setModalActivateOpen(false);
 
-      await fetchData({ merge: false, callFrom: "handleActivate" }); // refresh table
+      await fetchData(currentPageRef.current); // refresh table
     }
   };
 
@@ -758,7 +758,7 @@ export default function Table({
         showToast(3000, "error", `Gagal Assign Driver!`);
         // setIsLoadingAction(false);
       } finally {
-        await fetchData({ merge: false, callFrom: "handleAssign" }); // refresh table
+        await fetchData(currentPageRef.current); // refresh table
         setIsLoadingAction(false);
       }
     },
@@ -854,7 +854,7 @@ export default function Table({
         showToast(3000, "error", `Gagal Approve Travel Allowance!`);
         // setIsLoadingAction(false);
       } finally {
-        await fetchData({ merge: false, callFrom: "handleApproveTA" }); // refresh table
+        await fetchData(currentPageRef.current); // refresh table
         setModalApproveTAOpen(null);
         setIsLoadingAction(false);
       }
@@ -963,7 +963,7 @@ export default function Table({
         console.error("Submit failed", err);
         setWrapperClassname(3000, "top-20!");
         showToast(3000, "error", `Gagal Approve Photo!`);
-        await fetchData({ merge: false, callFrom: "handleApprovePhoto" });
+        await fetchData(currentPageRef.current);
         setPhotoViewIndex(null);
       } finally {
         setIsLoadingAction(false);
@@ -1056,14 +1056,16 @@ export default function Table({
                       { label: "100", value: 100 },
                     ]}
                     onChange={(val) => {
-                      setGlobalLimit(val as number);
+                      const newLimit = val as number;
+                      setGlobalLimit(newLimit);
                       if (!isForDetail) {
-                        if (val != 10) {
-                          setParams({ global_limit: val as string });
+                        if (newLimit != 10) {
+                          setParams({ global_limit: String(newLimit), page: "" });
                         } else {
-                          setParams({ global_limit: "" });
+                          setParams({ global_limit: "", page: "" });
                         }
                       }
+                      setCurrentPage(1);
                     }}
                   />
                 )}
@@ -1071,11 +1073,7 @@ export default function Table({
                   <Button
                     id=""
                     onClick={() => {
-                      nullCursor();
-                      throttledTrailingFetchData({
-                        merge: false,
-                        callFrom: "reload",
-                      });
+                      fetchData(currentPageRef.current);
                     }}
                     variant="gray-outline"
                   >
@@ -1395,7 +1393,7 @@ export default function Table({
                                     : "border"
                               } text-center align-top`}
                             >
-                              {index + 1}
+                              {(currentPage - 1) * globalLimit + index + 1}
                             </td>
                             {columns.map((col) => (
                               <td
@@ -1465,12 +1463,20 @@ export default function Table({
                     </tr>
                   ))}
 
-                {isFetchingMore && (
-                  <LoadingRow rowCount={5} columnCount={columns.length + 1} />
-                )}
               </tbody>
             </table>
           </div>
+
+          {/* Table Pagination */}
+          {!isForSelect && (
+            <TablePagination
+              page={currentPage}
+              total={totalItems}
+              limit={globalLimit}
+              onPageChange={handlePageChange}
+              isLoading={isLoading}
+            />
+          )}
         </div>
       </div>
 
@@ -1592,7 +1598,7 @@ export default function Table({
                     "error",
                     `Gagal Approve Travel Allowance, data bank driver belum ada!`,
                   );
-                  fetchData({ merge: false, callFrom: "handleApproveTA" });
+                  fetchData(currentPageRef.current);
                   setModalApproveTAOpen(null);
                   return;
                 }
