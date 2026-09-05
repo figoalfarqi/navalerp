@@ -51,7 +51,7 @@ export const useDynamicSelectOptions = ({
             fields
                 .filter(
                     (f) =>
-                        ["select", "selectButton"].includes(f.fieldType) &&
+                        ["select", "selectButton"].includes((f.fieldType as string) ?? "") &&
                         IsDynamicOptions(f.options)
                 )
                 .map((f) => {
@@ -78,7 +78,7 @@ export const useDynamicSelectOptions = ({
             const nextOptions: Record<string, SelectOption[]> = {};
 
             for (const field of fields) {
-                if (!["select", "selectButton"].includes(field.fieldType) || !field.options) continue;
+                if (!["select", "selectButton"].includes((field.fieldType as string) ?? "") || !field.options) continue;
 
                 if (Array.isArray(field.options) && !IsDynamicOptions(field.options)) {
                     nextOptions[field.name] = field.options;

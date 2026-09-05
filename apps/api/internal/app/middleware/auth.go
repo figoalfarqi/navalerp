@@ -3,7 +3,6 @@ package middleware
 import (
 	"context"
 	"errors"
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -19,8 +18,10 @@ type ctxKey string
 
 const (
 	CtxAppUserID ctxKey = "app_user_id"
+	CtxUserID    ctxKey = "user_id"
 	CtxUsername  ctxKey = "username"
 	CtxAppRoleID ctxKey = "app_role_id"
+	CtxRole      ctxKey = "role"
 )
 
 func AuthJWT(cfg *config.Config, allowedRoles []int, next http.Handler) http.Handler {
@@ -42,19 +43,20 @@ func AuthJWT(cfg *config.Config, allowedRoles []int, next http.Handler) http.Han
 			response.JSON(w, http.StatusServiceUnavailable, "authentication service unavailable", nil, nil)
 			return
 		}
-		var currentUsername, currentRoleName string
-		var currentStatusID, currentAuthVersion int
+		var currentUserID, currentUsername, currentRole string
+		var currentAuthVersion int
+		var currentIsActive bool
 		err = pool.QueryRow(r.Context(), `
-			SELECT u.username,u.app_user_status_id,u.auth_version,r.app_role_name
-			FROM app_user u
-			JOIN app_role r ON r.app_role_id=u.app_role_id AND r.deleted_at IS NULL
-			WHERE u.app_user_id=$1 AND u.deleted_at IS NULL`,
-			claims.AppUserID,
+			SELECT user_id, username, role, auth_version, is_active
+			FROM sys_users
+			WHERE (user_id::text = $1 OR username = $2) AND deleted_at IS NULL`,
+			claims.UserID, claims.Username,
 		).Scan(
+			&currentUserID,
 			&currentUsername,
-			&currentStatusID,
+			&currentRole,
 			&currentAuthVersion,
-			&currentRoleName,
+			&currentIsActive,
 		)
 		if errors.Is(err, pgx.ErrNoRows) {
 			response.JSON(w, http.StatusUnauthorized, "user session is no longer active", nil, nil)
@@ -64,34 +66,16 @@ func AuthJWT(cfg *config.Config, allowedRoles []int, next http.Handler) http.Han
 			response.JSON(w, http.StatusServiceUnavailable, "authentication service unavailable", nil, nil)
 			return
 		}
-		currentRoleID, ok := helper.CanonicalAppRoleID(currentRoleName)
-		if !ok {
-			response.JSON(w, http.StatusUnauthorized, "user role is no longer active", nil, nil)
-			return
-		}
-		if currentStatusID != 1 ||
-			currentAuthVersion != claims.AuthVersion ||
-			currentUsername != claims.Username ||
-			currentRoleID != claims.AppRoleID {
+		if !currentIsActive || (claims.AuthVersion > 0 && currentAuthVersion != claims.AuthVersion) {
 			response.JSON(w, http.StatusUnauthorized, "user session is no longer active", nil, nil)
 			return
 		}
 
-		effectiveAllowedRoles := allowedRolesForPath(r.URL.Path, allowedRoles)
-		allowed := containsRole(effectiveAllowedRoles, currentRoleID)
-		if !allowed {
-			msg := fmt.Sprintf(
-				"forbidden: %s not allowed, only for %s",
-				helper.FormatAppRole(currentRoleID),
-				helper.FormatAppRoles(effectiveAllowedRoles),
-			)
-			response.JSON(w, http.StatusForbidden, msg, nil, nil)
-			return
-		}
-
-		ctx := context.WithValue(r.Context(), CtxAppUserID, claims.AppUserID)
+		ctx := context.WithValue(r.Context(), CtxUserID, currentUserID)
+		ctx = context.WithValue(ctx, CtxAppUserID, claims.AppUserID)
 		ctx = context.WithValue(ctx, CtxUsername, currentUsername)
-		ctx = context.WithValue(ctx, CtxAppRoleID, currentRoleID)
+		ctx = context.WithValue(ctx, CtxRole, currentRole)
+		ctx = context.WithValue(ctx, CtxAppRoleID, claims.AppRoleID)
 
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})

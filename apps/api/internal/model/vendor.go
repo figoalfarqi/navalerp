@@ -1,145 +1,62 @@
 package model
 
-import "time"
+import (
+	"time"
+)
 
 type Vendor struct {
-	VendorID          int        `json:"vendor_id"`
-	VendorTypeID      int        `json:"vendor_type_id"`
-	BankMerkID        *int       `json:"bank_merk_id,omitempty"`
-	VendorName        string     `json:"vendor_name"`
-	VendorEmail       *string    `json:"vendor_email,omitempty"`
-	VendorPhone       *string    `json:"vendor_phone,omitempty"`
-	VendorTin         *string    `json:"vendor_tin,omitempty"`
-	CityID            *int       `json:"city_id,omitempty"`
-	VendorAddress     *string    `json:"vendor_address,omitempty"`
-	BankAccountNumber *string    `json:"bank_account_number,omitempty"`
-	BankAccountName   *string    `json:"bank_account_name,omitempty"`
-	IsActive          int        `json:"is_active"`
-	CreatedBy         int        `json:"created_by"`
-	UpdatedBy         int        `json:"updated_by"`
-	DeletedBy         *int       `json:"deleted_by,omitempty"`
-	CreatedAt         time.Time  `json:"created_at"`
-	UpdatedAt         time.Time  `json:"updated_at"`
-	DeletedAt         *time.Time `json:"deleted_at,omitempty"`
-
-	// Optional joins
-	VendorType *VendorType `json:"vendor_type,omitempty"`
-	BankMerk   *BankMerk   `json:"bank_merk,omitempty"`
-	City       *City       `json:"city,omitempty"`
-	Trucks     []Truck     `json:"trucks,omitempty"`
+	VendorId string `json:"vendor_id"`
+	VendorCode string `json:"vendor_code"`
+	VendorName string `json:"vendor_name"`
+	TaxNumber *string `json:"tax_number,omitempty"`
+	SecurityClearanceLevel *string `json:"security_clearance_level,omitempty"`
+	DefenceIndustryLicenseNo *string `json:"defence_industry_license_no,omitempty"`
+	Country *string `json:"country,omitempty"`
+	ContactPerson *string `json:"contact_person,omitempty"`
+	Email *string `json:"email,omitempty"`
+	Phone *string `json:"phone,omitempty"`
+	BankAccountName *string `json:"bank_account_name,omitempty"`
+	BankAccountNo *string `json:"bank_account_no,omitempty"`
+	BankName *string `json:"bank_name,omitempty"`
+	PerformanceRating *float64 `json:"performance_rating,omitempty"`
+	IsApproved *bool `json:"is_approved,omitempty"`
+	CreatedBy *string `json:"created_by,omitempty"`
+	UpdatedBy *string `json:"updated_by,omitempty"`
+	DeletedBy *string `json:"deleted_by"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt *time.Time `json:"updated_at,omitempty"`
+	DeletedAt *time.Time `json:"deleted_at"`
+	Ratings []VendorRatings `json:"ratings,omitempty"`
 }
 
-type VendorNullable struct {
-	VendorID          *int       `json:"vendor_id"`
-	VendorTypeID      *int       `json:"vendor_type_id,omitempty"`
-	BankMerkID        *int       `json:"bank_merk_id,omitempty"`
-	VendorName        *string    `json:"vendor_name"`
-	VendorEmail       *string    `json:"vendor_email,omitempty"`
-	VendorPhone       *string    `json:"vendor_phone,omitempty"`
-	VendorTin         *string    `json:"vendor_tin,omitempty"`
-	CityID            *int       `json:"city_id,omitempty"`
-	VendorAddress     *string    `json:"vendor_address,omitempty"`
-	BankAccountNumber *string    `json:"bank_account_number,omitempty"`
-	BankAccountName   *string    `json:"bank_account_name,omitempty"`
-	IsActive          *int       `json:"is_active"`
-	CreatedBy         *int       `json:"created_by"`
-	UpdatedBy         *int       `json:"updated_by"`
-	DeletedBy         *int       `json:"deleted_by,omitempty"`
-	CreatedAt         *time.Time `json:"created_at"`
-	UpdatedAt         *time.Time `json:"updated_at"`
-	DeletedAt         *time.Time `json:"deleted_at,omitempty"`
-
-	// Optional joins
-	VendorType *VendorType `json:"vendor_type,omitempty"`
-	BankMerk   *BankMerk   `json:"bank_merk,omitempty"`
-	City       *City       `json:"city,omitempty"`
-	Trucks     []Truck     `json:"trucks,omitempty"`
+type VendorRatings struct {
+	RatingId string `json:"rating_id"`
+	VendorId string `json:"vendor_id"`
+	EvaluationDate time.Time `json:"evaluation_date"`
+	EvaluatorUserId *string `json:"evaluator_user_id,omitempty"`
+	QualityScore float64 `json:"quality_score"`
+	DeliveryTimeScore float64 `json:"delivery_time_score"`
+	ServiceScore float64 `json:"service_score"`
+	PriceScore float64 `json:"price_score"`
+	OverallScore float64 `json:"overall_score"`
+	Remarks *string `json:"remarks,omitempty"`
+	CreatedAt time.Time `json:"created_at"`
 }
 
 type VendorRequest struct {
-	VendorTypeID      int     `json:"vendor_type_id" validate:"required,gt=0"`
-	BankMerkID        *int    `json:"bank_merk_id" validate:"omitempty,gt=0"`
-	VendorName        string  `json:"vendor_name" validate:"required,min=2,max=100"`
-	VendorEmail       *string `json:"vendor_email,omitempty" validate:"omitempty,email"`
-	VendorPhone       *string `json:"vendor_phone,omitempty" validate:"omitempty,max=20"`
-	VendorTin         *string `json:"vendor_tin,omitempty"`
-	CityID            *int    `json:"city_id" validate:"omitempty,gt=0"`
-	VendorAddress     *string `json:"vendor_address,omitempty"`
-	BankAccountNumber *string `json:"bank_account_number,omitempty"`
-	BankAccountName   *string `json:"bank_account_name,omitempty"`
-	IsActive          *int    `json:"is_active,omitempty"`
-}
-
-type VendorResponse struct {
-	VendorID          int        `json:"vendor_id"`
-	VendorTypeID      int        `json:"vendor_type_id"`
-	BankMerkID        *int       `json:"bank_merk_id,omitempty"`
-	VendorName        string     `json:"vendor_name"`
-	VendorEmail       *string    `json:"vendor_email,omitempty"`
-	VendorPhone       *string    `json:"vendor_phone,omitempty"`
-	VendorTin         *string    `json:"vendor_tin,omitempty"`
-	CityID            *int       `json:"city_id,omitempty"`
-	VendorAddress     *string    `json:"vendor_address,omitempty"`
-	BankAccountNumber *string    `json:"bank_account_number,omitempty"`
-	BankAccountName   *string    `json:"bank_account_name,omitempty"`
-	IsActive          int        `json:"is_active"`
-	CreatedAt         time.Time  `json:"created_at"`
-	UpdatedAt         time.Time  `json:"updated_at"`
-	DeletedAt         *time.Time `json:"deleted_at,omitempty"`
-
-	VendorType *VendorTypeResponse `json:"vendor_type,omitempty"`
-	BankMerk   *BankMerkResponse   `json:"bank_merk,omitempty"`
-	City       *CityResponse       `json:"city,omitempty"`
-	Trucks     []TruckResponse     `json:"trucks,omitempty"`
-}
-
-func (bm *VendorNullable) ToNotNullable() *Vendor {
-	if bm == nil {
-		return nil
-	}
-	createdAt := time.Time{}
-	if bm.CreatedAt != nil {
-		createdAt = *bm.CreatedAt
-	}
-
-	updatedAt := time.Time{}
-	if bm.UpdatedAt != nil {
-		updatedAt = *bm.UpdatedAt
-	}
-	createdBy := 0
-	if bm.CreatedBy != nil {
-		createdBy = *bm.CreatedBy
-	}
-
-	updatedBy := 0
-	if bm.UpdatedBy != nil {
-		updatedBy = *bm.UpdatedBy
-	}
-	vendorTypeID := 0
-	if bm.VendorTypeID != nil {
-		vendorTypeID = *bm.VendorTypeID
-	}
-	return &Vendor{
-		VendorID:          *bm.VendorID,
-		VendorTypeID:      vendorTypeID,
-		BankMerkID:        bm.BankMerkID,
-		VendorName:        *bm.VendorName,
-		VendorEmail:       bm.VendorEmail,
-		VendorPhone:       bm.VendorPhone,
-		VendorTin:         bm.VendorTin,
-		CityID:            bm.CityID,
-		VendorAddress:     bm.VendorAddress,
-		BankAccountNumber: bm.BankAccountNumber,
-		BankAccountName:   bm.BankAccountName,
-		IsActive:          *bm.IsActive,
-		CreatedBy:         createdBy,
-		UpdatedBy:         updatedBy,
-		CreatedAt:         createdAt,
-		UpdatedAt:         updatedAt,
-		DeletedAt:         bm.DeletedAt,
-		VendorType:        bm.VendorType,
-		BankMerk:          bm.BankMerk,
-		City:              bm.City,
-		Trucks:            bm.Trucks,
-	}
+	VendorCode *string `json:"vendor_code"`
+	VendorName *string `json:"vendor_name"`
+	TaxNumber *string `json:"tax_number"`
+	SecurityClearanceLevel *string `json:"security_clearance_level"`
+	DefenceIndustryLicenseNo *string `json:"defence_industry_license_no"`
+	Country *string `json:"country"`
+	ContactPerson *string `json:"contact_person"`
+	Email *string `json:"email"`
+	Phone *string `json:"phone"`
+	BankAccountName *string `json:"bank_account_name"`
+	BankAccountNo *string `json:"bank_account_no"`
+	BankName *string `json:"bank_name"`
+	PerformanceRating *float64 `json:"performance_rating"`
+	IsApproved *bool `json:"is_approved"`
+	Ratings []VendorRatings `json:"ratings"`
 }

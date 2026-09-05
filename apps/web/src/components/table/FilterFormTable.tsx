@@ -24,8 +24,9 @@ import { addDays } from "@/utils/dateTime";
 export type FilterField = {
   name: string;
   label?: string;
-  col: "left" | "right";
-  fieldType:
+  col?: "left" | "right";
+  type?: string;
+  fieldType?:
     | "text"
     | "number"
     | "textarea"
@@ -36,8 +37,10 @@ export type FilterField = {
     | "radio"
     | "date"
     | "dateAfterBefore"
-    | "datetime";
+    | "datetime"
+    | string;
   placeHolder?: string;
+  placeholder?: string;
   options?: StaticOptions | DynamicOptions;
   disabled?: boolean;
   chains?: ChainItem[];
@@ -485,7 +488,7 @@ export default function FilterFormTable({
           filter.options ??
           [];
         const isLoadingSelect =
-          ["select", "selectButton"].includes(filter.fieldType) &&
+          ["select", "selectButton"].includes((filter.fieldType as string) ?? "") &&
           !Array.isArray(opts);
 
         if (

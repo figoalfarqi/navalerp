@@ -22,7 +22,7 @@ func NewPostgresPool(dbURL string) *pgxpool.Pool {
 		log.Fatalf("Unable to connect to database: %v", err)
 	}
 	if _, err := p.Exec(ctx, `
-		ALTER TABLE app_user
+		ALTER TABLE sys_users
 		ADD COLUMN IF NOT EXISTS auth_version INTEGER NOT NULL DEFAULT 0
 	`); err != nil {
 		p.Close()

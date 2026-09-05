@@ -1,5 +1,7 @@
 import type { FormDataObject, FormDataValue } from "@/components/formCrud/FormCrud";
+import type { FilterField } from "@/components/table/FilterFormTable";
 
+export type AdminFilterField = FilterField;
 export type AdminCrudMode = "add" | "edit" | "copy" | "view";
 
 export function pickAdminPayload(

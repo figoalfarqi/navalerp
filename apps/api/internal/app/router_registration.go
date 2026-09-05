@@ -33,122 +33,74 @@ func registerRead(mux *http.ServeMux, cfg *config.Config, path string, roles []i
 	mux.Handle("GET "+path+"/{id}", authenticated(cfg, roles, fn))
 }
 
-func registerCreate(mux *http.ServeMux, cfg *config.Config, path string, roles []int, fn http.HandlerFunc) {
-	mux.Handle("POST "+path, authenticated(cfg, roles, fn))
-}
-
-func registerMutations(mux *http.ServeMux, cfg *config.Config, path string, roles []int, h crudHandler) {
-	registerCreate(mux, cfg, path, roles, h.Create)
+func registerCRUD(mux *http.ServeMux, cfg *config.Config, path string, roles []int, h crudHandler) {
+	registerRead(mux, cfg, path, roles, h.Get)
+	mux.Handle("POST "+path, authenticated(cfg, roles, h.Create))
 	mux.Handle("PUT "+path+"/{id}", authenticated(cfg, roles, h.Update))
 	mux.Handle("PATCH "+path+"/{id}", authenticated(cfg, roles, h.Update))
 	mux.Handle("DELETE "+path+"/{id}", authenticated(cfg, roles, h.Delete))
 }
 
-func registerCRUD(mux *http.ServeMux, cfg *config.Config, path string, roles []int, h crudHandler) {
-	registerRead(mux, cfg, path, roles, h.Get)
-	registerMutations(mux, cfg, path, roles, h)
-}
-
 func registerApplicationRoutes(mux *http.ServeMux, cfg *config.Config, h *routeHandlers) {
-	operational := helper.GetAppRoleIDsByRoleTypeName("admin_operational")
-	technical := helper.GetAppRoleIDsByRoleTypeName("admin_technical")
 	dashboardRoles := helper.GetAppRoleIDsByRoleTypeName("admin_dashboard")
 	reportRoles := helper.GetAppRoleIDsByRoleTypeName("admin_report")
-	checkerRoles := helper.GetAppRoleIDsByRoleTypeName("checker")
-	driverRoles := helper.GetAppRoleIDsByRoleTypeName("driver")
 	allRoles := helper.GetAppRoleIDsByRoleTypeName("allrole")
-	userManagementReads := []int{
-		helper.AppRoleITDev,
-		helper.AppRoleSuperAdmin,
-		helper.AppRoleAdmin,
-	}
 
-	mux.HandleFunc("POST /api/v1/admin/login", h.appUser.Login)
-	mux.HandleFunc("POST /api/v1/checker/login", h.appUser.Login)
-	mux.HandleFunc("POST /api/v1/driver/login", h.appUser.Login)
-
-	registerRead(mux, cfg, "/api/v1/admin/app_role", userManagementReads, h.appRole.Get)
-	registerMutations(mux, cfg, "/api/v1/admin/app_role", technical, h.appRole)
-	registerCRUD(mux, cfg, "/api/v1/admin/app_setting", technical, h.appSetting)
-
-	registerCRUD(mux, cfg, "/api/v1/admin/app_user", technical, h.appUser)
-	registerCRUD(mux, cfg, "/api/v1/admin/admin", []int{
-		helper.AppRoleITDev,
-		helper.AppRoleSuperAdmin,
-		helper.AppRoleAdmin,
-	}, h.appUser)
-	registerCRUD(mux, cfg, "/api/v1/admin/driver", operational, h.appUser)
-	registerCRUD(mux, cfg, "/api/v1/admin/checker", operational, h.appUser)
-
-	registerRead(mux, cfg, "/api/v1/admin/bank_merk", userManagementReads, h.bankMerk.Get)
-	registerMutations(mux, cfg, "/api/v1/admin/bank_merk", operational, h.bankMerk)
-	registerCRUD(mux, cfg, "/api/v1/admin/province", operational, h.province)
-	registerRead(mux, cfg, "/api/v1/admin/city", userManagementReads, h.city.Get)
-	registerMutations(mux, cfg, "/api/v1/admin/city", operational, h.city)
-	registerCRUD(mux, cfg, "/api/v1/admin/vendor_type", operational, h.vendorType)
-	registerCRUD(mux, cfg, "/api/v1/admin/vendor", operational, h.vendor)
-	registerCRUD(mux, cfg, "/api/v1/admin/truck_merk", operational, h.truckMerk)
-	registerCRUD(mux, cfg, "/api/v1/admin/truck_type", operational, h.truckType)
-	registerCRUD(mux, cfg, "/api/v1/admin/truck", operational, h.truck)
-	registerRead(mux, cfg, "/api/v1/admin/client", userManagementReads, h.client.Get)
-	registerMutations(mux, cfg, "/api/v1/admin/client", operational, h.client)
-	registerCRUD(mux, cfg, "/api/v1/admin/client_destination", operational, h.clientDestination)
-	registerCRUD(mux, cfg, "/api/v1/admin/cargo_type", operational, h.cargoType)
-	registerCRUD(mux, cfg, "/api/v1/admin/mine", operational, h.mine)
-	registerCRUD(mux, cfg, "/api/v1/admin/stockpile", operational, h.stockpile)
-	registerCRUD(mux, cfg, "/api/v1/admin/stockpile_cargo", operational, h.stockpileCargo)
-	registerCRUD(mux, cfg, "/api/v1/admin/stockpile_adjustment", operational, h.stockpileAdjustment)
-	registerRead(mux, cfg, "/api/v1/admin/stockpile_ledger", operational, h.stockpileLedger.Get)
-	registerCRUD(mux, cfg, "/api/v1/admin/port", operational, h.port)
-	registerCRUD(mux, cfg, "/api/v1/admin/vessel", operational, h.vessel)
-	registerCRUD(mux, cfg, "/api/v1/admin/vessel_cargo", operational, h.vesselCargo)
-
-	registerRead(mux, cfg, "/api/v1/admin/project", dashboardRoles, h.project.Get)
-	registerMutations(mux, cfg, "/api/v1/admin/project", operational, h.project)
-	registerCRUD(mux, cfg, "/api/v1/admin/project_checker_assignment", operational, h.projectCheckerAssignment)
-	registerCRUD(mux, cfg, "/api/v1/admin/project_truck_assignment", operational, h.projectTruckAssignment)
-	registerCRUD(mux, cfg, "/api/v1/admin/project_route", operational, h.projectRoute)
-	registerCRUD(mux, cfg, "/api/v1/admin/project_transport", operational, h.projectTransport)
-	registerCRUD(mux, cfg, "/api/v1/admin/project_transport_status", operational, h.projectTransportStatus)
-	registerCRUD(mux, cfg, "/api/v1/admin/project_transport_photo", operational, h.projectTransportPhoto)
-	registerCRUD(mux, cfg, "/api/v1/admin/project_financial_transaction", operational, h.projectFinancialTransaction)
+	mux.HandleFunc("POST /api/v1/admin/login", h.navalAuth.Login)
+	mux.HandleFunc("POST /api/v1/auth/login", h.navalAuth.Login)
+	mux.HandleFunc("POST /api/v1/auth/logout", h.navalAuth.Logout)
+	mux.Handle("GET /api/v1/auth/me", authenticated(cfg, allRoles, h.navalAuth.Me))
 
 	mux.Handle("GET /api/v1/admin/dashboard", authenticated(cfg, dashboardRoles, h.dashboard.Get))
 	mux.Handle("GET /api/v1/admin/report", authenticated(cfg, reportRoles, h.report.Get))
 
-	mux.Handle("GET /api/v1/checker/app_setting", authenticated(cfg, checkerRoles, h.appSetting.CheckerGet))
-	registerRead(mux, cfg, "/api/v1/checker/project", checkerRoles, h.project.CheckerGet)
-	mux.Handle("GET /api/v1/checker/project_checker_assignment/default", authenticated(cfg, checkerRoles, h.projectCheckerAssignment.CheckerDefault))
-	registerRead(mux, cfg, "/api/v1/checker/project_route", checkerRoles, h.projectRoute.CheckerGet)
-	registerRead(mux, cfg, "/api/v1/checker/project_truck_assignment", checkerRoles, h.projectTruckAssignment.CheckerGet)
-	registerRead(mux, cfg, "/api/v1/checker/project_transport", checkerRoles, h.projectTransport.CheckerGet)
-	registerCreate(mux, cfg, "/api/v1/checker/project_transport", checkerRoles, h.projectTransport.CheckerCreate)
-	registerRead(mux, cfg, "/api/v1/checker/project_transport_status", checkerRoles, h.projectTransportStatus.CheckerGet)
-	registerCreate(mux, cfg, "/api/v1/checker/project_transport_status", checkerRoles, h.projectTransportStatus.CheckerCreate)
-	registerRead(mux, cfg, "/api/v1/checker/project_transport_photo", checkerRoles, h.projectTransportPhoto.CheckerGet)
-	registerCreate(mux, cfg, "/api/v1/checker/project_transport_photo", checkerRoles, h.projectTransportPhoto.CheckerCreate)
-
-	registerRead(mux, cfg, "/api/v1/driver/project_transport", driverRoles, h.projectTransport.DriverGet)
-
-	registerRead(mux, cfg, "/api/v1/driver/driver", driverRoles, h.appUser.Get)
-	mux.Handle("PUT /api/v1/driver/driver/{id}", authenticated(cfg, driverRoles, h.appUser.Update))
-	mux.Handle("PATCH /api/v1/driver/driver/{id}", authenticated(cfg, driverRoles, h.appUser.Update))
-	registerRead(mux, cfg, "/api/v1/checker/checker", checkerRoles, h.appUser.Get)
-	mux.Handle("PUT /api/v1/checker/checker/{id}", authenticated(cfg, checkerRoles, h.appUser.Update))
-	mux.Handle("PATCH /api/v1/checker/checker/{id}", authenticated(cfg, checkerRoles, h.appUser.Update))
-
-	registerRead(mux, cfg, "/api/v1/driver/province", driverRoles, h.province.Get)
-	registerRead(mux, cfg, "/api/v1/driver/city", driverRoles, h.city.Get)
-	registerRead(mux, cfg, "/api/v1/checker/province", checkerRoles, h.province.Get)
-	registerRead(mux, cfg, "/api/v1/checker/city", checkerRoles, h.city.Get)
-
-	mux.Handle("PUT /api/v1/driver/change_password", authenticated(cfg, driverRoles, h.appUser.ChangePassword))
-	mux.Handle("PATCH /api/v1/driver/change_password", authenticated(cfg, driverRoles, h.appUser.ChangePassword))
-	mux.Handle("PUT /api/v1/checker/change_password", authenticated(cfg, checkerRoles, h.appUser.ChangePassword))
-	mux.Handle("PATCH /api/v1/checker/change_password", authenticated(cfg, checkerRoles, h.appUser.ChangePassword))
-	mux.Handle("PUT /api/v1/admin/change_password", authenticated(cfg, dashboardRoles, h.appUser.ChangePassword))
-	mux.Handle("PATCH /api/v1/admin/change_password", authenticated(cfg, dashboardRoles, h.appUser.ChangePassword))
-	mux.Handle("POST /api/v1/logout", authenticated(cfg, allRoles, h.appUser.Logout))
-	mux.Handle("POST /api/v1/allrole/presigned", authenticated(cfg, allRoles, h.fileUpload.GetPresignedURL))
-
+	// 48 Modular NavalERP CRUD Routes
+	registerCRUD(mux, cfg, "/api/v1/admin/org_unit", allRoles, h.orgUnit)
+	registerCRUD(mux, cfg, "/api/v1/admin/sys_user", allRoles, h.sysUser)
+	registerCRUD(mux, cfg, "/api/v1/admin/audit_log", allRoles, h.auditLog)
+	registerCRUD(mux, cfg, "/api/v1/admin/ship_class", allRoles, h.shipClass)
+	registerCRUD(mux, cfg, "/api/v1/admin/ship", allRoles, h.ship)
+	registerCRUD(mux, cfg, "/api/v1/admin/ship_system", allRoles, h.shipSystem)
+	registerCRUD(mux, cfg, "/api/v1/admin/equipment", allRoles, h.equipment)
+	registerCRUD(mux, cfg, "/api/v1/admin/pm_schedule", allRoles, h.pmSchedule)
+	registerCRUD(mux, cfg, "/api/v1/admin/failure_report", allRoles, h.failureReport)
+	registerCRUD(mux, cfg, "/api/v1/admin/work_order", allRoles, h.workOrder)
+	registerCRUD(mux, cfg, "/api/v1/admin/docking_record", allRoles, h.dockingRecord)
+	registerCRUD(mux, cfg, "/api/v1/admin/warehouse", allRoles, h.warehouse)
+	registerCRUD(mux, cfg, "/api/v1/admin/material", allRoles, h.material)
+	registerCRUD(mux, cfg, "/api/v1/admin/stock_balance", allRoles, h.stockBalance)
+	registerCRUD(mux, cfg, "/api/v1/admin/item_instance", allRoles, h.itemInstance)
+	registerCRUD(mux, cfg, "/api/v1/admin/stock_transfer", allRoles, h.stockTransfer)
+	registerCRUD(mux, cfg, "/api/v1/admin/stock_adjustment", allRoles, h.stockAdjustment)
+	registerCRUD(mux, cfg, "/api/v1/admin/vendor", allRoles, h.vendor)
+	registerCRUD(mux, cfg, "/api/v1/admin/requisition", allRoles, h.requisition)
+	registerCRUD(mux, cfg, "/api/v1/admin/tender", allRoles, h.tender)
+	registerCRUD(mux, cfg, "/api/v1/admin/contract", allRoles, h.contract)
+	registerCRUD(mux, cfg, "/api/v1/admin/purchase_order", allRoles, h.purchaseOrder)
+	registerCRUD(mux, cfg, "/api/v1/admin/goods_receipt", allRoles, h.goodsReceipt)
+	registerCRUD(mux, cfg, "/api/v1/admin/chart_of_account", allRoles, h.chartOfAccount)
+	registerCRUD(mux, cfg, "/api/v1/admin/budget_program", allRoles, h.budgetProgram)
+	registerCRUD(mux, cfg, "/api/v1/admin/budget_commitment", allRoles, h.budgetCommitment)
+	registerCRUD(mux, cfg, "/api/v1/admin/invoice", allRoles, h.invoice)
+	registerCRUD(mux, cfg, "/api/v1/admin/payment", allRoles, h.payment)
+	registerCRUD(mux, cfg, "/api/v1/admin/journal_entry", allRoles, h.journalEntry)
+	registerCRUD(mux, cfg, "/api/v1/admin/platform_tco", allRoles, h.platformTco)
+	registerCRUD(mux, cfg, "/api/v1/admin/military_rank", allRoles, h.militaryRank)
+	registerCRUD(mux, cfg, "/api/v1/admin/military_corps", allRoles, h.militaryCorps)
+	registerCRUD(mux, cfg, "/api/v1/admin/qualification", allRoles, h.qualification)
+	registerCRUD(mux, cfg, "/api/v1/admin/personnel", allRoles, h.personnel)
+	registerCRUD(mux, cfg, "/api/v1/admin/crew_assignment", allRoles, h.crewAssignment)
+	registerCRUD(mux, cfg, "/api/v1/admin/base_facility", allRoles, h.baseFacility)
+	registerCRUD(mux, cfg, "/api/v1/admin/berth_booking", allRoles, h.berthBooking)
+	registerCRUD(mux, cfg, "/api/v1/admin/fuel_bunker", allRoles, h.fuelBunker)
+	registerCRUD(mux, cfg, "/api/v1/admin/transport_unit", allRoles, h.transportUnit)
+	registerCRUD(mux, cfg, "/api/v1/admin/route", allRoles, h.route)
+	registerCRUD(mux, cfg, "/api/v1/admin/shipment", allRoles, h.shipment)
+	registerCRUD(mux, cfg, "/api/v1/admin/document_category", allRoles, h.documentCategory)
+	registerCRUD(mux, cfg, "/api/v1/admin/document", allRoles, h.document)
+	registerCRUD(mux, cfg, "/api/v1/admin/theater", allRoles, h.theater)
+	registerCRUD(mux, cfg, "/api/v1/admin/mission", allRoles, h.mission)
+	registerCRUD(mux, cfg, "/api/v1/admin/daily_log", allRoles, h.dailyLog)
+	registerCRUD(mux, cfg, "/api/v1/admin/readiness_report", allRoles, h.readinessReport)
+	registerCRUD(mux, cfg, "/api/v1/admin/readiness_alert", allRoles, h.readinessAlert)
 }

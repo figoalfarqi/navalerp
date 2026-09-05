@@ -1,21 +1,18 @@
 "use client";
 
 import Table from "@/components/table/Table";
-import {
-  vendorColumns,
-  vendorEndpoint,
-  vendorFilters,
-  vendorTableName,
-} from "./_config";
+import { columns, entityEndpoint, entityName, entityTitle, filterFields, primaryKey } from "./_config";
 
 export default function VendorListPage() {
   return (
     <Table
-      url={vendorEndpoint}
-      title="Vendor"
-      table_name={vendorTableName}
-      columns={vendorColumns}
-      filters={vendorFilters}
+      title={entityTitle}
+      url={entityEndpoint}
+      table_name={entityName}
+      table_url={`/admin/data/${entityName}`}
+      columns={columns}
+      primaryKey={primaryKey}
+      filters={filterFields}
     />
   );
 }

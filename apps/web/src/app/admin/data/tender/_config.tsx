@@ -1,0 +1,101 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { ColumnField } from "@/components/table/Table";
+import { FormField } from "@/components/formCrud/FormCrud";
+import { FilterField } from "@/components/table/FilterFormTable";
+
+export const entityName = "tender";
+export const entityTitle = "Tender & Lelang";
+export const entityEndpoint = "/admin/tender";
+export const primaryKey = "tender_id";
+
+export const columns: ColumnField[] = [
+  { key: "tender_id", label: "Tender Id" },
+  { key: "tender_number", label: "Tender Number" },
+  { key: "title", label: "Title" },
+  { key: "procurement_category", label: "Procurement Category" },
+  { key: "estimated_budget", label: "Estimated Budget" },
+  { key: "procurement_method", label: "Procurement Method" },
+  { key: "start_date", label: "Start Date" },
+];
+
+export const filterFields: FilterField[] = [
+  { name: "search", label: "Cari Tender & Lelang", fieldType: "text", col: "left", placeHolder: "Ketik kata kunci pencarian..." },
+];
+
+export const formFields = (mode: string): FormField[] => [
+  {
+    name: "tender_number",
+    label: "Tender Number",
+    fieldType: "text",
+    required: true,
+    disabled: mode === "view",
+  },
+  {
+    name: "title",
+    label: "Title",
+    fieldType: "text",
+    required: true,
+    disabled: mode === "view",
+  },
+  {
+    name: "procurement_category",
+    label: "Procurement Category",
+    fieldType: "text",
+    required: true,
+    disabled: mode === "view",
+  },
+  {
+    name: "estimated_budget",
+    label: "Estimated Budget",
+    fieldType: "number",
+    required: true,
+    disabled: mode === "view",
+  },
+  {
+    name: "procurement_method",
+    label: "Procurement Method",
+    fieldType: "text",
+    required: true,
+    disabled: mode === "view",
+  },
+  {
+    name: "start_date",
+    label: "Start Date",
+    fieldType: "date",
+    required: true,
+    disabled: mode === "view",
+  },
+  {
+    name: "closing_date",
+    label: "Closing Date",
+    fieldType: "date",
+    required: true,
+    disabled: mode === "view",
+  },
+  {
+    name: "status",
+    label: "Status",
+    fieldType: "text",
+    required: false,
+    disabled: mode === "view",
+  },
+  {
+    name: "winner_vendor_id",
+    label: "Winner Vendor Id",
+    fieldType: "text",
+    required: false,
+    disabled: mode === "view",
+  },
+];
+
+export const buildPayload = (data: any) => {
+  const payload: any = { ...data };
+  delete payload.tender_id;
+  delete payload.created_at;
+  delete payload.updated_at;
+  delete payload.deleted_at;
+  delete payload.created_by;
+  delete payload.updated_by;
+  delete payload.deleted_by;
+  return payload;
+};

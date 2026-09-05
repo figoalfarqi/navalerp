@@ -1,0 +1,115 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { ColumnField } from "@/components/table/Table";
+import { FormField } from "@/components/formCrud/FormCrud";
+import { FilterField } from "@/components/table/FilterFormTable";
+
+export const entityName = "shipment";
+export const entityTitle = "Pengiriman Konvoi";
+export const entityEndpoint = "/admin/shipment";
+export const primaryKey = "shipment_id";
+
+export const columns: ColumnField[] = [
+  { key: "shipment_id", label: "Shipment Id" },
+  { key: "manifest_number", label: "Manifest Number" },
+  { key: "route_id", label: "Route Id" },
+  { key: "transport_unit_id", label: "Transport Unit Id" },
+  { key: "origin_warehouse_id", label: "Origin Warehouse Id" },
+  { key: "destination_warehouse_id", label: "Destination Warehouse Id" },
+  { key: "departure_date", label: "Departure Date" },
+];
+
+export const filterFields: FilterField[] = [
+  { name: "search", label: "Cari Pengiriman Konvoi", fieldType: "text", col: "left", placeHolder: "Ketik kata kunci pencarian..." },
+];
+
+export const formFields = (mode: string): FormField[] => [
+  {
+    name: "manifest_number",
+    label: "Manifest Number",
+    fieldType: "text",
+    required: true,
+    disabled: mode === "view",
+  },
+  {
+    name: "route_id",
+    label: "Route Id",
+    fieldType: "text",
+    required: true,
+    disabled: mode === "view",
+  },
+  {
+    name: "transport_unit_id",
+    label: "Transport Unit Id",
+    fieldType: "text",
+    required: true,
+    disabled: mode === "view",
+  },
+  {
+    name: "origin_warehouse_id",
+    label: "Origin Warehouse Id",
+    fieldType: "text",
+    required: true,
+    disabled: mode === "view",
+  },
+  {
+    name: "destination_warehouse_id",
+    label: "Destination Warehouse Id",
+    fieldType: "text",
+    required: true,
+    disabled: mode === "view",
+  },
+  {
+    name: "departure_date",
+    label: "Departure Date",
+    fieldType: "date",
+    required: true,
+    disabled: mode === "view",
+  },
+  {
+    name: "arrival_date",
+    label: "Arrival Date",
+    fieldType: "date",
+    required: false,
+    disabled: mode === "view",
+  },
+  {
+    name: "escort_security_level",
+    label: "Escort Security Level",
+    fieldType: "text",
+    required: false,
+    disabled: mode === "view",
+  },
+  {
+    name: "status",
+    label: "Status",
+    fieldType: "text",
+    required: false,
+    disabled: mode === "view",
+  },
+  {
+    name: "authorized_by_user_id",
+    label: "Authorized By User Id",
+    fieldType: "text",
+    required: false,
+    disabled: mode === "view",
+  },
+  {
+    name: "remarks",
+    label: "Remarks",
+    fieldType: "textarea",
+    required: false,
+    disabled: mode === "view",
+  },
+];
+
+export const buildPayload = (data: any) => {
+  const payload: any = { ...data };
+  delete payload.shipment_id;
+  delete payload.created_at;
+  delete payload.updated_at;
+  delete payload.deleted_at;
+  delete payload.created_by;
+  delete payload.updated_by;
+  delete payload.deleted_by;
+  return payload;
+};

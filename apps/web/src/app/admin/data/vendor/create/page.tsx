@@ -2,23 +2,18 @@
 
 import { useRouter } from "next/navigation";
 import FormCrud from "@/components/formCrud/FormCrud";
-import {
-  buildVendorPayload,
-  vendorEndpoint,
-  vendorFields,
-} from "../_config";
+import { buildPayload, entityEndpoint, entityTitle, formFields } from "../_config";
 
-export default function CreateVendorPage() {
+export default function VendorCreatePage() {
   const router = useRouter();
   return (
     <FormCrud
-      title="Tambah Vendor"
-      url={vendorEndpoint}
+      title={`Tambah ${entityTitle}`}
+      url={entityEndpoint}
       mode="add"
-      initialData={{ is_active: 1 }}
-      fields={vendorFields("add")}
-      buildPayload={buildVendorPayload}
-      onSuccess={() => router.push("/admin/data/vendor")}
+      fields={formFields("add")}
+      buildPayload={buildPayload}
+      onSuccess={() => router.push(`/admin/data/${entityEndpoint.replace('/admin/', '')}`)}
     />
   );
 }

@@ -44,7 +44,8 @@ import { ApprovalBaseTableNameType } from "../approval/ApprovalTable";
 
 export type ColumnField = {
   key: string;
-  label: string;
+  label?: string;
+  header?: string;
   render?: (
     item: any,
     isSelected?: boolean,
@@ -69,6 +70,8 @@ export type ColumnField = {
   // autoSelectFirst?: boolean;
 };
 
+export type Column = ColumnField;
+
 export interface DetailActionTable {
   initialAdder?: Record<string, number | string>;
   modifiedDataTables: ModifiedDataTables;
@@ -83,10 +86,12 @@ export interface BaseTableProps {
   url: string;
   table_data?: Record<string, any>[];
   title: string;
-  table_name: string;
+  table_name?: string;
   table_url?: string;
+  primaryKey?: string;
+  filterFields?: FilterField[];
   default_filter_values?: Record<string, number | string | string[]>;
-  filters: FilterField[];
+  filters?: FilterField[];
   columns: ColumnField[];
   opendata?: string;
   tableFor?: "detail" | "normal" | "select";
@@ -95,6 +100,9 @@ export interface BaseTableProps {
   renderExpandedRow?: (row: any) => React.ReactNode;
   addedToolbarButtons?: ("travel_allowance" | "open_data")[];
   isCreateable?: boolean;
+  createUrl?: string;
+  showCreateButton?: boolean;
+  actionUrl?: string;
   readOnly?: boolean;
 }
 
@@ -109,10 +117,12 @@ export default function Table({
   url,
   table_data,
   title,
-  table_name,
+  table_name = "",
   table_url,
+  primaryKey,
+  filterFields,
   default_filter_values,
-  filters,
+  filters: rawFilters,
   columns,
   opendata,
   tableFor = "normal",
@@ -122,10 +132,14 @@ export default function Table({
   renderExpandedRow,
   addedToolbarButtons,
   isCreateable = true,
+  createUrl,
+  showCreateButton,
+  actionUrl,
   readOnly = false,
 }: TableProps) {
-  const key_table = `${table_name}_id`;
-  const table_web_url = table_url ? table_url : table_name;
+  const filters = rawFilters ?? filterFields ?? [];
+  const key_table = primaryKey ? primaryKey : `${table_name}_id`;
+  const table_web_url = table_url ? table_url : actionUrl ? actionUrl : table_name;
   const isForDetail = tableFor === "detail";
   const isForSelect = tableFor === "select";
   // Hitung di luar — jadi bisa digunakan di mana saja
@@ -1242,7 +1256,7 @@ export default function Table({
                       <div className="flex items-center justify-between w-full">
                         {/* Label di tengah */}
                         <span className="flex-1 text-center ml-4">
-                          {col.label}
+                          {col.label ?? col.header}
                         </span>
 
                         <>

@@ -1,30 +1,25 @@
 package model
 
 type DashboardSummary struct {
-	ProjectCount            int     `json:"project_count"`
-	TransportCount          int     `json:"transport_count"`
-	CompletedTransportCount int     `json:"completed_transport_count"`
-	VolumeCubic             float64 `json:"volume_cubic"`
-	WeightTon               float64 `json:"weight_ton"`
-	TotalIncome             float64 `json:"total_income"`
-	TotalExpense            float64 `json:"total_expense"`
-	NetProfit               float64 `json:"net_profit"`
+	TotalShips            int     `json:"total_ships"`
+	ActiveShips           int     `json:"active_ships"`
+	FullyMissionCapable   int     `json:"fully_mission_capable"`
+	TotalPersonnel        int     `json:"total_personnel"`
+	TotalWarehouses       int     `json:"total_warehouses"`
+	ActiveMissions        int     `json:"active_missions"`
+	OpenWorkOrders        int     `json:"open_work_orders"`
+	OverallReadinessScore float64 `json:"overall_readiness_score"`
 }
 
-type DashboardProject struct {
-	ProjectID   int    `json:"project_id"`
-	ProjectCode string `json:"project_code"`
-	ProjectName string `json:"project_name"`
-	DashboardSummary
-}
-
-type DashboardDaily struct {
-	Date string `json:"date"`
-	DashboardSummary
+type DashboardShipReadiness struct {
+	ShipID          string  `json:"ship_id"`
+	ShipName        string  `json:"ship_name"`
+	HullNumber      string  `json:"hull_number"`
+	ReadinessStatus string  `json:"readiness_status"`
+	CompositeScore  float64 `json:"composite_score"`
 }
 
 type DashboardResponse struct {
-	Summary  DashboardSummary   `json:"summary"`
-	Projects []DashboardProject `json:"projects"`
-	Daily    []DashboardDaily   `json:"daily"`
+	Summary DashboardSummary         `json:"summary"`
+	Ships   []DashboardShipReadiness `json:"ships"`
 }

@@ -13,6 +13,8 @@ node_modules/
 # Go build artifacts
 apps/api/app
 apps/api/cmd/navalerp/app
+*.exe
+navalerp.exe
 
 # OS and editor files
 .DS_Store

@@ -3,208 +3,82 @@ package service
 import (
 	"context"
 	"errors"
-	"time"
 
-	"github.com/figoalfarqi/navalerp/internal/helper"
 	"github.com/figoalfarqi/navalerp/internal/model"
 	"github.com/figoalfarqi/navalerp/internal/repository"
-	"github.com/figoalfarqi/navalerp/internal/validation"
 )
 
 type VendorService struct {
 	Repo *repository.VendorRepository
 }
 
-func NewVendorService(r *repository.VendorRepository) *VendorService {
-	return &VendorService{Repo: r}
+func NewVendorService(repo *repository.VendorRepository) *VendorService {
+	return &VendorService{Repo: repo}
 }
 
-// ==================================================
-// Utility
-// ==================================================
-func trimVendor(req *model.VendorRequest) {
-	validation.TrimStrings(
-		&req.VendorName,
-	)
+func (s *VendorService) GetByID(ctx context.Context, id string) (*model.Vendor, error) {
+	if id == "" {
+		return nil, errors.New("id is required")
+	}
+	return s.Repo.Get(ctx, id)
 }
 
-// ==================================================
-// Create
-// ==================================================
-func (s *VendorService) Create(ctx context.Context, loginID int, req *model.VendorRequest) (*model.VendorResponse, error, map[string]string) {
-	trimVendor(req)
+func (s *VendorService) List(ctx context.Context, opts model.ListOptions) ([]model.Vendor, int, error) {
+	return s.Repo.List(ctx, opts)
+}
 
-	if err := validation.ValidateStruct(req); err != nil {
-		return nil, errors.New("validation error"), validation.ValidationErrors(err)
-	}
-
-	now := time.Now()
-
-	isActive := 1
-	if req.IsActive != nil {
-		isActive = *req.IsActive
-	}
-
-	m := &model.Vendor{
-		VendorTypeID:      req.VendorTypeID,
-		BankMerkID:        req.BankMerkID,
-		VendorName:        req.VendorName,
-		VendorEmail:       req.VendorEmail,
-		VendorPhone:       req.VendorPhone,
-		VendorTin:         req.VendorTin,
-		CityID:            req.CityID,
-		VendorAddress:     req.VendorAddress,
-		BankAccountNumber: req.BankAccountNumber,
-		BankAccountName:   req.BankAccountName,
-		IsActive:          isActive,
-		CreatedBy:         loginID,
-		UpdatedBy:         loginID,
-		CreatedAt:         now,
-		UpdatedAt:         now,
-	}
-
+func (s *VendorService) Create(ctx context.Context, loginID string, req *model.VendorRequest) (*model.Vendor, error, map[string]string) {
+	m := &model.Vendor{}
+	if req.VendorCode != nil { m.VendorCode = *req.VendorCode }
+	if req.VendorName != nil { m.VendorName = *req.VendorName }
+	m.TaxNumber = req.TaxNumber
+	m.SecurityClearanceLevel = req.SecurityClearanceLevel
+	m.DefenceIndustryLicenseNo = req.DefenceIndustryLicenseNo
+	m.Country = req.Country
+	m.ContactPerson = req.ContactPerson
+	m.Email = req.Email
+	m.Phone = req.Phone
+	m.BankAccountName = req.BankAccountName
+	m.BankAccountNo = req.BankAccountNo
+	m.BankName = req.BankName
+	m.PerformanceRating = req.PerformanceRating
+	m.IsApproved = req.IsApproved
+	m.Ratings = req.Ratings
 	id, err := s.Repo.Create(ctx, m)
 	if err != nil {
 		return nil, err, nil
 	}
-
-	res, err := s.GetByID(ctx, id)
-	return res, err, nil
+	item, err := s.Repo.Get(ctx, id)
+	return item, err, nil
 }
 
-// ==================================================
-// Update
-// ==================================================
-func (s *VendorService) Update(ctx context.Context, loginID, id int, req *model.VendorRequest) (*model.VendorResponse, error, map[string]string) {
-	trimVendor(req)
-
-	if err := validation.ValidateStruct(req); err != nil {
-		return nil, errors.New("validation error"), validation.ValidationErrors(err)
+func (s *VendorService) Update(ctx context.Context, loginID string, id string, req *model.VendorRequest) (*model.Vendor, error, map[string]string) {
+	m, err := s.Repo.Get(ctx, id)
+	if err != nil {
+		return nil, err, nil
 	}
-
-	m := &model.Vendor{
-		VendorTypeID:      req.VendorTypeID,
-		BankMerkID:        req.BankMerkID,
-		VendorName:        req.VendorName,
-		VendorEmail:       req.VendorEmail,
-		VendorPhone:       req.VendorPhone,
-		VendorTin:         req.VendorTin,
-		CityID:            req.CityID,
-		VendorAddress:     req.VendorAddress,
-		BankAccountNumber: req.BankAccountNumber,
-		BankAccountName:   req.BankAccountName,
-		UpdatedBy:         loginID,
-		UpdatedAt:         time.Now(),
-	}
-
-	// is_active opsional
-	if req.IsActive != nil {
-		m.IsActive = *req.IsActive
-	} else {
-		m.IsActive = -1 // signal ke repo: jangan update is_active
-	}
-
+	if req.VendorCode != nil { m.VendorCode = *req.VendorCode }
+	if req.VendorName != nil { m.VendorName = *req.VendorName }
+	if req.TaxNumber != nil { m.TaxNumber = req.TaxNumber }
+	if req.SecurityClearanceLevel != nil { m.SecurityClearanceLevel = req.SecurityClearanceLevel }
+	if req.DefenceIndustryLicenseNo != nil { m.DefenceIndustryLicenseNo = req.DefenceIndustryLicenseNo }
+	if req.Country != nil { m.Country = req.Country }
+	if req.ContactPerson != nil { m.ContactPerson = req.ContactPerson }
+	if req.Email != nil { m.Email = req.Email }
+	if req.Phone != nil { m.Phone = req.Phone }
+	if req.BankAccountName != nil { m.BankAccountName = req.BankAccountName }
+	if req.BankAccountNo != nil { m.BankAccountNo = req.BankAccountNo }
+	if req.BankName != nil { m.BankName = req.BankName }
+	if req.PerformanceRating != nil { m.PerformanceRating = req.PerformanceRating }
+	if req.IsApproved != nil { m.IsApproved = req.IsApproved }
+	if req.Ratings != nil { m.Ratings = req.Ratings }
 	if err := s.Repo.Update(ctx, id, m); err != nil {
 		return nil, err, nil
 	}
-
-	res, err := s.GetByID(ctx, id)
-	return res, err, nil
+	item, err := s.Repo.Get(ctx, id)
+	return item, err, nil
 }
 
-// ==================================================
-// Delete (Soft Delete)
-// ==================================================
-func (s *VendorService) Delete(ctx context.Context, loginID, id int) error {
-	return s.Repo.SoftDelete(ctx, loginID, id)
-}
-
-// ==================================================
-// Get By ID
-// ==================================================
-func (s *VendorService) GetByID(ctx context.Context, id int) (*model.VendorResponse, error) {
-	m, err := s.Repo.GetByID(ctx, id)
-	if err != nil {
-		return nil, err
-	}
-	return toVendorResp(m), nil
-}
-
-// ==================================================
-// List (cursor pagination + filters)
-// ==================================================
-func (s *VendorService) List(
-	ctx context.Context,
-	cursorValue interface{}, cursorKey *int,
-	limit int,
-	filters map[string]string,
-	orderBy, sort string,
-) ([]model.VendorResponse, error) {
-	// Normalisasi date filter seperti: created_at_after, created_at_before
-	filters, err := helper.NormalizeTimeFilters(filters, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	items, err := s.Repo.List(ctx, cursorValue, cursorKey, limit, filters, orderBy, sort)
-	if err != nil {
-		return nil, err
-	}
-
-	resp := make([]model.VendorResponse, 0, len(items))
-	for _, m := range items {
-		resp = append(resp, *toVendorResp(&m))
-	}
-
-	return resp, nil
-}
-
-// ==================================================
-// Mapping ke response DTO
-// ==================================================
-func toVendorResp(m *model.Vendor) *model.VendorResponse {
-	if m == nil {
-		return nil
-	}
-
-	var vendorTypeResp *model.VendorTypeResponse
-	if m.VendorType != nil {
-		vendorTypeResp = toVendorTypeResp(m.VendorType)
-	}
-	var bankMerkResp *model.BankMerkResponse
-	if m.BankMerk != nil {
-		bankMerkResp = toBankMerkResp(m.BankMerk)
-	}
-	var cityResp *model.CityResponse
-	if m.City != nil {
-		cityResp = toCityResp(m.City)
-	}
-	Trucks := make([]model.TruckResponse, 0)
-	if m.Trucks != nil {
-		for _, truck := range m.Trucks {
-			Trucks = append(Trucks, *toTruckResp(&truck))
-		}
-	}
-	resp := &model.VendorResponse{
-		VendorID:          m.VendorID,
-		VendorTypeID:      m.VendorTypeID,
-		BankMerkID:        m.BankMerkID,
-		VendorName:        m.VendorName,
-		VendorEmail:       m.VendorEmail,
-		VendorPhone:       m.VendorPhone,
-		VendorTin:         m.VendorTin,
-		CityID:            m.CityID,
-		VendorAddress:     m.VendorAddress,
-		BankAccountNumber: m.BankAccountNumber,
-		BankAccountName:   m.BankAccountName,
-		IsActive:          m.IsActive,
-		CreatedAt:         m.CreatedAt,
-		UpdatedAt:         m.UpdatedAt,
-		DeletedAt:         m.DeletedAt,
-		VendorType:        vendorTypeResp,
-		BankMerk:          bankMerkResp,
-		City:              cityResp,
-		Trucks:            Trucks,
-	}
-	return resp
+func (s *VendorService) Delete(ctx context.Context, loginID string, id string) error {
+	return s.Repo.Delete(ctx, id)
 }

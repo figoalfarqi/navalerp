@@ -1,0 +1,122 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { ColumnField } from "@/components/table/Table";
+import { FormField } from "@/components/formCrud/FormCrud";
+import { FilterField } from "@/components/table/FilterFormTable";
+
+export const entityName = "invoice";
+export const entityTitle = "Tagihan Rekanan";
+export const entityEndpoint = "/admin/invoice";
+export const primaryKey = "invoice_id";
+
+export const columns: ColumnField[] = [
+  { key: "invoice_id", label: "Invoice Id" },
+  { key: "invoice_number", label: "Invoice Number" },
+  { key: "vendor_id", label: "Vendor Id" },
+  { key: "contract_id", label: "Contract Id" },
+  { key: "po_id", label: "Po Id" },
+  { key: "invoice_date", label: "Invoice Date" },
+  { key: "due_date", label: "Due Date" },
+];
+
+export const filterFields: FilterField[] = [
+  { name: "search", label: "Cari Tagihan Rekanan", fieldType: "text", col: "left", placeHolder: "Ketik kata kunci pencarian..." },
+];
+
+export const formFields = (mode: string): FormField[] => [
+  {
+    name: "invoice_number",
+    label: "Invoice Number",
+    fieldType: "text",
+    required: true,
+    disabled: mode === "view",
+  },
+  {
+    name: "vendor_id",
+    label: "Vendor Id",
+    fieldType: "text",
+    required: true,
+    disabled: mode === "view",
+  },
+  {
+    name: "contract_id",
+    label: "Contract Id",
+    fieldType: "text",
+    required: false,
+    disabled: mode === "view",
+  },
+  {
+    name: "po_id",
+    label: "Po Id",
+    fieldType: "text",
+    required: false,
+    disabled: mode === "view",
+  },
+  {
+    name: "invoice_date",
+    label: "Invoice Date",
+    fieldType: "date",
+    required: true,
+    disabled: mode === "view",
+  },
+  {
+    name: "due_date",
+    label: "Due Date",
+    fieldType: "date",
+    required: true,
+    disabled: mode === "view",
+  },
+  {
+    name: "tax_invoice_number",
+    label: "Tax Invoice Number",
+    fieldType: "text",
+    required: false,
+    disabled: mode === "view",
+  },
+  {
+    name: "subtotal",
+    label: "Subtotal",
+    fieldType: "number",
+    required: true,
+    disabled: mode === "view",
+  },
+  {
+    name: "tax_amount",
+    label: "Tax Amount",
+    fieldType: "number",
+    required: false,
+    disabled: mode === "view",
+  },
+  {
+    name: "verification_status",
+    label: "Verification Status",
+    fieldType: "text",
+    required: false,
+    disabled: mode === "view",
+  },
+  {
+    name: "verified_by_user_id",
+    label: "Verified By User Id",
+    fieldType: "text",
+    required: false,
+    disabled: mode === "view",
+  },
+  {
+    name: "payment_status",
+    label: "Payment Status",
+    fieldType: "text",
+    required: false,
+    disabled: mode === "view",
+  },
+];
+
+export const buildPayload = (data: any) => {
+  const payload: any = { ...data };
+  delete payload.invoice_id;
+  delete payload.created_at;
+  delete payload.updated_at;
+  delete payload.deleted_at;
+  delete payload.created_by;
+  delete payload.updated_by;
+  delete payload.deleted_by;
+  return payload;
+};
