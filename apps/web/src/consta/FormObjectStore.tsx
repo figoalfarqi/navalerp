@@ -1,0 +1,14 @@
+export enum FORM_OBJECT_STORE {
+  DELIVERY_ORDER_ACTIVE_FORM_CREATE = "delivery_order_active_form_create",
+  DELIVERY_ORDER_ACTIVE_MOVE_DATA_OBJECT = "delivery_order_active_move_data_object",
+  DELIVERY_ORDER_ACTIVE_NOTE_PHOTO_URLS = "delivery_order_active_note_photo_urls",
+  DELIVERY_ORDER_ACTIVE_CREATE_NOTE_PHOTO_URLS = "delivery_order_active_create_note_photo_urls",
+  DELIVERY_ORDER_ACTIVE_NOTE_PHOTO_APPROVAL_DATA_ALL = "delivery_order_active_note_photo_approval_data_all",
+  DELIVERY_ORDER_ACTIVE_ADDED_NOTE_PHOTO_URLS = "delivery_order_active_added_note_photo_urls",
+  DELIVERY_ORDER_ACTIVE_DELETED_NOTE_PHOTO_IDS = "delivery_order_active_deleted_note_photo_ids",
+  DELIVERY_ORDER_ACTIVE_CARGO_PHOTO_URLS = "delivery_order_active_cargo_photo_urls",
+  DELIVERY_ORDER_ACTIVE_CREATE_CARGO_PHOTO_URLS = "delivery_order_active_create_cargo_photo_urls",
+  DELIVERY_ORDER_ACTIVE_CARGO_PHOTO_APPROVAL_DATA_ALL = "delivery_order_active_cargo_photo_approval_data_all",
+  DELIVERY_ORDER_ACTIVE_ADDED_CARGO_PHOTO_URLS = "delivery_order_active_added_cargo_photo_urls",
+  DELIVERY_ORDER_ACTIVE_DELETED_CARGO_PHOTO_IDS = "delivery_order_active_deleted_cargo_photo_ids",
+}

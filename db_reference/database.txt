@@ -1,0 +1,734 @@
+-- =============================================================================
+-- NAVAL ENTERPRISE RESOURCE & READINESS MANAGEMENT ARCHITECTURE (NER2MA)
+-- DATABASE SCHEMA DEFINITION FOR POSTGRESQL
+-- =============================================================================
+
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+-- =============================================================================
+-- MODUL 0: ORGANISASI, PENGGUNA & COMMON MASTER DATA
+-- =============================================================================
+
+-- Master Satuan Kerja / Komando / Pangkalan (Kormar, Koarmada, Lantamal, Lanal, KRI, dll.)
+CREATE TABLE org_units (
+    unit_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    parent_unit_id UUID REFERENCES org_units(unit_id),
+    unit_code VARCHAR(50) UNIQUE NOT NULL,
+    unit_name VARCHAR(150) NOT NULL,
+    unit_type VARCHAR(50) NOT NULL, -- FLEET, LANTAMAL, LANAL, SQUADRON, SHIP, SHORE_BASE
+    latitude NUMERIC(10, 7),
+    longitude NUMERIC(10, 7),
+    is_active BOOLEAN DEFAULT TRUE,
+    created_by UUID NOT NULL,
+    updated_by UUID,
+    deleted_by UUID,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ,
+    deleted_at TIMESTAMPTZ
+);
+
+-- Master Pengguna Sistem ERP
+CREATE TABLE sys_users (
+    user_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    unit_id UUID NOT NULL REFERENCES org_units(unit_id),
+    username VARCHAR(50) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    full_name VARCHAR(150) NOT NULL,
+    email VARCHAR(100) UNIQUE,
+    phone VARCHAR(30),
+    military_id VARCHAR(50) UNIQUE, -- NRP (Nomor Registrasi Prajurit)
+    is_active BOOLEAN DEFAULT TRUE,
+    created_by UUID NOT NULL,
+    updated_by UUID,
+    deleted_by UUID,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ,
+    deleted_at TIMESTAMPTZ
+);
+
+-- Hak Akses & Role Pengguna
+CREATE TABLE sys_roles (
+    role_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    role_name VARCHAR(50) UNIQUE NOT NULL,
+    description TEXT,
+    created_by UUID NOT NULL,
+    updated_by UUID,
+    deleted_by UUID,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ,
+    deleted_at TIMESTAMPTZ
+);
+
+CREATE TABLE sys_user_roles (
+    user_role_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID NOT NULL REFERENCES sys_users(user_id),
+    role_id UUID NOT NULL REFERENCES sys_roles(role_id),
+    created_by UUID NOT NULL,
+    updated_by UUID,
+    deleted_by UUID,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ,
+    deleted_at TIMESTAMPTZ,
+    UNIQUE(user_id, role_id)
+);
+
+
+-- =============================================================================
+-- MODUL 1: FLEET, ASSET & HIERARKI PERALATAN KAPAL (MRO & ASSET)
+-- =============================================================================
+
+-- Master Kelas Kapal / Tipe Platform (cth: SIGMA 10514, Martadinata Class)
+CREATE TABLE mro_ship_classes (
+    class_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    class_code VARCHAR(50) UNIQUE NOT NULL,
+    class_name VARCHAR(100) NOT NULL,
+    category VARCHAR(50) NOT NULL, -- FRIGATE, CORVETTE, SUBMARINE, LPD, PATROL, AIRCRAFT
+    specifications JSONB,
+    created_by UUID NOT NULL,
+    updated_by UUID,
+    deleted_by UUID,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ,
+    deleted_at TIMESTAMPTZ
+);
+
+-- Master Kapal (KRI) / Wahana / Aset Bergerak
+CREATE TABLE mro_ships (
+    ship_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    class_id UUID NOT NULL REFERENCES mro_ship_classes(class_id),
+    assigned_unit_id UUID NOT NULL REFERENCES org_units(unit_id),
+    hull_number VARCHAR(20) UNIQUE NOT NULL, -- Nomor Lambung (misal: 331)
+    ship_name VARCHAR(100) NOT NULL,        -- misal: KRI R.E. Martadinata
+    commission_date DATE,
+    home_port VARCHAR(100),
+    status VARCHAR(50) DEFAULT 'ACTIVE',    -- ACTIVE, DOCKED, RETIRED, DEPLOYED
+    created_by UUID NOT NULL,
+    updated_by UUID,
+    deleted_by UUID,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ,
+    deleted_at TIMESTAMPTZ
+);
+
+-- Hierarki Sistem Kapal / Asset Tree (Hull -> System -> Subsystem -> Equipment -> Component)
+CREATE TABLE mro_systems (
+    system_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    ship_id UUID NOT NULL REFERENCES mro_ships(ship_id),
+    parent_system_id UUID REFERENCES mro_systems(system_id),
+    system_code VARCHAR(50) NOT NULL,
+    system_name VARCHAR(100) NOT NULL, -- Propulsion, Electrical, Combat Management, Navigation
+    system_level VARCHAR(30) NOT NULL, -- SYSTEM, SUBSYSTEM, EQUIPMENT, COMPONENT
+    created_by UUID NOT NULL,
+    updated_by UUID,
+    deleted_by UUID,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ,
+    deleted_at TIMESTAMPTZ
+);
+
+-- Equipment Individual Terpasang (Main Engine 1, Radar MW08, dsb.)
+CREATE TABLE mro_equipments (
+    equipment_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    system_id UUID NOT NULL REFERENCES mro_systems(system_id),
+    serial_number VARCHAR(100) NOT NULL,
+    equipment_name VARCHAR(150) NOT NULL,
+    manufacturer VARCHAR(100),
+    model_number VARCHAR(100),
+    installation_date DATE,
+    total_operating_hours NUMERIC(10, 2) DEFAULT 0,
+    health_status VARCHAR(30) DEFAULT 'OPERATIONAL', -- OPERATIONAL, DEGRADED, CRITICAL, NON_OPERATIONAL
+    created_by UUID NOT NULL,
+    updated_by UUID,
+    deleted_by UUID,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ,
+    deleted_at TIMESTAMPTZ
+);
+
+-- Laporan Kerusakan Peralatan (Failure Report)
+CREATE TABLE mro_failure_reports (
+    report_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    equipment_id UUID NOT NULL REFERENCES mro_equipments(equipment_id),
+    reported_by_user_id UUID NOT NULL REFERENCES sys_users(user_id),
+    report_number VARCHAR(50) UNIQUE NOT NULL,
+    incident_date TIMESTAMPTZ NOT NULL,
+    severity VARCHAR(30) NOT NULL, -- CAT1 (Immediate Mission Stop), CAT2, CAT3, CAT4
+    description TEXT NOT NULL,
+    operational_impact TEXT,
+    status VARCHAR(30) DEFAULT 'PENDING', -- PENDING, ASSESSED, WORK_ORDER_CREATED, CLOSED
+    created_by UUID NOT NULL,
+    updated_by UUID,
+    deleted_by UUID,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ,
+    deleted_at TIMESTAMPTZ
+);
+
+-- Perintah Kerja Pemeliharaan (Maintenance Work Orders)
+CREATE TABLE mro_work_orders (
+    work_order_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    failure_report_id UUID REFERENCES mro_failure_reports(report_id),
+    equipment_id UUID NOT NULL REFERENCES mro_equipments(equipment_id),
+    work_order_number VARCHAR(50) UNIQUE NOT NULL,
+    work_order_type VARCHAR(50) NOT NULL, -- CORRECTIVE, PREVENTIVE, DOCKING, DEPOT_LEVEL
+    priority VARCHAR(30) NOT NULL,        -- EMERGENCY, URGENT, ROUTINE
+    scheduled_start_date DATE,
+    scheduled_end_date DATE,
+    actual_start_date DATE,
+    actual_end_date DATE,
+    status VARCHAR(30) DEFAULT 'DRAFT',   -- DRAFT, APPROVED, IN_PROGRESS, WAITING_PARTS, COMPLETED, INSPECTED
+    assigned_dock_facility VARCHAR(100),
+    total_cost NUMERIC(18, 2) DEFAULT 0,
+    created_by UUID NOT NULL,
+    updated_by UUID,
+    deleted_by UUID,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ,
+    deleted_at TIMESTAMPTZ
+);
+
+
+-- =============================================================================
+-- MODUL 2: LOGISTIK, INVENTARISASI & WAREHOUSING
+-- =============================================================================
+
+-- Master Gudang / Depo Logistik (Pangkalan, Arsenal, Depo BBM, Ruang Mesin KRI)
+CREATE TABLE inv_warehouses (
+    warehouse_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    unit_id UUID NOT NULL REFERENCES org_units(unit_id),
+    warehouse_code VARCHAR(50) UNIQUE NOT NULL,
+    warehouse_name VARCHAR(100) NOT NULL,
+    warehouse_type VARCHAR(50) NOT NULL, -- SHORE_DEPOT, SHIPBOARD_STORE, AMMUNITION_BUNKER, FUEL_DEPOT
+    location_address TEXT,
+    created_by UUID NOT NULL,
+    updated_by UUID,
+    deleted_by UUID,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ,
+    deleted_at TIMESTAMPTZ
+);
+
+-- Master Material / Suku Cadang (NSN: NATO Stock Number / Nomor Induk Material)
+CREATE TABLE inv_materials (
+    material_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    material_code VARCHAR(50) UNIQUE NOT NULL,
+    nsn VARCHAR(50) UNIQUE, -- NATO / Military Stock Number
+    part_number VARCHAR(100),
+    material_name VARCHAR(150) NOT NULL,
+    category VARCHAR(50) NOT NULL, -- TECHNICAL_SPARES, CONSUMABLES, FUEL_ENERGY, AMMUNITION, GENERAL_SUPPLIES, STRATEGIC_RESERVE
+    uom VARCHAR(20) NOT NULL,      -- UNIT, SET, LITER, KG, TON, METER
+    min_stock_level NUMERIC(12, 2) DEFAULT 0,
+    max_stock_level NUMERIC(12, 2) DEFAULT 0,
+    shelf_life_days INT,
+    is_controlled_item BOOLEAN DEFAULT FALSE, -- Alutsista / Munisi / Bersandi
+    created_by UUID NOT NULL,
+    updated_by UUID,
+    deleted_by UUID,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ,
+    deleted_at TIMESTAMPTZ
+);
+
+-- Pemetaan Kompatibilitas Suku Cadang ke Sistem/Equipment
+CREATE TABLE inv_material_equipment_links (
+    link_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    material_id UUID NOT NULL REFERENCES inv_materials(material_id),
+    system_id UUID REFERENCES mro_systems(system_id),
+    is_mandatory_spare BOOLEAN DEFAULT FALSE,
+    created_by UUID NOT NULL,
+    updated_by UUID,
+    deleted_by UUID,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ,
+    deleted_at TIMESTAMPTZ
+);
+
+-- Saldo / Stok per Gudang
+CREATE TABLE inv_stock_balances (
+    balance_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    warehouse_id UUID NOT NULL REFERENCES inv_warehouses(warehouse_id),
+    material_id UUID NOT NULL REFERENCES inv_materials(material_id),
+    quantity_on_hand NUMERIC(14, 2) NOT NULL DEFAULT 0,
+    quantity_reserved NUMERIC(14, 2) NOT NULL DEFAULT 0,
+    quantity_available NUMERIC(14, 2) GENERATED ALWAYS AS (quantity_on_hand - quantity_reserved) STORED,
+    created_by UUID NOT NULL,
+    updated_by UUID,
+    deleted_by UUID,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ,
+    deleted_at TIMESTAMPTZ,
+    UNIQUE(warehouse_id, material_id)
+);
+
+-- Batch / Lot / Serial Tracking (Spesifik per suku cadang atau amunisi)
+CREATE TABLE inv_item_instances (
+    instance_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    warehouse_id UUID NOT NULL REFERENCES inv_warehouses(warehouse_id),
+    material_id UUID NOT NULL REFERENCES inv_materials(material_id),
+    batch_number VARCHAR(100),
+    serial_number VARCHAR(100),
+    expiry_date DATE,
+    manufactured_date DATE,
+    condition VARCHAR(30) DEFAULT 'SERVICEABLE', -- SERVICEABLE, UNSERVICEABLE, CONDEMNED
+    quantity NUMERIC(12, 2) NOT NULL DEFAULT 1,
+    created_by UUID NOT NULL,
+    updated_by UUID,
+    deleted_by UUID,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ,
+    deleted_at TIMESTAMPTZ
+);
+
+-- Konsumsi Suku Cadang pada Perintah Kerja (Digital Thread: WO -> Parts)
+CREATE TABLE mro_work_order_items (
+    wo_item_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    work_order_id UUID NOT NULL REFERENCES mro_work_orders(work_order_id),
+    material_id UUID NOT NULL REFERENCES inv_materials(material_id),
+    quantity_required NUMERIC(10, 2) NOT NULL,
+    quantity_issued NUMERIC(10, 2) DEFAULT 0,
+    is_critical_spare BOOLEAN DEFAULT FALSE,
+    created_by UUID NOT NULL,
+    updated_by UUID,
+    deleted_by UUID,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ,
+    deleted_at TIMESTAMPTZ
+);
+
+-- Pergerakan / Distribusi Suku Cadang (Stock Movements / Fleet Distribution)
+CREATE TABLE inv_stock_transfers (
+    transfer_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    transfer_number VARCHAR(50) UNIQUE NOT NULL,
+    from_warehouse_id UUID NOT NULL REFERENCES inv_warehouses(warehouse_id),
+    to_warehouse_id UUID NOT NULL REFERENCES inv_warehouses(warehouse_id),
+    movement_type VARCHAR(50) NOT NULL, -- FLEET_RESUPPLY, BASE_TRANSFER, DEPOT_DISPATCH
+    scheduled_departure TIMESTAMPTZ,
+    actual_arrival TIMESTAMPTZ,
+    status VARCHAR(30) DEFAULT 'PLANNED', -- PLANNED, IN_TRANSIT, RECEIVED, REJECTED
+    created_by UUID NOT NULL,
+    updated_by UUID,
+    deleted_by UUID,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ,
+    deleted_at TIMESTAMPTZ
+);
+
+CREATE TABLE inv_stock_transfer_items (
+    transfer_item_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    transfer_id UUID NOT NULL REFERENCES inv_stock_transfers(transfer_id),
+    material_id UUID NOT NULL REFERENCES inv_materials(material_id),
+    quantity NUMERIC(12, 2) NOT NULL,
+    created_by UUID NOT NULL,
+    updated_by UUID,
+    deleted_by UUID,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ,
+    deleted_at TIMESTAMPTZ
+);
+
+
+-- =============================================================================
+-- MODUL 3: PENGADAAN PERTAHANAN (DEFENCE PROCUREMENT)
+-- =============================================================================
+
+-- Master Vendor / Penyedia Pertahanan
+CREATE TABLE proc_vendors (
+    vendor_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    vendor_code VARCHAR(50) UNIQUE NOT NULL,
+    vendor_name VARCHAR(150) NOT NULL,
+    tax_number VARCHAR(50),
+    security_clearance_level VARCHAR(50), -- NATO_SECRET, RESTRICTED, UNCLASSIFIED
+    country VARCHAR(100),
+    contact_person VARCHAR(100),
+    email VARCHAR(100),
+    phone VARCHAR(50),
+    performance_rating NUMERIC(3, 2) DEFAULT 0,
+    created_by UUID NOT NULL,
+    updated_by UUID,
+    deleted_by UUID,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ,
+    deleted_at TIMESTAMPTZ
+);
+
+-- Permintaan Pembelian / Kebutuhan Material (Purchase Requisitions)
+CREATE TABLE proc_requisitions (
+    requisition_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    requisition_number VARCHAR(50) UNIQUE NOT NULL,
+    origin_unit_id UUID NOT NULL REFERENCES org_units(unit_id),
+    work_order_id UUID REFERENCES mro_work_orders(work_order_id), -- Hubungan langsung jika dari WO
+    priority VARCHAR(30) NOT NULL, -- EMERGENCY, HIGH, REGULAR
+    requested_date DATE NOT NULL,
+    approval_status VARCHAR(30) DEFAULT 'PENDING', -- PENDING, APPROVED, REJECTED
+    total_estimated_cost NUMERIC(18, 2) DEFAULT 0,
+    created_by UUID NOT NULL,
+    updated_by UUID,
+    deleted_by UUID,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ,
+    deleted_at TIMESTAMPTZ
+);
+
+CREATE TABLE proc_requisition_items (
+    req_item_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    requisition_id UUID NOT NULL REFERENCES proc_requisitions(requisition_id),
+    material_id UUID NOT NULL REFERENCES inv_materials(material_id),
+    quantity NUMERIC(12, 2) NOT NULL,
+    estimated_unit_price NUMERIC(18, 2),
+    created_by UUID NOT NULL,
+    updated_by UUID,
+    deleted_by UUID,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ,
+    deleted_at TIMESTAMPTZ
+);
+
+-- Kontrak Pengadaan
+CREATE TABLE proc_contracts (
+    contract_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    contract_number VARCHAR(100) UNIQUE NOT NULL,
+    vendor_id UUID NOT NULL REFERENCES proc_vendors(vendor_id),
+    contract_title VARCHAR(200) NOT NULL,
+    contract_value NUMERIC(18, 2) NOT NULL,
+    start_date DATE NOT NULL,
+    end_date DATE NOT NULL,
+    procurement_method VARCHAR(50), -- DIRECT_SELECTION, TENDER, G2G_PURCHASE
+    status VARCHAR(30) DEFAULT 'ACTIVE', -- DRAFT, SIGNED, ACTIVE, COMPLETED, TERMINATED
+    created_by UUID NOT NULL,
+    updated_by UUID,
+    deleted_by UUID,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ,
+    deleted_at TIMESTAMPTZ
+);
+
+-- Surat Pemesanan Pengadaan (Purchase Orders)
+CREATE TABLE proc_purchase_orders (
+    po_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    po_number VARCHAR(50) UNIQUE NOT NULL,
+    contract_id UUID REFERENCES proc_contracts(contract_id),
+    vendor_id UUID NOT NULL REFERENCES proc_vendors(vendor_id),
+    order_date DATE NOT NULL,
+    delivery_deadline DATE,
+    total_amount NUMERIC(18, 2) NOT NULL,
+    status VARCHAR(30) DEFAULT 'ISSUED', -- ISSUED, PARTIAL_RECEIVED, COMPLETED, CANCELLED
+    created_by UUID NOT NULL,
+    updated_by UUID,
+    deleted_by UUID,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ,
+    deleted_at TIMESTAMPTZ
+);
+
+CREATE TABLE proc_purchase_order_items (
+    po_item_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    po_id UUID NOT NULL REFERENCES proc_purchase_orders(po_id),
+    material_id UUID NOT NULL REFERENCES inv_materials(material_id),
+    quantity NUMERIC(12, 2) NOT NULL,
+    unit_price NUMERIC(18, 2) NOT NULL,
+    total_price NUMERIC(18, 2) NOT NULL,
+    created_by UUID NOT NULL,
+    updated_by UUID,
+    deleted_by UUID,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ,
+    deleted_at TIMESTAMPTZ
+);
+
+-- Penerimaan Barang & Uji Fungsi (Goods Receipt & Inspection)
+CREATE TABLE proc_goods_receipts (
+    receipt_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    receipt_number VARCHAR(50) UNIQUE NOT NULL,
+    po_id UUID NOT NULL REFERENCES proc_purchase_orders(po_id),
+    warehouse_id UUID NOT NULL REFERENCES inv_warehouses(warehouse_id),
+    received_date TIMESTAMPTZ NOT NULL,
+    inspected_by_user_id UUID NOT NULL REFERENCES sys_users(user_id),
+    inspection_passed BOOLEAN DEFAULT TRUE,
+    remarks TEXT,
+    created_by UUID NOT NULL,
+    updated_by UUID,
+    deleted_by UUID,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ,
+    deleted_at TIMESTAMPTZ
+);
+
+
+-- =============================================================================
+-- MODUL 4: ANGGARAN & KEUANGAN (FINANCE & STRATEGIC BUDGETING)
+-- =============================================================================
+
+-- Mata Anggaran / Struktur Program Kerja Pertahanan (Hierarchy of Defense Budget)
+CREATE TABLE fin_budget_programs (
+    program_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    parent_program_id UUID REFERENCES fin_budget_programs(program_id),
+    fiscal_year INT NOT NULL,
+    program_code VARCHAR(50) NOT NULL,
+    program_name VARCHAR(150) NOT NULL,
+    allocated_budget NUMERIC(18, 2) NOT NULL DEFAULT 0,
+    created_by UUID NOT NULL,
+    updated_by UUID,
+    deleted_by UUID,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ,
+    deleted_at TIMESTAMPTZ,
+    UNIQUE(fiscal_year, program_code)
+);
+
+-- Alokasi Anggaran ke Satker / Unit / Platform Kapal (Untuk TCO Tracking)
+CREATE TABLE fin_budget_allocations (
+    allocation_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    program_id UUID NOT NULL REFERENCES fin_budget_programs(program_id),
+    unit_id UUID NOT NULL REFERENCES org_units(unit_id),
+    ship_id UUID REFERENCES mro_ships(ship_id), -- Langsung link ke platform kapal
+    allocated_amount NUMERIC(18, 2) NOT NULL,
+    committed_amount NUMERIC(18, 2) DEFAULT 0,
+    spent_amount NUMERIC(18, 2) DEFAULT 0,
+    created_by UUID NOT NULL,
+    updated_by UUID,
+    deleted_by UUID,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ,
+    deleted_at TIMESTAMPTZ
+);
+
+-- Komitmen Anggaran / Pagu Terkunci (Commitments)
+CREATE TABLE fin_budget_commitments (
+    commitment_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    allocation_id UUID NOT NULL REFERENCES fin_budget_allocations(allocation_id),
+    contract_id UUID REFERENCES proc_contracts(contract_id),
+    po_id UUID REFERENCES proc_purchase_orders(po_id),
+    commitment_amount NUMERIC(18, 2) NOT NULL,
+    status VARCHAR(30) DEFAULT 'ACTIVE', -- ACTIVE, RELEASED, EXECUTED
+    created_by UUID NOT NULL,
+    updated_by UUID,
+    deleted_by UUID,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ,
+    deleted_at TIMESTAMPTZ
+);
+
+-- Invoice & Tagihan Pembayaran
+CREATE TABLE fin_invoices (
+    invoice_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    po_id UUID NOT NULL REFERENCES proc_purchase_orders(po_id),
+    vendor_id UUID NOT NULL REFERENCES proc_vendors(vendor_id),
+    invoice_number VARCHAR(100) NOT NULL,
+    invoice_date DATE NOT NULL,
+    amount NUMERIC(18, 2) NOT NULL,
+    tax_amount NUMERIC(18, 2) DEFAULT 0,
+    payment_status VARCHAR(30) DEFAULT 'UNPAID', -- UNPAID, PARTIAL, PAID
+    verified_by UUID REFERENCES sys_users(user_id),
+    created_by UUID NOT NULL,
+    updated_by UUID,
+    deleted_by UUID,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ,
+    deleted_at TIMESTAMPTZ
+);
+
+-- Pembayaran / Disbursmen Anggaran
+CREATE TABLE fin_payments (
+    payment_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    invoice_id UUID NOT NULL REFERENCES fin_invoices(invoice_id),
+    payment_reference VARCHAR(100) UNIQUE NOT NULL,
+    payment_date DATE NOT NULL,
+    payment_amount NUMERIC(18, 2) NOT NULL,
+    disbursement_method VARCHAR(50), -- SP2D, TREASURY_TRANSFER
+    created_by UUID NOT NULL,
+    updated_by UUID,
+    deleted_by UUID,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ,
+    deleted_at TIMESTAMPTZ
+);
+
+
+-- =============================================================================
+-- MODUL 5: SUMBER DAYA MANUSIA MILITER (MILITARY HUMAN CAPITAL)
+-- =============================================================================
+
+-- Master Kepangkatan TNI AL (Laksamana, Kolonel, Mayor, Kapten, Serka, Klasi, dll.)
+CREATE TABLE hcm_ranks (
+    rank_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    rank_code VARCHAR(20) UNIQUE NOT NULL,
+    rank_name VARCHAR(100) NOT NULL,
+    rank_tier VARCHAR(30) NOT NULL, -- PATI, PAMEN, PAMA, BINTARA, TMT/TAMTAMA
+    rank_level INT NOT NULL,         -- Skala numerik hierarki
+    created_by UUID NOT NULL,
+    updated_by UUID,
+    deleted_by UUID,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ,
+    deleted_at TIMESTAMPTZ
+);
+
+-- Master Personel Prajurit TNI AL
+CREATE TABLE hcm_personnel (
+    personnel_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID UNIQUE REFERENCES sys_users(user_id),
+    nrp VARCHAR(50) UNIQUE NOT NULL,
+    full_name VARCHAR(150) NOT NULL,
+    rank_id UUID NOT NULL REFERENCES hcm_ranks(rank_id),
+    corps VARCHAR(50) NOT NULL, -- PELAUT, TEKNIK, ELEKTRONIKA, SUPLAI, MARINIR, KESEHATAN, KHUSUS
+    current_unit_id UUID NOT NULL REFERENCES org_units(unit_id),
+    blood_type VARCHAR(5),
+    medical_readiness_status VARCHAR(30) DEFAULT 'FIT_FOR_SEA', -- FIT_FOR_SEA, FIT_FOR_SHORE, TEMPORARY_UNFIT, UNFIT
+    date_of_birth DATE NOT NULL,
+    created_by UUID NOT NULL,
+    updated_by UUID,
+    deleted_by UUID,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ,
+    deleted_at TIMESTAMPTZ
+);
+
+-- Kualifikasi & Sertifikasi Kemiliteran (Diving, Radar Spec, Sonar Spec, Sniper, dll.)
+CREATE TABLE hcm_qualifications (
+    qualification_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    qualification_code VARCHAR(50) UNIQUE NOT NULL,
+    qualification_name VARCHAR(150) NOT NULL,
+    qualification_type VARCHAR(50) NOT NULL, -- SPECIALTY, WEAPON_SYSTEM, TECHNICAL_RATING
+    created_by UUID NOT NULL,
+    updated_by UUID,
+    deleted_by UUID,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ,
+    deleted_at TIMESTAMPTZ
+);
+
+-- Catatan Kualifikasi & Sertifikasi Prajurit
+CREATE TABLE hcm_personnel_qualifications (
+    record_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    personnel_id UUID NOT NULL REFERENCES hcm_personnel(personnel_id),
+    qualification_id UUID NOT NULL REFERENCES hcm_qualifications(qualification_id),
+    issue_date DATE NOT NULL,
+    valid_until DATE,
+    is_active BOOLEAN DEFAULT TRUE,
+    created_by UUID NOT NULL,
+    updated_by UUID,
+    deleted_by UUID,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ,
+    deleted_at TIMESTAMPTZ
+);
+
+-- Penugasan Prajurit ke Platform Kapal / Satgas (Crew Roster & Deployment)
+CREATE TABLE hcm_crew_assignments (
+    assignment_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    personnel_id UUID NOT NULL REFERENCES hcm_personnel(personnel_id),
+    ship_id UUID NOT NULL REFERENCES mro_ships(ship_id),
+    role_on_board VARCHAR(100) NOT NULL, -- KOMANDAN, PALAKSA, KEPALA KAMAR MESIN, OPERATOR RADAR
+    start_date DATE NOT NULL,
+    end_date DATE,
+    status VARCHAR(30) DEFAULT 'ASSIGNED', -- ASSIGNED, ON_DUTY, MEDICAL_LEAVE, RELIEVED
+    created_by UUID NOT NULL,
+    updated_by UUID,
+    deleted_by UUID,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ,
+    deleted_at TIMESTAMPTZ
+);
+
+
+-- =============================================================================
+-- MODUL 6: ENTERPRISE DOCUMENT & RECORDS MANAGEMENT (EDRMS)
+-- =============================================================================
+
+-- Master Dokumen Terintegrasi
+CREATE TABLE doc_documents (
+    document_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    document_number VARCHAR(100) UNIQUE NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    doc_type VARCHAR(50) NOT NULL, -- CONTRACT, TECH_MANUAL, CERTIFICATE, INVOICE, DRAWING, TELEGRAM
+    classification VARCHAR(50) NOT NULL, -- TOP_SECRET, SECRET, CONFIDENTIAL, RESTRICTED, UNCLASSIFIED
+    file_path TEXT NOT NULL,
+    file_hash_sha256 VARCHAR(64),
+    file_size_bytes BIGINT,
+    mime_type VARCHAR(100),
+    is_digitally_signed BOOLEAN DEFAULT FALSE,
+    created_by UUID NOT NULL,
+    updated_by UUID,
+    deleted_by UUID,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ,
+    deleted_at TIMESTAMPTZ
+);
+
+-- Digital Thread Document Linkages (Menghubungkan Dokumen ke Transaksi Nyata)
+CREATE TABLE doc_document_links (
+    link_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    document_id UUID NOT NULL REFERENCES doc_documents(document_id),
+    linked_entity_type VARCHAR(50) NOT NULL, -- SHIP, EQUIPMENT, WORK_ORDER, CONTRACT, PO, INVOICE, PERSONNEL
+    linked_entity_id UUID NOT NULL,          -- UUID referensi entitas terkait
+    remarks VARCHAR(255),
+    created_by UUID NOT NULL,
+    updated_by UUID,
+    deleted_by UUID,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ,
+    deleted_at TIMESTAMPTZ
+);
+
+
+-- =============================================================================
+-- MODUL 7: READINESS INTEGRATION & COMMAND DASHBOARD
+-- =============================================================================
+
+-- Operasi Militer / Misi Penggelaran Armada
+CREATE TABLE ops_missions (
+    mission_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    mission_code VARCHAR(50) UNIQUE NOT NULL,
+    mission_name VARCHAR(150) NOT NULL,
+    operation_area VARCHAR(100) NOT NULL,
+    start_date DATE NOT NULL,
+    end_date DATE,
+    lead_command_id UUID NOT NULL REFERENCES org_units(unit_id),
+    mission_type VARCHAR(50) NOT NULL, -- BORDER_PATROL, COMBAT_TASK_FORCE, SAR, MARITIME_SECURITY
+    status VARCHAR(30) DEFAULT 'PLANNED', -- PLANNED, ACTIVE, COMPLETED, ABORTED
+    created_by UUID NOT NULL,
+    updated_by UUID,
+    deleted_by UUID,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ,
+    deleted_at TIMESTAMPTZ
+);
+
+-- Konsolidasi Indikator Kesiapan Kapal (Naval Readiness Calculation)
+-- Formula: NR = f(MR, PR, LR, TR, FR, IR)
+CREATE TABLE ops_ship_readiness_snapshots (
+    snapshot_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    ship_id UUID NOT NULL REFERENCES mro_ships(ship_id),
+    mission_id UUID REFERENCES ops_missions(mission_id),
+    snapshot_timestamp TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    
+    -- Pilar-pilar Kesiapan (Skala 0.00 - 100.00%)
+    materiel_readiness_score NUMERIC(5, 2) NOT NULL,     -- MR: Kesiapan fisik mesin/senjata/alat apung
+    personnel_readiness_score NUMERIC(5, 2) NOT NULL,    -- PR: Kelengkapan krew, kualifikasi & kesehatan
+    logistics_readiness_score NUMERIC(5, 2) NOT NULL,    -- LR: Ketersediaan bekal amunisi, BBM, cadang
+    training_readiness_score NUMERIC(5, 2) NOT NULL,     -- TR: Jam latihan & standar kualifikasi tempur
+    overall_readiness_score NUMERIC(5, 2) NOT NULL,      -- Hasil komposit kesiapan tempur
+    
+    combat_ready_status VARCHAR(30) NOT NULL,            -- FULLY_MISSION_CAPABLE, PARTIALLY_MISSION_CAPABLE, NON_MISSION_CAPABLE
+    remarks TEXT,
+    created_by UUID NOT NULL,
+    updated_by UUID,
+    deleted_by UUID,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ,
+    deleted_at TIMESTAMPTZ
+);
+
+
+-- =============================================================================
+-- INDEXING UNTUK OPTIMASI QUERY POSTGRESQL & SOFT DELETES
+-- =============================================================================
+
+CREATE INDEX idx_mro_equipments_system ON mro_equipments(system_id) WHERE deleted_at IS NULL;
+CREATE INDEX idx_mro_work_orders_ship_status ON mro_work_orders(status) WHERE deleted_at IS NULL;
+CREATE INDEX idx_inv_stock_balances_wh_mat ON inv_stock_balances(warehouse_id, material_id) WHERE deleted_at IS NULL;
+CREATE INDEX idx_proc_po_contract ON proc_purchase_orders(contract_id) WHERE deleted_at IS NULL;
+CREATE INDEX idx_fin_allocations_ship ON fin_budget_allocations(ship_id) WHERE deleted_at IS NULL;
+CREATE INDEX idx_hcm_crew_ship ON hcm_crew_assignments(ship_id) WHERE deleted_at IS NULL;
+CREATE INDEX idx_doc_links_entity ON doc_document_links(linked_entity_type, linked_entity_id) WHERE deleted_at IS NULL;
+CREATE INDEX idx_ops_readiness_ship ON ops_ship_readiness_snapshots(ship_id, snapshot_timestamp DESC) WHERE deleted_at IS NULL;

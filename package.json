@@ -1,0 +1,21 @@
+{
+  "name": "navalerp",
+  "version": "1.0.0",
+  "private": true,
+  "packageManager": "pnpm@10.15.0",
+  "scripts": {
+    "dev": "concurrently --names web,api --prefix-colors blue,green \"pnpm dev:web\" \"pnpm dev:api\"",
+    "dev:web": "pnpm --filter @navalerp/web dev",
+    "dev:api": "go -C apps/api run ./cmd/apipml",
+    "build": "pnpm build:web && pnpm build:api",
+    "build:web": "pnpm --filter @navalerp/web build",
+    "build:api": "go -C apps/api build -o app ./cmd/apipml",
+    "lint": "pnpm lint:web",
+    "lint:web": "pnpm --filter @navalerp/web lint",
+    "test": "pnpm test:api",
+    "test:api": "go -C apps/api test ./..."
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}

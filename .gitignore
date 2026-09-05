@@ -1,0 +1,25 @@
+# Environment files
+.env
+.env.*
+!.env.example
+
+# JavaScript dependencies and build output
+node_modules/
+**/node_modules/
+**/.next/
+**/out/
+**/coverage/
+
+# Go build artifacts
+apps/api/app
+apps/api/cmd/apipml/app
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+*.tsbuildinfo
+
+# Local backup retained while the monorepo migration is verified
+.monorepo-migration-backup/
+/apipml/
+/apppml/

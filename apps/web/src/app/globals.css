@@ -1,0 +1,161 @@
+@import "tailwindcss";
+@plugin 'tailwind-scrollbar';
+
+@layer base {
+  :root {
+    --scrollbar-track: transparent;
+    --scrollbar-thumb: rgba(100, 116, 139, 0.42);
+    --scrollbar-thumb-hover: rgba(14, 116, 144, 0.72);
+    --scrollbar-thumb-active: rgba(3, 105, 161, 0.88);
+  }
+
+  html {
+    scrollbar-gutter: stable;
+  }
+
+  * {
+    scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+    scrollbar-width: thin;
+  }
+
+  *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: var(--scrollbar-track);
+  }
+
+  *::-webkit-scrollbar-thumb {
+    min-height: 36px;
+    border: 2px solid transparent;
+    border-radius: 999px;
+    background: var(--scrollbar-thumb);
+    background-clip: padding-box;
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    background-color: var(--scrollbar-thumb-hover);
+  }
+
+  *::-webkit-scrollbar-thumb:active {
+    background-color: var(--scrollbar-thumb-active);
+  }
+
+  *::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+}
+
+@keyframes bounce-custom {
+  0%, 80%, 100% {
+    transform: translateY(3px);
+  }
+  40% {
+    transform: translateY(-6px); /* tinggi lompatan */
+  }
+}
+
+@font-face {
+  font-family: "PoppinsRegular";
+  src: url("/Poppins-Regular.woff") format("woff");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: 'PoppinsRegular', Arial, Helvetica, sans-serif;
+}
+
+
+.bounce-delay-1 {
+  animation: bounce-custom 0.8s infinite ease-in-out;
+  animation-delay: -0.32s; /* lingkaran pertama */
+}
+
+.bounce-delay-2 {
+  animation: bounce-custom 0.8s infinite ease-in-out;
+  animation-delay: -0.16s; /* lingkaran kedua */
+}
+
+.bounce-delay-3 {
+  animation: bounce-custom 0.8s infinite ease-in-out;
+  animation-delay: 0s; /* lingkaran ketiga */
+}
+
+/* Scrollable areas on light surfaces */
+.app-scrollbar {
+  overscroll-behavior: contain;
+  scrollbar-color: rgba(100, 116, 139, 0.5) transparent;
+  scrollbar-width: thin;
+}
+
+.app-scrollbar::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.app-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.app-scrollbar::-webkit-scrollbar-thumb {
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background: rgba(100, 116, 139, 0.5);
+  background-clip: padding-box;
+}
+
+.app-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(14, 116, 144, 0.76);
+}
+
+/* Sidebar scrollbar on the blue gradient */
+.custom-scrollbar {
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.52) transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 9px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  margin-block: 8px;
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.42);
+  background-clip: padding-box;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.68);
+}
+
+
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  transform: scale(0);
+  animation: ripple 400ms linear;
+  background-color: rgba(0, 0, 0, 0.3);
+  pointer-events: none;
+}
+
+@keyframes ripple {
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+

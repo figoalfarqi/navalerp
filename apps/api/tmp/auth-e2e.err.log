@@ -1,0 +1,20 @@
+2026/07/26 17:35:39 ✅ Connected to PostgreSQL
+2026/07/26 17:35:39 🚀 Server running at :18085
+2026/07/26 18:26:25 [POST] /api/v1/admin/login 200 187.2324ms from [::1]:61580
+2026/07/26 18:26:25 [GET] /api/v1/admin/=1 404 0s from [::1]:61580
+2026/07/26 18:26:25 [GET] /api/v1/admin/=1 404 0s from [::1]:61580
+2026/07/26 18:26:25 [GET] /api/v1/admin/=1 404 932.4µs from [::1]:61580
+2026/07/26 18:26:25 [POST] /api/v1/admin/login 200 54.3214ms from [::1]:61580
+2026/07/26 18:26:26 [GET] /api/v1/admin/=1 404 0s from [::1]:61580
+2026/07/26 18:26:26 [GET] /api/v1/admin/=1 404 0s from [::1]:61580
+2026/07/26 18:26:26 [GET] /api/v1/admin/=1 404 0s from [::1]:61580
+2026/07/26 18:26:36 [POST] /api/v1/admin/login 200 60.9499ms from [::1]:61628
+2026/07/26 18:26:36 [GET] /api/v1/admin/app_role 200 15.4537ms from [::1]:61628
+2026/07/26 18:26:36 [GET] /api/v1/admin/province 200 3.7763ms from [::1]:61628
+2026/07/26 18:26:36 [GET] /api/v1/admin/project 500 13.0913ms from [::1]:61628
+2026/07/26 18:26:37 [POST] /api/v1/admin/login 200 51.5046ms from [::1]:61628
+2026/07/26 18:26:37 [GET] /api/v1/admin/app_role 200 640.1µs from [::1]:61628
+2026/07/26 18:26:37 [GET] /api/v1/admin/province 200 550.5µs from [::1]:61628
+2026/07/26 18:26:37 [GET] /api/v1/admin/project 500 504.1µs from [::1]:61628
+2026/07/26 18:26:44 [POST] /api/v1/admin/login 200 53.1892ms from [::1]:61663
+2026/07/26 18:26:44 [GET] /api/v1/admin/project 500 1.8631ms from [::1]:61663
