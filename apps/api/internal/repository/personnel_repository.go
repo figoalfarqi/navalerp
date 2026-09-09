@@ -93,9 +93,13 @@ func (r *PersonnelRepository) List(ctx context.Context, opts model.ListOptions) 
 	}
 
 	limit := opts.Limit
-	if limit <= 0 { limit = 10 }
+	if limit <= 0 {
+		limit = 10
+	}
 	offset := opts.Offset
-	if offset < 0 { offset = 0 }
+	if offset < 0 {
+		offset = 0
+	}
 
 	listQuery := fmt.Sprintf(`SELECT t.personnel_id, t.nrp, t.full_name, t.rank_id, COALESCE(j_rnk.rank_name, ''), t.corps_id, COALESCE(j_crp.corps_name, ''), t.current_unit_id, COALESCE(j_unit.unit_name, ''), t.current_position, t.birth_place, t.birth_date, t.gender, t.blood_type, t.religion, t.education_level, t.service_entry_date, t.user_id, t.status, t.created_by, t.updated_by, t.deleted_by, t.created_at, t.updated_at, t.deleted_at
 	FROM hcm_personnel t

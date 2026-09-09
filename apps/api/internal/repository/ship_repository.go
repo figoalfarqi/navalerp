@@ -56,9 +56,13 @@ func (r *ShipRepository) List(ctx context.Context, opts model.ListOptions) ([]mo
 	}
 
 	limit := opts.Limit
-	if limit <= 0 { limit = 10 }
+	if limit <= 0 {
+		limit = 10
+	}
 	offset := opts.Offset
-	if offset < 0 { offset = 0 }
+	if offset < 0 {
+		offset = 0
+	}
 
 	listQuery := fmt.Sprintf(`SELECT s.ship_id, s.class_id, COALESCE(c.class_name, ''), s.assigned_unit_id, COALESCE(u.unit_name, ''), s.hull_number, s.ship_name, s.call_sign, s.commission_date, s.home_port, s.length_m, s.beam_m, s.draft_m, s.displacement_tons, s.max_speed_knots, s.cruise_range_nm, s.crew_capacity, s.fuel_capacity_liters, s.fresh_water_capacity_liters, s.status, s.current_readiness_status, s.created_by, s.updated_by, s.deleted_by, s.created_at, s.updated_at, s.deleted_at
 	FROM mro_ships s

@@ -71,9 +71,13 @@ func (r *WarehouseRepository) List(ctx context.Context, opts model.ListOptions) 
 	}
 
 	limit := opts.Limit
-	if limit <= 0 { limit = 10 }
+	if limit <= 0 {
+		limit = 10
+	}
 	offset := opts.Offset
-	if offset < 0 { offset = 0 }
+	if offset < 0 {
+		offset = 0
+	}
 
 	listQuery := fmt.Sprintf(`SELECT w.warehouse_id, w.unit_id, COALESCE(u_unit.unit_name, ''), w.warehouse_code, w.warehouse_name, w.warehouse_type, w.capacity_m3, w.manager_user_id, COALESCE(u_mgr.full_name, ''), w.location_address, w.is_active, w.created_by, w.updated_by, w.deleted_by, w.created_at, w.updated_at, w.deleted_at
 	FROM inv_warehouses w

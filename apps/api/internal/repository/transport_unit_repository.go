@@ -55,9 +55,13 @@ func (r *TransportUnitRepository) List(ctx context.Context, opts model.ListOptio
 	}
 
 	limit := opts.Limit
-	if limit <= 0 { limit = 10 }
+	if limit <= 0 {
+		limit = 10
+	}
 	offset := opts.Offset
-	if offset < 0 { offset = 0 }
+	if offset < 0 {
+		offset = 0
+	}
 
 	listQuery := fmt.Sprintf(`SELECT t.transport_unit_id, t.unit_code, t.unit_name, t.transport_type, t.cargo_capacity_tons, t.fuel_capacity_liters, t.operating_unit_id, COALESCE(j_unit.unit_name, ''), t.status, t.created_by, t.updated_by, t.deleted_by, t.created_at, t.updated_at, t.deleted_at
 	FROM log_transport_units t

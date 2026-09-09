@@ -67,9 +67,13 @@ func (r *CrewAssignmentRepository) List(ctx context.Context, opts model.ListOpti
 	}
 
 	limit := opts.Limit
-	if limit <= 0 { limit = 10 }
+	if limit <= 0 {
+		limit = 10
+	}
 	offset := opts.Offset
-	if offset < 0 { offset = 0 }
+	if offset < 0 {
+		offset = 0
+	}
 
 	listQuery := fmt.Sprintf(`SELECT t.assignment_id, t.ship_id, COALESCE(j_ship.ship_name, ''), t.personnel_id, COALESCE(j_prs.full_name, ''), t.crew_role, t.department, t.watch_bill_duty, t.assigned_date, t.relieved_date, t.is_active, t.created_by, t.created_at, t.updated_at
 	FROM hcm_crew_assignments t
