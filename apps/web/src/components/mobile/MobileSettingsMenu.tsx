@@ -2,7 +2,7 @@
 
 import BackButton from "@/components/mobile/BackButton";
 import { useRouter } from "next/navigation";
-import { FiChevronRight, FiHelpCircle, FiInfo } from "react-icons/fi";
+import { FiChevronRight, FiHelpCircle, FiInfo } from "@/components/icons";
 
 type MobileRole = "checker" | "driver";
 

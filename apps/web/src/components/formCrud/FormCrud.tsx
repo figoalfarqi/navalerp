@@ -20,6 +20,8 @@ import { IsStaticOptions } from "@/utils/globalUtils";
 import { SelectOption } from "../form/SelectField";
 import { RadioOption } from "../form/RadioField";
 import { useCheckUniqueField } from "@/hooks/useCheckUniqueField";
+import DetailItemsTable, { DetailItemsConfig } from "./DetailItemsTable";
+import { AUTO_NUMBER_CONFIGS, fetchAutoNumber } from "@/utils/numberGenerator";
 
 export type StaticOptions = SelectOption[] | RadioOption[];
 export type DynamicOptions = {
@@ -62,6 +64,10 @@ export interface FormField {
   col?: "left" | "right";
   required?: boolean;
   disabled?: boolean;
+  readOnly?: boolean;
+  autoGenerate?: boolean;
+  autoPrefix?: string;
+  autoEntity?: string;
   placeholder?: string;
   chains?: ChainItem[];
   rowGetters?: rowGetter[];
@@ -130,6 +136,7 @@ export interface FormCrudProps {
   tablesAddedData?: any;
   tables?: tablesProps[];
   detailForms?: DetailFormProps[];
+  detailItemsConfig?: DetailItemsConfig;
   formCrudFor?: "detail" | "normal";
   detailAction?: DetailActionFromCrud;
   buildPayload?: (formData: FormDataObject, tables: tablesProps[]) => void;
@@ -153,16 +160,43 @@ export default function FormCrud({
   tablesAddedData,
   tables,
   detailForms,
+  detailItemsConfig,
   formCrudFor = "normal",
   detailAction,
   buildPayload,
   parentFormData,
 }: FormCrudProps) {
-  const { postAPI, putAPI } = useFetchAPI();
+  const { postAPI, putAPI, getAPI } = useFetchAPI();
   const [formData, setFormData] = useState<FormDataObject>(initialData || {});
   const [errorForm, setErrorForm] = useState<{ [key: string]: string }>({});
 
   const [loadingSumbit, setLoadingSumbit] = useState(false);
+
+  // Auto-generate document numbering for add and copy modes
+  useEffect(() => {
+    if (!["add", "copy"].includes(mode)) return;
+
+    fields.forEach(async (field) => {
+      const isAuto = field.autoGenerate || AUTO_NUMBER_CONFIGS[field.name];
+      if (!isAuto) return;
+
+      if (!formData[field.name]) {
+        const nextNum = await fetchAutoNumber(
+          field.name,
+          field.autoPrefix,
+          field.autoEntity,
+          getAPI
+        );
+        setFormData((prev) => {
+          if (prev[field.name]) return prev;
+          return {
+            ...prev,
+            [field.name]: nextNum,
+          };
+        });
+      }
+    });
+  }, [mode, fields, getAPI]);
 
   const isForDetail = formCrudFor === "detail";
 
@@ -412,9 +446,25 @@ export default function FormCrud({
   //   };
   // }, [formData?.truck_type_id, formData?.project_detail_id]);
 
-  // ==============================================
-  //  END : ini hanya untuk create delivery order
-  // ==============================================
+  const handleDetailItemsChange = (newItems: any[]) => {
+    if (!detailItemsConfig) return;
+    setFormData((prev) => ({
+      ...prev,
+      [detailItemsConfig.tableName]: newItems,
+    }));
+  };
+
+  const handleSyncHeaderTotal = (total: number) => {
+    if (!detailItemsConfig?.syncHeaderTotalKey) return;
+    const targetKey = detailItemsConfig.syncHeaderTotalKey;
+    setFormData((prev) => {
+      if (Number(prev[targetKey]) === total) return prev;
+      return {
+        ...prev,
+        [targetKey]: total,
+      };
+    });
+  };
 
   // Handle form submit
   const handleSubmit = async (e: React.FormEvent) => {
@@ -477,7 +527,7 @@ export default function FormCrud({
         className={`${
           isForDetail
             ? ""
-            : "app-scrollbar rounded-md shadow p-4 border-t-4 border-[#004f7f] overflow-auto h-[calc(100vh-80px)]"
+            : "rounded-md shadow p-4 border-t-4 border-[#0a2540] overflow-visible md:overflow-auto h-auto md:h-[calc(100vh-80px)] md:app-scrollbar"
         } bg-white`}
       >
         <h2 className={`${isForDetail ? "text-lg" : "text-xl"} font-bold mb-2`}>
@@ -485,7 +535,7 @@ export default function FormCrud({
         </h2>
         <Wrapper
           {...(isForDetail ? {} : { onSubmit: handleSubmit })}
-          className={`grid grid-cols-2 gap-4`}
+          className="grid grid-cols-1 md:grid-cols-2 gap-4"
         >
           {formData && (
             <FieldLayout
@@ -529,7 +579,21 @@ export default function FormCrud({
               errorForm={errorFormCombined}
             />
           )}
-          <div className="col-span-2 flex justify-end mt-2">
+
+          {detailItemsConfig && (
+            <DetailItemsTable
+              config={detailItemsConfig}
+              items={
+                Array.isArray(formData[detailItemsConfig.tableName])
+                  ? (formData[detailItemsConfig.tableName] as any[])
+                  : []
+              }
+              onChange={handleDetailItemsChange}
+              mode={mode}
+              onSyncHeaderTotal={handleSyncHeaderTotal}
+            />
+          )}
+          <div className="col-span-1 md:col-span-2 flex justify-end mt-2">
             {!isForDetail && (
               <Button
                 type="reset"
@@ -553,7 +617,16 @@ export default function FormCrud({
                     if (isForDetail) {
                       detailAction?.resetItem(formData);
                     } else {
-                      setFormData(initialData);
+                      const resetData: any = { ...initialData };
+                      fields.forEach((f) => {
+                        if (
+                          (f.autoGenerate || AUTO_NUMBER_CONFIGS[f.name]) &&
+                          formData[f.name]
+                        ) {
+                          resetData[f.name] = formData[f.name];
+                        }
+                      });
+                      setFormData(resetData);
                     }
                   }}
                   id={"button-reset"}

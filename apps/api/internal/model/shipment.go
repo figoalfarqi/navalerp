@@ -32,6 +32,8 @@ type ShipmentItems struct {
 	ShipmentItemId string `json:"shipment_item_id"`
 	ShipmentId string `json:"shipment_id"`
 	MaterialId string `json:"material_id"`
+	MaterialName *string `json:"material_name,omitempty"`
+	MaterialCode *string `json:"material_code,omitempty"`
 	QuantityDispatched float64 `json:"quantity_dispatched"`
 	QuantityReceived *float64 `json:"quantity_received,omitempty"`
 	PackagingType string `json:"packaging_type"`

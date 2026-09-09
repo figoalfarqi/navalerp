@@ -11,7 +11,7 @@ import { ProjectTransport } from "@/types/projectTransport.type";
 import { ProjectTransportStatus } from "@/types/projectTransportStatus.type";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
-import { FiMapPin, FiRefreshCw } from "react-icons/fi";
+import { FiMapPin, FiRefreshCw } from "@/components/icons";
 
 const readItems = <T,>(value: unknown): T[] => {
   if (Array.isArray(value)) return value as T[];

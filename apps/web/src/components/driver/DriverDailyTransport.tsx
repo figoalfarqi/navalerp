@@ -2,6 +2,7 @@
 
 import ItemCardSkeleton from "@/components/driver/ItemCardSkeleton";
 import Button from "@/components/form/Button";
+import DateField from "@/components/form/DateField";
 import Modal from "@/components/Modal";
 import ProjectTransportCard, {
   getProjectTransportStatusLabel,
@@ -12,12 +13,11 @@ import { ProjectTransport } from "@/types/projectTransport.type";
 import { formatDateTime, toLocalDateString } from "@/utils/dateTime";
 import { useCallback, useEffect, useState } from "react";
 import {
-  FiCalendar,
   FiMap,
   FiRefreshCw,
   FiTrendingUp,
   FiTruck,
-} from "react-icons/fi";
+} from "@/components/icons";
 
 const readItems = <T,>(value: unknown): T[] => {
   if (Array.isArray(value)) return value as T[];
@@ -183,18 +183,20 @@ export default function DriverDailyTransport() {
           </Button>
         </div>
 
-        <label className="mt-5 block">
-          <span className="mb-1.5 flex items-center gap-2 text-xs font-medium text-slate-300">
-            <FiCalendar />
-            Tanggal perjalanan
-          </span>
-          <input
-            type="date"
-            value={selectedDate}
-            onChange={(event) => setSelectedDate(event.target.value)}
-            className="min-h-12 w-full rounded-xl border border-white/15 bg-white/10 px-3 text-base text-white outline-none [color-scheme:dark] focus:border-blue-300"
-          />
-        </label>
+        <DateField
+          id="driver_transport_date"
+          label="Tanggal perjalanan"
+          value={selectedDate}
+          uncloseable
+          onChange={(val) => {
+            if (val) {
+              setSelectedDate(toLocalDateString(new Date(val)));
+            }
+          }}
+          wrapperClassName="mt-5"
+          labelClassName="mb-1.5 flex items-center gap-2 text-xs font-medium text-slate-300"
+          className="min-h-12 w-full rounded-xl border-white/15 bg-white/10 px-3 text-base text-white hover:bg-white/15 focus:border-blue-300"
+        />
       </header>
 
       <section className="-mt-3 grid grid-cols-3 gap-2 px-4">

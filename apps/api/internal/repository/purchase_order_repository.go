@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/figoalfarqi/navalerp/internal/helper"
 	"github.com/figoalfarqi/navalerp/internal/model"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -34,12 +35,12 @@ func (r *PurchaseOrderRepository) Get(ctx context.Context, id string) (*model.Pu
 	}
 
 	// Load Items
-	childRowsItems, err := r.DB.Query(ctx, `SELECT po_item_id, po_id, material_id, quantity, unit_price, total_price, notes, created_by, updated_by, deleted_by, created_at, updated_at, deleted_at FROM proc_purchase_order_items WHERE po_id = $1`, id)
+	childRowsItems, err := r.DB.Query(ctx, `SELECT poi.po_item_id, poi.po_id, poi.material_id, COALESCE(m.material_name, ''), COALESCE(m.material_code, ''), poi.quantity, poi.unit_price, poi.total_price, poi.notes, poi.created_by, poi.updated_by, poi.deleted_by, poi.created_at, poi.updated_at, poi.deleted_at FROM proc_purchase_order_items poi LEFT JOIN inv_materials m ON m.material_id = poi.material_id WHERE poi.po_id = $1`, id)
 	if err == nil {
 		defer childRowsItems.Close()
 		for childRowsItems.Next() {
 			var item model.PurchaseOrderItems
-			if err := childRowsItems.Scan(&item.PoItemId, &item.PoId, &item.MaterialId, &item.Quantity, &item.UnitPrice, &item.TotalPrice, &item.Notes, &item.CreatedBy, &item.UpdatedBy, &item.DeletedBy, &item.CreatedAt, &item.UpdatedAt, &item.DeletedAt); err == nil {
+			if err := childRowsItems.Scan(&item.PoItemId, &item.PoId, &item.MaterialId, &item.MaterialName, &item.MaterialCode, &item.Quantity, &item.UnitPrice, &item.TotalPrice, &item.Notes, &item.CreatedBy, &item.UpdatedBy, &item.DeletedBy, &item.CreatedAt, &item.UpdatedAt, &item.DeletedAt); err == nil {
 				m.Items = append(m.Items, item)
 			}
 		}
@@ -70,9 +71,13 @@ func (r *PurchaseOrderRepository) List(ctx context.Context, opts model.ListOptio
 	}
 
 	limit := opts.Limit
-	if limit <= 0 { limit = 10 }
+	if limit <= 0 {
+		limit = 10
+	}
 	offset := opts.Offset
-	if offset < 0 { offset = 0 }
+	if offset < 0 {
+		offset = 0
+	}
 
 	listQuery := fmt.Sprintf(`SELECT t.po_id, t.po_number, t.contract_id, COALESCE(j_ctr.contract_number, ''), t.vendor_id, COALESCE(j_vnd.vendor_name, ''), t.issuing_unit_id, COALESCE(j_unit.unit_name, ''), t.order_date, t.delivery_deadline, t.destination_warehouse_id, COALESCE(j_dwh.warehouse_name, ''), t.total_amount, t.tax_amount, t.grand_total, t.status, t.created_by, t.updated_by, t.deleted_by, t.created_at, t.updated_at, t.deleted_at
 	FROM proc_purchase_orders t
@@ -109,6 +114,10 @@ func (r *PurchaseOrderRepository) Create(ctx context.Context, m *model.PurchaseO
 	}
 	defer tx.Rollback(ctx)
 
+	if m.PoNumber == "" {
+		m.PoNumber, _ = helper.GenerateNextNumber(ctx, r.DB, "proc_purchase_orders", "po_number", "PO")
+	}
+
 	insertQuery := `INSERT INTO proc_purchase_orders (po_number, contract_id, vendor_id, issuing_unit_id, order_date, delivery_deadline, destination_warehouse_id, total_amount, tax_amount, status, created_by, updated_by, deleted_by) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10::po_status_type, $11, $12, $13) RETURNING po_id`
 	var newID string
 	err = tx.QueryRow(ctx, insertQuery, m.PoNumber, m.ContractId, m.VendorId, m.IssuingUnitId, m.OrderDate, m.DeliveryDeadline, m.DestinationWarehouseId, m.TotalAmount, m.TaxAmount, m.Status, m.CreatedBy, m.UpdatedBy, m.DeletedBy).Scan(&newID)
@@ -143,7 +152,7 @@ func (r *PurchaseOrderRepository) Update(ctx context.Context, id string, m *mode
 		return err
 	}
 
-	if len(m.Items) > 0 {
+	if m.Items != nil {
 		_, _ = tx.Exec(ctx, `DELETE FROM proc_purchase_order_items WHERE po_id = $1`, id)
 		for _, item := range m.Items {
 			_, err := tx.Exec(ctx, `INSERT INTO proc_purchase_order_items (po_id, material_id, quantity, unit_price, notes, created_by, updated_by, deleted_by) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`, id, item.MaterialId, item.Quantity, item.UnitPrice, item.Notes, item.CreatedBy, item.UpdatedBy, item.DeletedBy)

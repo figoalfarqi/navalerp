@@ -6,7 +6,7 @@ import TimePicker from "./picker/TimePicker";
 import DateTimeActions from "./picker/ActionPicker";
 import { formatTime, toLocalTimeString } from "@/utils/dateTime";
 import { usePopoverPosition } from "@/hooks/usePopoverPosition";
-import { FaX } from "react-icons/fa6";
+import { FaX } from "@/components/icons";
 import { useCloseOnScrollDistance } from "@/hooks/useCloseOnScrollDistance";
 
 interface TimeFieldProps {

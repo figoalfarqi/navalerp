@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/figoalfarqi/navalerp/internal/helper"
 	"github.com/figoalfarqi/navalerp/internal/model"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -44,12 +45,12 @@ func (r *WorkOrderRepository) Get(ctx context.Context, id string) (*model.WorkOr
 	}
 
 	// Load Items
-	childRowsItems, err := r.DB.Query(ctx, `SELECT wo_item_id, work_order_id, material_id, quantity_required, quantity_issued, unit_cost, total_cost, is_critical_spare, created_by, updated_by, deleted_by, created_at, updated_at, deleted_at FROM mro_work_order_items WHERE work_order_id = $1`, id)
+	childRowsItems, err := r.DB.Query(ctx, `SELECT poi.wo_item_id, poi.work_order_id, poi.material_id, COALESCE(m.material_name, ''), COALESCE(m.material_code, ''), poi.quantity_required, poi.quantity_issued, poi.unit_cost, poi.total_cost, poi.is_critical_spare, poi.created_by, poi.updated_by, poi.deleted_by, poi.created_at, poi.updated_at, poi.deleted_at FROM mro_work_order_items poi LEFT JOIN inv_materials m ON m.material_id = poi.material_id WHERE poi.work_order_id = $1`, id)
 	if err == nil {
 		defer childRowsItems.Close()
 		for childRowsItems.Next() {
 			var item model.WorkOrderItems
-			if err := childRowsItems.Scan(&item.WoItemId, &item.WorkOrderId, &item.MaterialId, &item.QuantityRequired, &item.QuantityIssued, &item.UnitCost, &item.TotalCost, &item.IsCriticalSpare, &item.CreatedBy, &item.UpdatedBy, &item.DeletedBy, &item.CreatedAt, &item.UpdatedAt, &item.DeletedAt); err == nil {
+			if err := childRowsItems.Scan(&item.WoItemId, &item.WorkOrderId, &item.MaterialId, &item.MaterialName, &item.MaterialCode, &item.QuantityRequired, &item.QuantityIssued, &item.UnitCost, &item.TotalCost, &item.IsCriticalSpare, &item.CreatedBy, &item.UpdatedBy, &item.DeletedBy, &item.CreatedAt, &item.UpdatedAt, &item.DeletedAt); err == nil {
 				m.Items = append(m.Items, item)
 			}
 		}
@@ -80,9 +81,13 @@ func (r *WorkOrderRepository) List(ctx context.Context, opts model.ListOptions) 
 	}
 
 	limit := opts.Limit
-	if limit <= 0 { limit = 10 }
+	if limit <= 0 {
+		limit = 10
+	}
 	offset := opts.Offset
-	if offset < 0 { offset = 0 }
+	if offset < 0 {
+		offset = 0
+	}
 
 	listQuery := fmt.Sprintf(`SELECT t.work_order_id, t.failure_report_id, t.pm_schedule_id, t.equipment_id, COALESCE(j_eqp.equipment_name, ''), t.work_order_number, t.work_order_type, t.priority, t.scheduled_start_date, t.scheduled_end_date, t.actual_start_date, t.actual_end_date, t.lead_engineer_user_id, COALESCE(j_usr.full_name, ''), t.assigned_facility, t.status, t.total_labor_hours, t.estimated_cost, t.actual_cost, t.completion_notes, t.created_by, t.updated_by, t.deleted_by, t.created_at, t.updated_at, t.deleted_at
 	FROM mro_work_orders t
@@ -116,6 +121,10 @@ func (r *WorkOrderRepository) Create(ctx context.Context, m *model.WorkOrder) (s
 		return "", err
 	}
 	defer tx.Rollback(ctx)
+
+	if m.WorkOrderNumber == "" {
+		m.WorkOrderNumber, _ = helper.GenerateNextNumber(ctx, r.DB, "mro_work_orders", "work_order_number", "WO")
+	}
 
 	insertQuery := `INSERT INTO mro_work_orders (failure_report_id, pm_schedule_id, equipment_id, work_order_number, work_order_type, priority, scheduled_start_date, scheduled_end_date, actual_start_date, actual_end_date, lead_engineer_user_id, assigned_facility, status, total_labor_hours, estimated_cost, actual_cost, completion_notes, created_by, updated_by, deleted_by) VALUES ($1, $2, $3, $4, $5::work_order_type_enum, $6::work_order_priority_type, $7, $8, $9, $10, $11, $12, $13::work_order_status_type, $14, $15, $16, $17, $18, $19, $20) RETURNING work_order_id`
 	var newID string
@@ -168,7 +177,7 @@ func (r *WorkOrderRepository) Update(ctx context.Context, id string, m *model.Wo
 		}
 	}
 
-	if len(m.Items) > 0 {
+	if m.Items != nil {
 		_, _ = tx.Exec(ctx, `DELETE FROM mro_work_order_items WHERE work_order_id = $1`, id)
 		for _, item := range m.Items {
 			_, err := tx.Exec(ctx, `INSERT INTO mro_work_order_items (work_order_id, material_id, quantity_required, quantity_issued, unit_cost, total_cost, is_critical_spare, created_by, updated_by, deleted_by) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`, id, item.MaterialId, item.QuantityRequired, item.QuantityIssued, item.UnitCost, item.TotalCost, item.IsCriticalSpare, item.CreatedBy, item.UpdatedBy, item.DeletedBy)

@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { formatSmartDate } from "@/utils/dateTime";
 import { ColumnField } from "@/components/table/Table";
 import { FormField } from "@/components/formCrud/FormCrud";
 import { FilterField } from "@/components/table/FilterFormTable";
@@ -14,7 +15,7 @@ export const columns: ColumnField[] = [
   { key: "hull_number", label: "Hull Number" },
   { key: "ship_name", label: "Ship Name" },
   { key: "call_sign", label: "Call Sign" },
-  { key: "commission_date", label: "Commission Date" },
+  { key: "commission_date", label: "Commission Date", render: (item: any) => formatSmartDate(item.commission_date) },
 ];
 
 export const filterFields: FilterField[] = [
@@ -164,7 +165,14 @@ export const formFields = (mode: string): FormField[] => [
     name: "status",
     col: "left",
     label: "Status",
-    fieldType: "text",
+    fieldType: "select",
+    options: [
+      { label: "Active", value: "ACTIVE" },
+      { label: "Docked", value: "DOCKED" },
+      { label: "Retired", value: "RETIRED" },
+      { label: "Deployed", value: "DEPLOYED" },
+      { label: "Standby", value: "STANDBY" },
+    ],
     required: false,
     disabled: mode === "view",
   },
@@ -172,7 +180,12 @@ export const formFields = (mode: string): FormField[] => [
     name: "current_readiness_status",
     col: "right",
     label: "Current Readiness Status",
-    fieldType: "text",
+    fieldType: "select",
+    options: [
+      { label: "Fully Mission Capable", value: "FULLY_MISSION_CAPABLE" },
+      { label: "Partially Mission Capable", value: "PARTIALLY_MISSION_CAPABLE" },
+      { label: "Non Mission Capable", value: "NON_MISSION_CAPABLE" },
+    ],
     required: false,
     disabled: mode === "view",
   },

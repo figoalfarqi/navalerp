@@ -2,8 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import Button from "../form/Button";
-import { LuCamera, LuX } from "react-icons/lu";
-import { BsArrowRepeat } from "react-icons/bs";
+import { LuCamera, LuX } from "@/components/icons";
+import { BsArrowRepeat } from "@/components/icons";
 import { usePathname } from "next/navigation";
 import { setCameraStream } from "./cameraUtils";
 import Modal from "../Modal";

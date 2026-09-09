@@ -9,58 +9,59 @@ import (
 )
 
 type routeHandlers struct {
-	fileUpload *handler.FileUploadHandler
-	dashboard  *handler.DashboardHandler
-	report     *handler.ReportHandler
-	navalAuth  *handler.NavalAuthHandler
-	orgUnit *handler.OrgUnitHandler
-	sysUser *handler.SysUserHandler
-	auditLog *handler.AuditLogHandler
-	shipClass *handler.ShipClassHandler
-	ship *handler.ShipHandler
-	shipSystem *handler.ShipSystemHandler
-	equipment *handler.EquipmentHandler
-	pmSchedule *handler.PmScheduleHandler
-	failureReport *handler.FailureReportHandler
-	workOrder *handler.WorkOrderHandler
-	dockingRecord *handler.DockingRecordHandler
-	warehouse *handler.WarehouseHandler
-	material *handler.MaterialHandler
-	stockBalance *handler.StockBalanceHandler
-	itemInstance *handler.ItemInstanceHandler
-	stockTransfer *handler.StockTransferHandler
-	stockAdjustment *handler.StockAdjustmentHandler
-	vendor *handler.VendorHandler
-	requisition *handler.RequisitionHandler
-	tender *handler.TenderHandler
-	contract *handler.ContractHandler
-	purchaseOrder *handler.PurchaseOrderHandler
-	goodsReceipt *handler.GoodsReceiptHandler
-	chartOfAccount *handler.ChartOfAccountHandler
-	budgetProgram *handler.BudgetProgramHandler
+	fileUpload       *handler.FileUploadHandler
+	dashboard        *handler.DashboardHandler
+	report           *handler.ReportHandler
+	navalAuth        *handler.NavalAuthHandler
+	orgUnit          *handler.OrgUnitHandler
+	sysUser          *handler.SysUserHandler
+	auditLog         *handler.AuditLogHandler
+	shipClass        *handler.ShipClassHandler
+	ship             *handler.ShipHandler
+	shipSystem       *handler.ShipSystemHandler
+	equipment        *handler.EquipmentHandler
+	pmSchedule       *handler.PmScheduleHandler
+	failureReport    *handler.FailureReportHandler
+	workOrder        *handler.WorkOrderHandler
+	dockingRecord    *handler.DockingRecordHandler
+	warehouse        *handler.WarehouseHandler
+	material         *handler.MaterialHandler
+	stockBalance     *handler.StockBalanceHandler
+	itemInstance     *handler.ItemInstanceHandler
+	stockTransfer    *handler.StockTransferHandler
+	stockAdjustment  *handler.StockAdjustmentHandler
+	vendor           *handler.VendorHandler
+	requisition      *handler.RequisitionHandler
+	tender           *handler.TenderHandler
+	contract         *handler.ContractHandler
+	purchaseOrder    *handler.PurchaseOrderHandler
+	goodsReceipt     *handler.GoodsReceiptHandler
+	chartOfAccount   *handler.ChartOfAccountHandler
+	budgetProgram    *handler.BudgetProgramHandler
 	budgetCommitment *handler.BudgetCommitmentHandler
-	invoice *handler.InvoiceHandler
-	payment *handler.PaymentHandler
-	journalEntry *handler.JournalEntryHandler
-	platformTco *handler.PlatformTcoHandler
-	militaryRank *handler.MilitaryRankHandler
-	militaryCorps *handler.MilitaryCorpsHandler
-	qualification *handler.QualificationHandler
-	personnel *handler.PersonnelHandler
-	crewAssignment *handler.CrewAssignmentHandler
-	baseFacility *handler.BaseFacilityHandler
-	berthBooking *handler.BerthBookingHandler
-	fuelBunker *handler.FuelBunkerHandler
-	transportUnit *handler.TransportUnitHandler
-	route *handler.RouteHandler
-	shipment *handler.ShipmentHandler
+	invoice          *handler.InvoiceHandler
+	payment          *handler.PaymentHandler
+	journalEntry     *handler.JournalEntryHandler
+	platformTco      *handler.PlatformTcoHandler
+	militaryRank     *handler.MilitaryRankHandler
+	militaryCorps    *handler.MilitaryCorpsHandler
+	qualification    *handler.QualificationHandler
+	personnel        *handler.PersonnelHandler
+	crewAssignment   *handler.CrewAssignmentHandler
+	baseFacility     *handler.BaseFacilityHandler
+	berthBooking     *handler.BerthBookingHandler
+	fuelBunker       *handler.FuelBunkerHandler
+	transportUnit    *handler.TransportUnitHandler
+	route            *handler.RouteHandler
+	shipment         *handler.ShipmentHandler
 	documentCategory *handler.DocumentCategoryHandler
-	document *handler.DocumentHandler
-	theater *handler.TheaterHandler
-	mission *handler.MissionHandler
-	dailyLog *handler.DailyLogHandler
-	readinessReport *handler.ReadinessReportHandler
-	readinessAlert *handler.ReadinessAlertHandler
+	document         *handler.DocumentHandler
+	theater          *handler.TheaterHandler
+	mission          *handler.MissionHandler
+	dailyLog         *handler.DailyLogHandler
+	readinessReport  *handler.ReadinessReportHandler
+	readinessAlert   *handler.ReadinessAlertHandler
+	generator        *handler.GeneratorHandler
 }
 
 func buildRouteHandlers(cfg *config.Config) *routeHandlers {
@@ -169,57 +170,58 @@ func buildRouteHandlers(cfg *config.Config) *routeHandlers {
 	readinessAlertService := service.NewReadinessAlertService(readinessAlertRepo)
 
 	return &routeHandlers{
-		fileUpload: handler.NewFileUploadHandler(fileService, cfg),
-		dashboard:  handler.NewDashboardHandler(dashboardService, cfg),
-		report:     handler.NewReportHandler(reportService, cfg),
-		navalAuth:  handler.NewNavalAuthHandler(db, cfg),
-		orgUnit: handler.NewOrgUnitHandler(orgUnitService, cfg),
-		sysUser: handler.NewSysUserHandler(sysUserService, cfg),
-		auditLog: handler.NewAuditLogHandler(auditLogService, cfg),
-		shipClass: handler.NewShipClassHandler(shipClassService, cfg),
-		ship: handler.NewShipHandler(shipService, cfg),
-		shipSystem: handler.NewShipSystemHandler(shipSystemService, cfg),
-		equipment: handler.NewEquipmentHandler(equipmentService, cfg),
-		pmSchedule: handler.NewPmScheduleHandler(pmScheduleService, cfg),
-		failureReport: handler.NewFailureReportHandler(failureReportService, cfg),
-		workOrder: handler.NewWorkOrderHandler(workOrderService, cfg),
-		dockingRecord: handler.NewDockingRecordHandler(dockingRecordService, cfg),
-		warehouse: handler.NewWarehouseHandler(warehouseService, cfg),
-		material: handler.NewMaterialHandler(materialService, cfg),
-		stockBalance: handler.NewStockBalanceHandler(stockBalanceService, cfg),
-		itemInstance: handler.NewItemInstanceHandler(itemInstanceService, cfg),
-		stockTransfer: handler.NewStockTransferHandler(stockTransferService, cfg),
-		stockAdjustment: handler.NewStockAdjustmentHandler(stockAdjustmentService, cfg),
-		vendor: handler.NewVendorHandler(vendorService, cfg),
-		requisition: handler.NewRequisitionHandler(requisitionService, cfg),
-		tender: handler.NewTenderHandler(tenderService, cfg),
-		contract: handler.NewContractHandler(contractService, cfg),
-		purchaseOrder: handler.NewPurchaseOrderHandler(purchaseOrderService, cfg),
-		goodsReceipt: handler.NewGoodsReceiptHandler(goodsReceiptService, cfg),
-		chartOfAccount: handler.NewChartOfAccountHandler(chartOfAccountService, cfg),
-		budgetProgram: handler.NewBudgetProgramHandler(budgetProgramService, cfg),
+		fileUpload:       handler.NewFileUploadHandler(fileService, cfg),
+		dashboard:        handler.NewDashboardHandler(dashboardService, cfg),
+		report:           handler.NewReportHandler(reportService, cfg),
+		navalAuth:        handler.NewNavalAuthHandler(db, cfg),
+		orgUnit:          handler.NewOrgUnitHandler(orgUnitService, cfg),
+		sysUser:          handler.NewSysUserHandler(sysUserService, cfg),
+		auditLog:         handler.NewAuditLogHandler(auditLogService, cfg),
+		shipClass:        handler.NewShipClassHandler(shipClassService, cfg),
+		ship:             handler.NewShipHandler(shipService, cfg),
+		shipSystem:       handler.NewShipSystemHandler(shipSystemService, cfg),
+		equipment:        handler.NewEquipmentHandler(equipmentService, cfg),
+		pmSchedule:       handler.NewPmScheduleHandler(pmScheduleService, cfg),
+		failureReport:    handler.NewFailureReportHandler(failureReportService, cfg),
+		workOrder:        handler.NewWorkOrderHandler(workOrderService, cfg),
+		dockingRecord:    handler.NewDockingRecordHandler(dockingRecordService, cfg),
+		warehouse:        handler.NewWarehouseHandler(warehouseService, cfg),
+		material:         handler.NewMaterialHandler(materialService, cfg),
+		stockBalance:     handler.NewStockBalanceHandler(stockBalanceService, cfg),
+		itemInstance:     handler.NewItemInstanceHandler(itemInstanceService, cfg),
+		stockTransfer:    handler.NewStockTransferHandler(stockTransferService, cfg),
+		stockAdjustment:  handler.NewStockAdjustmentHandler(stockAdjustmentService, cfg),
+		vendor:           handler.NewVendorHandler(vendorService, cfg),
+		requisition:      handler.NewRequisitionHandler(requisitionService, cfg),
+		tender:           handler.NewTenderHandler(tenderService, cfg),
+		contract:         handler.NewContractHandler(contractService, cfg),
+		purchaseOrder:    handler.NewPurchaseOrderHandler(purchaseOrderService, cfg),
+		goodsReceipt:     handler.NewGoodsReceiptHandler(goodsReceiptService, cfg),
+		chartOfAccount:   handler.NewChartOfAccountHandler(chartOfAccountService, cfg),
+		budgetProgram:    handler.NewBudgetProgramHandler(budgetProgramService, cfg),
 		budgetCommitment: handler.NewBudgetCommitmentHandler(budgetCommitmentService, cfg),
-		invoice: handler.NewInvoiceHandler(invoiceService, cfg),
-		payment: handler.NewPaymentHandler(paymentService, cfg),
-		journalEntry: handler.NewJournalEntryHandler(journalEntryService, cfg),
-		platformTco: handler.NewPlatformTcoHandler(platformTcoService, cfg),
-		militaryRank: handler.NewMilitaryRankHandler(militaryRankService, cfg),
-		militaryCorps: handler.NewMilitaryCorpsHandler(militaryCorpsService, cfg),
-		qualification: handler.NewQualificationHandler(qualificationService, cfg),
-		personnel: handler.NewPersonnelHandler(personnelService, cfg),
-		crewAssignment: handler.NewCrewAssignmentHandler(crewAssignmentService, cfg),
-		baseFacility: handler.NewBaseFacilityHandler(baseFacilityService, cfg),
-		berthBooking: handler.NewBerthBookingHandler(berthBookingService, cfg),
-		fuelBunker: handler.NewFuelBunkerHandler(fuelBunkerService, cfg),
-		transportUnit: handler.NewTransportUnitHandler(transportUnitService, cfg),
-		route: handler.NewRouteHandler(routeService, cfg),
-		shipment: handler.NewShipmentHandler(shipmentService, cfg),
+		invoice:          handler.NewInvoiceHandler(invoiceService, cfg),
+		payment:          handler.NewPaymentHandler(paymentService, cfg),
+		journalEntry:     handler.NewJournalEntryHandler(journalEntryService, cfg),
+		platformTco:      handler.NewPlatformTcoHandler(platformTcoService, cfg),
+		militaryRank:     handler.NewMilitaryRankHandler(militaryRankService, cfg),
+		militaryCorps:    handler.NewMilitaryCorpsHandler(militaryCorpsService, cfg),
+		qualification:    handler.NewQualificationHandler(qualificationService, cfg),
+		personnel:        handler.NewPersonnelHandler(personnelService, cfg),
+		crewAssignment:   handler.NewCrewAssignmentHandler(crewAssignmentService, cfg),
+		baseFacility:     handler.NewBaseFacilityHandler(baseFacilityService, cfg),
+		berthBooking:     handler.NewBerthBookingHandler(berthBookingService, cfg),
+		fuelBunker:       handler.NewFuelBunkerHandler(fuelBunkerService, cfg),
+		transportUnit:    handler.NewTransportUnitHandler(transportUnitService, cfg),
+		route:            handler.NewRouteHandler(routeService, cfg),
+		shipment:         handler.NewShipmentHandler(shipmentService, cfg),
 		documentCategory: handler.NewDocumentCategoryHandler(documentCategoryService, cfg),
-		document: handler.NewDocumentHandler(documentService, cfg),
-		theater: handler.NewTheaterHandler(theaterService, cfg),
-		mission: handler.NewMissionHandler(missionService, cfg),
-		dailyLog: handler.NewDailyLogHandler(dailyLogService, cfg),
-		readinessReport: handler.NewReadinessReportHandler(readinessReportService, cfg),
-		readinessAlert: handler.NewReadinessAlertHandler(readinessAlertService, cfg),
+		document:         handler.NewDocumentHandler(documentService, cfg),
+		theater:          handler.NewTheaterHandler(theaterService, cfg),
+		mission:          handler.NewMissionHandler(missionService, cfg),
+		dailyLog:         handler.NewDailyLogHandler(dailyLogService, cfg),
+		readinessReport:  handler.NewReadinessReportHandler(readinessReportService, cfg),
+		readinessAlert:   handler.NewReadinessAlertHandler(readinessAlertService, cfg),
+		generator:        handler.NewGeneratorHandler(db),
 	}
 }

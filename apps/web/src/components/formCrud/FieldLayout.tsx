@@ -178,7 +178,11 @@ const FieldLayout = ({
   );
 
   if (isMobile) {
-    return renderFieldList(fields);
+    return (
+      <div className="col-span-1 md:col-span-2">
+        {renderFieldList(fields)}
+      </div>
+    );
   }
 
   const leftFields: FormField[] = [];

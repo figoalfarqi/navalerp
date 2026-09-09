@@ -2,7 +2,7 @@ import { useIsMobile } from "@/hooks/useIsMobile";
 import { FormDataObject, FormDataValue, FormField } from "./FormCrud";
 import FieldLayout from "./FieldLayout";
 import { Mode } from "@/hooks/useDetails";
-import { LuEllipsis, LuPlus } from "react-icons/lu";
+import { LuEllipsis, LuPlus } from "@/components/icons";
 import Button from "../form/Button";
 import { Fragment, useMemo, useState } from "react";
 import { IsPrimitive, IsStaticOptions } from "@/utils/globalUtils";

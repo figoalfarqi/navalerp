@@ -96,7 +96,7 @@ export default function ButtonSwipe({
     "green-solid": "bg-green-500 text-white",
     "purple-solid": "bg-purple-500 text-white",
     "gray-solid": "bg-gray-500 text-white",
-    "blue-dkl": "bg-[#004f7f] text-white",
+    "blue-dkl": "bg-[#0a2540] text-white",
   };
 
   const baseButtonClass =

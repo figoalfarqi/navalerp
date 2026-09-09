@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/figoalfarqi/navalerp/internal/helper"
 	"github.com/figoalfarqi/navalerp/internal/model"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -28,12 +29,12 @@ func (r *JournalEntryRepository) Get(ctx context.Context, id string) (*model.Jou
 	}
 
 	// Load Lines
-	childRowsLines, err := r.DB.Query(ctx, `SELECT line_id, journal_id, account_id, debit, credit, memo, created_at FROM fin_journal_lines WHERE journal_id = $1`, id)
+	childRowsLines, err := r.DB.Query(ctx, `SELECT l.line_id, l.journal_id, l.account_id, COALESCE(coa.account_code, ''), COALESCE(coa.account_name, ''), l.debit, l.credit, l.memo, l.created_at FROM fin_journal_lines l LEFT JOIN fin_chart_of_accounts coa ON coa.account_id = l.account_id WHERE l.journal_id = $1`, id)
 	if err == nil {
 		defer childRowsLines.Close()
 		for childRowsLines.Next() {
 			var item model.JournalLines
-			if err := childRowsLines.Scan(&item.LineId, &item.JournalId, &item.AccountId, &item.Debit, &item.Credit, &item.Memo, &item.CreatedAt); err == nil {
+			if err := childRowsLines.Scan(&item.LineId, &item.JournalId, &item.AccountId, &item.AccountCode, &item.AccountName, &item.Debit, &item.Credit, &item.Memo, &item.CreatedAt); err == nil {
 				m.Lines = append(m.Lines, item)
 			}
 		}
@@ -64,9 +65,13 @@ func (r *JournalEntryRepository) List(ctx context.Context, opts model.ListOption
 	}
 
 	limit := opts.Limit
-	if limit <= 0 { limit = 10 }
+	if limit <= 0 {
+		limit = 10
+	}
 	offset := opts.Offset
-	if offset < 0 { offset = 0 }
+	if offset < 0 {
+		offset = 0
+	}
 
 	listQuery := fmt.Sprintf("SELECT journal_id, entry_number, entry_date, description, source_module, source_reference_id, is_posted, created_by, updated_by, deleted_by, created_at, updated_at, deleted_at FROM fin_journal_entries WHERE %s ORDER BY created_at DESC LIMIT $%d OFFSET $%d", whereSql, argPos, argPos+1)
 	args = append(args, limit, offset)
@@ -96,6 +101,10 @@ func (r *JournalEntryRepository) Create(ctx context.Context, m *model.JournalEnt
 		return "", err
 	}
 	defer tx.Rollback(ctx)
+
+	if m.EntryNumber == "" {
+		m.EntryNumber, _ = helper.GenerateNextNumber(ctx, r.DB, "fin_journal_entries", "entry_number", "JRN")
+	}
 
 	insertQuery := `INSERT INTO fin_journal_entries (entry_number, entry_date, description, source_module, source_reference_id, is_posted, created_by, updated_by, deleted_by) VALUES ($1, $2, $3, $4::journal_source_type, $5, $6, $7, $8, $9) RETURNING journal_id`
 	var newID string
@@ -131,7 +140,7 @@ func (r *JournalEntryRepository) Update(ctx context.Context, id string, m *model
 		return err
 	}
 
-	if len(m.Lines) > 0 {
+	if m.Lines != nil {
 		_, _ = tx.Exec(ctx, `DELETE FROM fin_journal_lines WHERE journal_id = $1`, id)
 		for _, item := range m.Lines {
 			_, err := tx.Exec(ctx, `INSERT INTO fin_journal_lines (journal_id, account_id, debit, credit, memo) VALUES ($1, $2, $3, $4, $5)`, id, item.AccountId, item.Debit, item.Credit, item.Memo)

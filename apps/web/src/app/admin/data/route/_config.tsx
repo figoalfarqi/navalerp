@@ -84,7 +84,12 @@ export const formFields = (mode: string): FormField[] => [
     name: "risk_level",
     col: "left",
     label: "Risk Level",
-    fieldType: "text",
+    fieldType: "select",
+    options: [
+      { label: "Normal", value: "NORMAL" },
+      { label: "High Sea", value: "HIGH_SEA" },
+      { label: "Combat Risk", value: "COMBAT_RISK" },
+    ],
     required: false,
     disabled: mode === "view",
   },

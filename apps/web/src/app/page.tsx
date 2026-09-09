@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
-import { FaAnchor, FaShieldHalved, FaCompass, FaArrowRight } from "react-icons/fa6";
+import { FaAnchor, FaShieldHalved, FaCompass, FaArrowRight } from "@/components/icons";
 
 export default function Home() {
   const router = useRouter();

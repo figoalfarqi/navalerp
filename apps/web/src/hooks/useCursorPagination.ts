@@ -69,6 +69,15 @@ export function useCursorPagination<T>({
             try {
                 const params = new URLSearchParams();
 
+                Object.entries(filterValues).forEach(([key, value]) => {
+                    if (value !== undefined && value !== null && value !== "") {
+                        if (Array.isArray(value)) {
+                            value.forEach((v) => params.append(key, String(v)));
+                        } else {
+                            params.append(key, String(value));
+                        }
+                    }
+                });
                 if (Object.keys(filterValues).length > 0) {
                     params.append("query", buildQueryString(filterValues));
                 }

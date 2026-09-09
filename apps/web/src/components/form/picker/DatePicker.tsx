@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { CgChevronLeft, CgChevronRight } from "react-icons/cg";
+import { CgChevronLeft, CgChevronRight } from "@/components/icons";
 
 interface DatePickerProps {
   tempDate: Date | null;
@@ -140,15 +140,21 @@ export default function DatePicker({
           <CgChevronLeft />
         </button>
 
-        <span className="font-semibold cursor-pointer select-none">
+        <span className="font-semibold select-none">
           {viewMode === "day" && (
-            <span onClick={() => setViewMode("month")}>
+            <span
+              onClick={() => setViewMode("month")}
+              className="cursor-pointer hover:text-blue-600 transition"
+            >
               {currentMonth.toLocaleString("default", { month: "long" })}{" "}
               {currentMonth.getFullYear()}
             </span>
           )}
           {viewMode === "month" && (
-            <span onClick={() => setViewMode("year")}>
+            <span
+              onClick={() => setViewMode("year")}
+              className="cursor-pointer hover:text-blue-600 transition"
+            >
               {currentMonth.getFullYear()}
             </span>
           )}
@@ -225,7 +231,7 @@ export default function DatePicker({
           {Array.from({ length: 12 }, (_, m) => (
             <button
               key={m}
-              className={`py-2 px-3 rounded hover:bg-blue-500/30 ${
+              className={`py-2 px-3 rounded hover:bg-blue-500/30 cursor-pointer ${
                 currentMonth.getMonth() === m ? "bg-blue-500 text-white" : ""
               }`}
               onClick={() => handleSelectMonth(m)}
@@ -246,7 +252,7 @@ export default function DatePicker({
               ref={(el) => {
                 yearRefs.current[y] = el;
               }}
-              className={`py-2 rounded hover:bg-blue-500/30 ${
+              className={`py-2 rounded hover:bg-blue-500/30 cursor-pointer ${
                 currentMonth.getFullYear() === y ? "bg-blue-500 text-white" : ""
               }`}
               onClick={() => {

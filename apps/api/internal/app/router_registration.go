@@ -53,6 +53,7 @@ func registerApplicationRoutes(mux *http.ServeMux, cfg *config.Config, h *routeH
 
 	mux.Handle("GET /api/v1/admin/dashboard", authenticated(cfg, dashboardRoles, h.dashboard.Get))
 	mux.Handle("GET /api/v1/admin/report", authenticated(cfg, reportRoles, h.report.Get))
+	mux.Handle("GET /api/v1/admin/generate_number", authenticated(cfg, allRoles, h.generator.GenerateNumber))
 
 	// 48 Modular NavalERP CRUD Routes
 	registerCRUD(mux, cfg, "/api/v1/admin/org_unit", allRoles, h.orgUnit)

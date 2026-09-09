@@ -5,7 +5,7 @@ import AdminRecordState from "@/components/admin/crud/AdminRecordState";
 import { crudTitle, type AdminCrudMode } from "@/components/admin/crud/adminCrud";
 import { useAdminRecord } from "@/components/admin/crud/useAdminRecord";
 import FormCrud from "@/components/formCrud/FormCrud";
-import { buildPayload, entityEndpoint, entityTitle, formFields, primaryKey } from "../../_config";
+import { buildPayload, entityEndpoint, entityTitle, formFields, primaryKey, detailItemsConfig } from "../../_config";
 
 export default function ShipmentDetailPage() {
   const { id, mode } = useParams<{ id: string; mode: Exclude<AdminCrudMode, "add"> }>();
@@ -26,6 +26,7 @@ export default function ShipmentDetailPage() {
       mode={mode}
       initialData={record}
       fields={formFields(mode)}
+      detailItemsConfig={detailItemsConfig}
       hideSubmit={mode === "view"}
       buildPayload={buildPayload}
       onSuccess={() => router.push(`/admin/data/${entityEndpoint.replace('/admin/', '')}`)}

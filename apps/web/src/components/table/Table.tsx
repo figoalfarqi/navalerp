@@ -18,11 +18,20 @@ import { useToast } from "../ToastContext";
 import { useFetchAPI } from "@/hooks/useFetchAPI";
 import FilterFormTable, { FilterField } from "./FilterFormTable";
 import { buildQueryString } from "@/utils/queryString";
-import { FaListCheck } from "react-icons/fa6";
-import { IoReload } from "react-icons/io5";
+import {
+  FaListCheck,
+  IoReload,
+  HiArrowLongUp,
+  GridIcon,
+  TableIcon,
+  EyeIcon,
+  EditIcon,
+  CopyIcon,
+  TrashIcon,
+  CheckIcon,
+} from "@/components/icons";
 import LoadingRow from "./LoadingRow";
 import { useQueryParams } from "@/hooks/useQueryParams";
-import { HiArrowLongUp } from "react-icons/hi2";
 import { useThrottleLeadingTrailing } from "@/hooks/useThrottleLeadingTrailing";
 import { useDebounceFn } from "@/hooks/useDebounceFn";
 import SelectField from "../form/SelectField";
@@ -33,15 +42,15 @@ import {
 } from "@/utils/globalUtils";
 import { getLastDeliveryOrderStatusTypeIdStatusTime } from "@/utils/deliveryOrder";
 import { DeliveryOrderStatusTypeMap } from "@/consta/DeliveryOrderStatusTypeMap";
-import { formatDateTime } from "@/utils/dateTime";
+import { formatDate, formatDateTime, formatSmartDate } from "@/utils/dateTime";
 import { InfoRow } from "../InfoRow";
-import { TextSkeleton } from "../TextSkeleton";
-import { formatCurrencyIDR } from "@/utils/currencyFormater";
+import { formatCurrencyIDR, formatNumberID } from "@/utils/currencyFormater";
 import ImageViewer from "../ImageViewer";
 import { BankMerkMap } from "@/consta/BankMerkMap";
 import { useAuth } from "@/context/AuthContext";
 import { isApproveableData } from "@/utils/approvement";
 import { ApprovalBaseTableNameType } from "../approval/ApprovalTable";
+import { formatEnumLabel, KNOWN_ENUM_VALUES } from "@/utils/string";
 
 export type ColumnField = {
   key: string;
@@ -160,9 +169,10 @@ export default function Table({
   }, [rawColumns, key_table, table_name]);
 
   const renderSafeCellValue = (item: any, colKey: string) => {
-    const val = item[colKey];
+    let val = item[colKey];
     if (val === null || val === undefined) return "-";
     if (typeof val === "boolean") return val ? "Aktif" : "Non-Aktif";
+    if (val instanceof Date) return formatSmartDate(val);
     if (isUUID(val)) {
       // Find candidate name in the same record
       const baseKey = colKey.replace(/_id$/, "");
@@ -178,13 +188,70 @@ export default function Table({
         "code",
         "title",
       ];
+      let foundCand = false;
       for (const k of candidates) {
         const candVal = item[k];
         if (candVal && !isUUID(candVal)) {
-          return String(candVal);
+          val = candVal;
+          foundCand = true;
+          break;
         }
       }
-      return "-";
+      if (!foundCand) return "-";
+    }
+    if (typeof val === "number") {
+      const isYear =
+        colKey === "fiscal_year" ||
+        colKey.endsWith("_year") ||
+        colKey === "year" ||
+        (val >= 1900 && val <= 2100 && (colKey.includes("year") || colKey.includes("tahun")));
+      if (isYear) return String(val);
+      return formatNumberID(val);
+    }
+    if (typeof val === "string") {
+      const isDateCol =
+        colKey.includes("date") ||
+        colKey.includes("time") ||
+        colKey.endsWith("_at") ||
+        colKey.endsWith("_timestamp");
+      if (
+        isDateCol ||
+        /^\d{4}-\d{2}-\d{2}([T ]\d{2}:\d{2}(:\d{2})?(\.\d+)?(Z|[+-]\d{2}:?\d{2})?)?$/.test(
+          val.trim(),
+        )
+      ) {
+        return formatSmartDate(val);
+      }
+      if (val.includes("_") && /^[a-zA-Z0-9_]+$/.test(val)) {
+        return formatEnumLabel(val);
+      }
+      if (KNOWN_ENUM_VALUES.has(val)) {
+        return formatEnumLabel(val);
+      }
+      const trimmed = val.trim();
+      if (/^-?\d+(\.\d+)?$/.test(trimmed)) {
+        const isYear =
+          colKey === "fiscal_year" ||
+          colKey.endsWith("_year") ||
+          colKey === "year" ||
+          (Number(trimmed) >= 1900 &&
+            Number(trimmed) <= 2100 &&
+            (colKey.includes("year") || colKey.includes("tahun")));
+        const isCodeLike =
+          colKey.endsWith("_code") ||
+          colKey.endsWith("_number") ||
+          colKey.includes("phone") ||
+          colKey.includes("postal") ||
+          colKey.includes("nip") ||
+          colKey.includes("nrp");
+        if (
+          !isYear &&
+          !isCodeLike &&
+          (!trimmed.startsWith("0") || trimmed === "0" || trimmed.startsWith("0."))
+        ) {
+          return formatNumberID(Number(trimmed));
+        }
+      }
     }
     return val;
   };
@@ -227,6 +294,7 @@ export default function Table({
   }, []);
   const [currentPage, setCurrentPage] = useState<number>(initialPage);
   const [totalItems, setTotalItems] = useState<number>(0);
+  const [mobileViewMode, setMobileViewMode] = useState<"cards" | "table">("cards");
   const currentPageRef = useRef(currentPage);
   useEffect(() => {
     currentPageRef.current = currentPage;
@@ -489,13 +557,21 @@ export default function Table({
       abortControllerRef.current = controller;
       setIsLoading(true);
       setError(null);
-
       try {
+        const params = new URLSearchParams();
+        Object.entries(filterValues).forEach(([key, value]) => {
+          if (value !== undefined && value !== null && value !== "") {
+            if (Array.isArray(value)) {
+              value.forEach((v) => params.append(key, String(v)));
+            } else {
+              params.append(key, String(value));
+            }
+          }
+        });
         const queryString =
           Object.keys(filterValues).length > 0
             ? buildQueryString(filterValues)
             : "";
-        const params = new URLSearchParams();
         if (queryString) params.append("query", queryString);
         params.append("page", String(targetPage));
         if (globalLimit) params.append("limit", String(globalLimit));
@@ -1068,26 +1144,59 @@ export default function Table({
   return (
     <>
       <div
-        className={`${isForDetail || isForSelect ? "" : "pt-3 px-3"} w-full`}
+        className={`${isForDetail || isForSelect ? "" : "pt-2 sm:pt-3 px-2 sm:px-3"} w-full`}
       >
         <div
           className={`${
             isForDetail || isForSelect
               ? ""
-              : "app-scrollbar rounded-md shadow px-4 pt-4 pb-3 border-t-4 border-[#004f7f] overflow-auto h-[calc(100vh-80px)]"
+              : "rounded-xl sm:rounded-md shadow-xs sm:shadow px-3 sm:px-4 pt-3 sm:pt-4 pb-3 border-t-4 border-[#0a2540] overflow-visible md:overflow-auto min-h-0 md:h-[calc(100vh-80px)] md:app-scrollbar"
           } bg-white`}
         >
           {/* Header */}
           {!isForSelect && (
-            <div className="flex justify-between items-center">
-              <h2
-                className={`${
-                  isForDetail ? "text-lg" : "text-xl"
-                } font-bold mb-2`}
-              >
-                {title}
-              </h2>
-              <div className="flex flex-row gap-2">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2.5 mb-3">
+              <div className="flex items-center justify-between w-full sm:w-auto gap-2">
+                <h2
+                  className={`${
+                    isForDetail ? "text-base sm:text-lg" : "text-lg sm:text-xl"
+                  } font-bold text-slate-900 truncate`}
+                >
+                  {title}
+                </h2>
+
+                {/* Mobile View Mode Switcher (Visible on mobile only) */}
+                <div className="flex items-center md:hidden bg-slate-100 p-0.5 rounded-lg border border-slate-200 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => setMobileViewMode("cards")}
+                    className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold cursor-pointer transition select-none ${
+                      mobileViewMode === "cards"
+                        ? "bg-[#0a2540] text-white shadow-xs"
+                        : "text-slate-600 hover:text-slate-900"
+                    }`}
+                    title="Tampilan Kartu"
+                  >
+                    <GridIcon size={13} />
+                    <span>Kartu</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setMobileViewMode("table")}
+                    className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold cursor-pointer transition select-none ${
+                      mobileViewMode === "table"
+                        ? "bg-[#004f7f] text-white shadow-xs"
+                        : "text-slate-600 hover:text-slate-900"
+                    }`}
+                    title="Tampilan Tabel"
+                  >
+                    <TableIcon size={13} />
+                    <span>Tabel</span>
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 w-full sm:w-auto">
                 {isForDetail ? null : (
                   <SelectField
                     id="global_limit"
@@ -1117,11 +1226,12 @@ export default function Table({
                 )}
                 {url && (
                   <Button
-                    id=""
+                    id="reload-table-button"
                     onClick={() => {
                       fetchData(currentPageRef.current);
                     }}
                     variant="gray-outline"
+                    className="cursor-pointer"
                   >
                     <div
                       className={`${isLoading ? "animate-spin" : ""} pl-[2px]`}
@@ -1132,7 +1242,7 @@ export default function Table({
                 )}
                 {!isForDetail && !isForSelect && isCreateable && !readOnly && (
                   <Button
-                    id=""
+                    id="create-new-row-button"
                     onClick={() => {
                       const query =
                         searchParams && searchParams.toString()
@@ -1144,6 +1254,7 @@ export default function Table({
                           : `/admin/data/${table_web_url}/create${query}`,
                       );
                     }}
+                    className="cursor-pointer"
                   >
                     Create
                   </Button>
@@ -1258,46 +1369,318 @@ export default function Table({
             )}
           </div>
 
-          {/* Table */}
+          {/* Mobile Card List (Visible on mobile when mobileViewMode is "cards") */}
           <div
-            className={`overflow-x-auto overflow-y-auto ${
-              isForSelect ? "max-h-100" : "max-h-80"
-            } app-scrollbar`}
-            ref={scrollRef}
+            className={`${
+              mobileViewMode === "cards" ? "block md:hidden" : "hidden"
+            } space-y-3 mb-3`}
           >
-            <table className="w-full border-collapse table-fixed">
-              <thead className="sticky top-0 z-10">
-                <tr>
-                  <th className="bg-black h-[1px] w-12"></th>
-                  {columns.map((col) => (
-                    <th
-                      className="bg-black h-[1px] border-black"
-                      key={col.key}
-                      style={{ width: col.columnLength }}
-                    ></th>
-                  ))}
-                </tr>
-                <tr>
-                  <th
-                    className="p-2 border-x w-12 text-center bg-gray-200 cursor-pointer"
-                    onClick={() => setMultipleMode(!multipleMode)}
+            {isLoading && (
+              <div className="space-y-3">
+                {[1, 2, 3].map((i) => (
+                  <div
+                    key={`skeleton-card-${i}`}
+                    className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs animate-pulse space-y-3"
                   >
-                    {multipleMode ? (
-                      <FaListCheck
-                        size={22}
-                        className="mx-auto text-green-500"
-                      />
-                    ) : (
-                      "No"
+                    <div className="flex items-center justify-between">
+                      <div className="h-5 w-36 bg-slate-200 rounded" />
+                      <div className="h-5 w-16 bg-slate-200 rounded-full" />
+                    </div>
+                    <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100">
+                      <div className="h-4 w-24 bg-slate-100 rounded" />
+                      <div className="h-4 w-28 bg-slate-100 rounded" />
+                      <div className="h-4 w-20 bg-slate-100 rounded" />
+                      <div className="h-4 w-24 bg-slate-100 rounded" />
+                    </div>
+                    <div className="flex gap-2 pt-2 border-t border-slate-100">
+                      <div className="h-8 flex-1 bg-slate-200 rounded-lg" />
+                      <div className="h-8 flex-1 bg-slate-200 rounded-lg" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {error && (
+              <div className="rounded-2xl border border-red-200 bg-red-50 p-4 text-center text-sm text-red-600">
+                {error}
+              </div>
+            )}
+
+            {!isLoading && !error && dataCombineds.length === 0 && (
+              <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50/50 p-8 text-center">
+                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-slate-400 mb-2">
+                  <TableIcon size={24} />
+                </div>
+                <p className="text-sm font-medium text-slate-600">
+                  Data yang dicari tidak ditemukan
+                </p>
+              </div>
+            )}
+
+            {!isLoading &&
+              !error &&
+              dataCombineds.length > 0 &&
+              dataCombineds.map((item: any, index: number) => {
+                const isSelected = selectedRows.some(
+                  (row) => row[key_table] === item[key_table],
+                );
+                const rowNumber = (currentPage - 1) * globalLimit + index + 1;
+                const primaryCol = columns[0];
+                const otherColumns = columns.slice(1);
+
+                return (
+                  <div
+                    key={item[key_table] ?? `mobile-card-${index}`}
+                    onClick={() => {
+                      handleSelectRow(item);
+                      if (renderExpandedRow) {
+                        setExpandedRowKey((current) =>
+                          current === item[key_table] ? null : item[key_table],
+                        );
+                      }
+                    }}
+                    className={`rounded-2xl border transition-all duration-200 bg-white p-3.5 shadow-xs cursor-pointer select-none space-y-3 ${
+                      isSelected
+                        ? "border-[#004f7f] bg-blue-50/40 ring-2 ring-[#004f7f]/20"
+                        : item.flagDel === "deleted"
+                          ? "border-red-200 bg-red-50/30"
+                          : "border-slate-200 hover:border-slate-300 hover:shadow-sm"
+                    }`}
+                  >
+                    {/* Card Header */}
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <span
+                          className={`inline-flex items-center justify-center h-6 min-w-6 px-1.5 rounded-md text-xs font-bold ${
+                            isSelected
+                              ? "bg-[#0a2540] text-white"
+                              : "bg-slate-100 text-slate-600"
+                          }`}
+                        >
+                          #{rowNumber}
+                        </span>
+                        <div className="min-w-0">
+                          <span className="block text-sm font-bold text-slate-900 truncate">
+                            {primaryCol?.render
+                              ? primaryCol.render(
+                                  item,
+                                  isSelected,
+                                  setPhotoViewData,
+                                  setPhotoViewIndex,
+                                  setapprovalBaseTableName,
+                                  setItemInImageViewer,
+                                  setDestinationIndexInImageViewer,
+                                )
+                              : renderSafeCellValue(item, primaryCol?.key ?? "")}
+                          </span>
+                          {primaryCol && (
+                            <span className="block text-[10px] text-slate-400 leading-tight">
+                              {primaryCol.label ?? primaryCol.header}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Select Indicator */}
+                      <div className="shrink-0">
+                        <div
+                          className={`h-5 w-5 rounded-md border flex items-center justify-center transition-colors ${
+                            isSelected
+                              ? "bg-[#0a2540] border-[#0a2540] text-white"
+                              : "border-slate-300 bg-white text-transparent"
+                          }`}
+                        >
+                          <CheckIcon size={12} />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Card Body: Key-Value Columns */}
+                    {otherColumns.length > 0 && (
+                      <div className="grid grid-cols-2 gap-x-3 gap-y-2 pt-2.5 pb-1 border-t border-slate-100 text-xs">
+                        {otherColumns.map((col) => {
+                          const isFullWidth =
+                            col.key.includes("description") ||
+                            col.key.includes("note") ||
+                            col.key.includes("address") ||
+                            col.key.includes("reason");
+
+                          return (
+                            <div
+                              key={col.key}
+                              className={`min-w-0 ${isFullWidth ? "col-span-2" : "col-span-1"}`}
+                            >
+                              <span className="block text-[11px] font-medium text-slate-400 truncate">
+                                {col.label ?? col.header}
+                              </span>
+                              <span className="block text-xs font-semibold text-slate-800 break-words mt-0.5">
+                                {col.render
+                                  ? col.render(
+                                      item,
+                                      isSelected,
+                                      setPhotoViewData,
+                                      setPhotoViewIndex,
+                                      setapprovalBaseTableName,
+                                      setItemInImageViewer,
+                                      setDestinationIndexInImageViewer,
+                                    )
+                                  : renderSafeCellValue(item, col.key)}
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
                     )}
-                  </th>
-                  {columns.map((col) => (
+
+                    {/* Expanded row if active */}
+                    {renderExpandedRow &&
+                      expandedRowKey === item[key_table] && (
+                        <div className="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs">
+                          {renderExpandedRow(item)}
+                        </div>
+                      )}
+
+                    {/* Card Actions Row */}
+                    {!isForSelect && (
+                      <div
+                        className="flex items-center gap-1.5 pt-2 border-t border-slate-100"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <Button
+                          id={`card-view-${index}`}
+                          size="2xs"
+                          variant="gray-solid"
+                          onClick={() => {
+                            const query =
+                              searchParams && searchParams.toString()
+                                ? `?${searchParams.toString()}`
+                                : "";
+                            isForDetail
+                              ? detailAction?.setMode("view")
+                              : router.push(
+                                  `/admin/data/${table_web_url}/${item[key_table]}/view${query}`,
+                                );
+                          }}
+                          className="flex-1 justify-center !py-2 text-xs font-medium cursor-pointer shadow-xs"
+                        >
+                          <EyeIcon size={13} className="mr-1" />
+                          <span>Detail</span>
+                        </Button>
+
+                        {!readOnly && (
+                          <Button
+                            id={`card-edit-${index}`}
+                            size="2xs"
+                            variant="green-solid"
+                            onClick={() => {
+                              const query =
+                                searchParams && searchParams.toString()
+                                  ? `?${searchParams.toString()}`
+                                  : "";
+                              isForDetail
+                                ? detailAction?.setMode("edit")
+                                : router.push(
+                                    `/admin/data/${table_web_url}/${item[key_table]}/edit${query}`,
+                                  );
+                            }}
+                            className="flex-1 justify-center !py-2 text-xs font-medium cursor-pointer shadow-xs"
+                          >
+                            <EditIcon size={13} className="mr-1" />
+                            <span>Ubah</span>
+                          </Button>
+                        )}
+
+                        {!readOnly && (
+                          <Button
+                            id={`card-copy-${index}`}
+                            size="2xs"
+                            variant="blue-solid"
+                            onClick={() => {
+                              const query =
+                                searchParams && searchParams.toString()
+                                  ? `?${searchParams.toString()}`
+                                  : "";
+                              isForDetail
+                                ? detailAction?.setMode("copy")
+                                : router.push(
+                                    `/admin/data/${table_web_url}/${item[key_table]}/copy${query}`,
+                                  );
+                            }}
+                            className="!p-2 text-xs font-medium cursor-pointer shadow-xs"
+                            title="Salin"
+                          >
+                            <CopyIcon size={13} />
+                          </Button>
+                        )}
+
+                        {!readOnly && (
+                          <Button
+                            id={`card-delete-${index}`}
+                            size="2xs"
+                            variant="red-solid"
+                            onClick={() => {
+                              if (!isForDetail) {
+                                setSelectedRows([item]);
+                                setModalDeleteOpen(true);
+                                return;
+                              }
+                              detailAction?.remove(item[key_table]);
+                            }}
+                            className="!p-2 text-xs font-medium cursor-pointer shadow-xs"
+                            title="Hapus"
+                          >
+                            <TrashIcon size={13} />
+                          </Button>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+          </div>
+
+          {/* Table */}
+          <div className={`${mobileViewMode === "cards" ? "hidden md:block" : "block"}`}>
+            <div
+              className={`overflow-x-auto overflow-y-auto ${
+                isForSelect ? "max-h-100" : "max-h-80 md:max-h-[calc(100vh-320px)]"
+              } app-scrollbar`}
+              ref={scrollRef}
+            >
+              <table className="w-full min-w-full border-collapse table-fixed">
+                <thead className="sticky top-0 z-10">
+                  <tr>
+                    <th className="bg-black h-[1px] w-12"></th>
+                    {columns.map((col) => (
+                      <th
+                        className="bg-black h-[1px] border-black"
+                        key={col.key}
+                        style={{ width: col.columnLength, minWidth: col.columnLength ?? 130 }}
+                      ></th>
+                    ))}
+                  </tr>
+                  <tr>
                     <th
-                      key={col.key}
-                      className={`p-2 border-x bg-gray-200 ${
-                        col.sortable ? "cursor-pointer" : ""
-                      }`}
-                      style={{ width: col.columnLength }}
+                      className="p-2 border-x w-12 text-center bg-gray-200 cursor-pointer"
+                      onClick={() => setMultipleMode(!multipleMode)}
+                    >
+                      {multipleMode ? (
+                        <FaListCheck
+                          size={22}
+                          className="mx-auto text-green-500"
+                        />
+                      ) : (
+                        "No"
+                      )}
+                    </th>
+                    {columns.map((col) => (
+                      <th
+                        key={col.key}
+                        className={`p-2 border-x bg-gray-200 ${
+                          col.sortable ? "cursor-pointer" : ""
+                        }`}
+                        style={{ width: col.columnLength, minWidth: col.columnLength ?? 130 }}
                       onClick={() => {
                         if (!col.sortable) return;
                         // urutan toggle: "" → asc → desc → ""
@@ -1530,6 +1913,7 @@ export default function Table({
               </tbody>
             </table>
           </div>
+        </div>
 
           {/* Table Pagination */}
           {!isForSelect && (

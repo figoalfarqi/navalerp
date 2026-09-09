@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { formatSmartDate } from "@/utils/dateTime";
 import { ColumnField } from "@/components/table/Table";
 import { FormField } from "@/components/formCrud/FormCrud";
 import { FilterField } from "@/components/table/FilterFormTable";
@@ -14,7 +15,7 @@ export const columns: ColumnField[] = [
   { key: "booking_purpose", label: "Booking Purpose" },
   { key: "eta", label: "Eta" },
   { key: "etd", label: "Etd" },
-  { key: "actual_berth_time", label: "Actual Berth Time" },
+  { key: "actual_berth_time", label: "Actual Berth Time", render: (item: any) => formatSmartDate(item.actual_berth_time) },
 ];
 
 export const filterFields: FilterField[] = [
@@ -52,7 +53,14 @@ export const formFields = (mode: string): FormField[] => [
     name: "booking_purpose",
     col: "left",
     label: "Booking Purpose",
-    fieldType: "text",
+    fieldType: "select",
+    options: [
+      { label: "Berthing Rest", value: "BERTHING_REST" },
+      { label: "Logistic Replenishment", value: "LOGISTIC_REPLENISHMENT" },
+      { label: "MRO Repair", value: "MRO_REPAIR" },
+      { label: "Embarkation", value: "EMBARKATION" },
+      { label: "VIP Ceremony", value: "VIP_CEREMONY" },
+    ],
     required: true,
     disabled: mode === "view",
   },
@@ -108,7 +116,13 @@ export const formFields = (mode: string): FormField[] => [
     name: "status",
     col: "right",
     label: "Status",
-    fieldType: "text",
+    fieldType: "select",
+    options: [
+      { label: "Scheduled", value: "SCHEDULED" },
+      { label: "Berthed", value: "BERTHED" },
+      { label: "Completed", value: "COMPLETED" },
+      { label: "Cancelled", value: "CANCELLED" },
+    ],
     required: false,
     disabled: mode === "view",
   },

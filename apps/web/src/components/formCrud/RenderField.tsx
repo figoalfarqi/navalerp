@@ -98,6 +98,7 @@ const RenderField = ({
         className="rounded px-2 py-1 w-full"
         required={field.required}
         disabled={field.disabled}
+        readOnly={field.readOnly}
         value={(formData[field.name] as string) ?? ""}
         onChange={(val) => setFormData((prev) => ({ ...prev, [field.name]: val }))}
         id={""}

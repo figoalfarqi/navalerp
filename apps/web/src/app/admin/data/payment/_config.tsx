@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { formatSmartDate } from "@/utils/dateTime";
 import { ColumnField } from "@/components/table/Table";
 import { FormField } from "@/components/formCrud/FormCrud";
 import { FilterField } from "@/components/table/FilterFormTable";
@@ -13,7 +14,7 @@ export const columns: ColumnField[] = [
   { key: "spp_number", label: "Spp Number" },
   { key: "spm_number", label: "Spm Number" },
   { key: "invoice_number", label: "No. Invoice" },
-  { key: "payment_date", label: "Payment Date" },
+  { key: "payment_date", label: "Payment Date", render: (item: any) => formatSmartDate(item.payment_date) },
   { key: "amount_paid", label: "Amount Paid" },
 ];
 
@@ -28,7 +29,10 @@ export const formFields = (mode: string): FormField[] => [
     label: "Payment Reference No",
     fieldType: "text",
     required: true,
+    readOnly: true,
     disabled: mode === "view",
+    autoGenerate: true,
+    autoPrefix: "SP2D",
   },
   {
     name: "spp_number",
@@ -79,7 +83,12 @@ export const formFields = (mode: string): FormField[] => [
     name: "payment_method",
     col: "left",
     label: "Payment Method",
-    fieldType: "text",
+    fieldType: "select",
+    options: [
+      { label: "KPPN Treasury", value: "KPPN_TREASURY" },
+      { label: "Bank Transfer", value: "BANK_TRANSFER" },
+      { label: "Cash", value: "CASH" },
+    ],
     required: false,
     disabled: mode === "view",
   },

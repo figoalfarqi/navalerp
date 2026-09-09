@@ -26,7 +26,7 @@ export default function AdminShell({ children, roleId }: AdminShellProps) {
       />
       <div
         className={`min-h-screen transition-[padding] duration-300 ${
-          desktopCollapsed ? "md:pl-16" : "md:pl-72"
+          desktopCollapsed ? "md:pl-14" : "md:pl-72"
         }`}
       >
         <Header

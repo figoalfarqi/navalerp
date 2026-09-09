@@ -13,9 +13,14 @@
 
 
 
-export const formatDateTime = (value: string | Date) => {
+export const formatDateTime = (value: string | Date | null | undefined): string => {
   if (!value) return "";
-  const d = new Date(value);
+  const normalized =
+    typeof value === "string" && value.includes(" ") && !value.includes("T")
+      ? value.replace(" ", "T")
+      : value;
+  const d = new Date(normalized);
+  if (isNaN(d.getTime())) return "";
 
   const dd = String(d.getDate()).padStart(2, "0");
   const mm = String(d.getMonth() + 1).padStart(2, "0");
@@ -27,13 +32,55 @@ export const formatDateTime = (value: string | Date) => {
   return `${dd}/${mm}/${yyyy} ${hh}:${min}`;
 };
 
-export function formatDate(dateString: string | Date) {
+export function formatDate(dateString: string | Date | null | undefined): string {
+  if (!dateString) return "";
+  if (typeof dateString === "string") {
+    const match = dateString.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (
+      match &&
+      (dateString.length === 10 ||
+        dateString.includes("T00:00:00") ||
+        dateString.includes(" 00:00:00"))
+    ) {
+      return `${match[3]}/${match[2]}/${match[1]}`;
+    }
+  }
   const d = new Date(dateString);
+  if (isNaN(d.getTime())) return "";
   const dd = String(d.getDate()).padStart(2, "0");
   const mm = String(d.getMonth() + 1).padStart(2, "0");
   const yyyy = d.getFullYear();
   return `${dd}/${mm}/${yyyy}`;
 }
+
+export const formatSmartDate = (value: string | Date | null | undefined): string => {
+  if (!value) return "-";
+  const str =
+    typeof value === "string"
+      ? value.trim()
+      : value instanceof Date
+      ? value.toISOString()
+      : String(value).trim();
+  if (!str || str === "null" || str === "undefined" || str === "-") return "-";
+
+  if (
+    !/^\d{4}-\d{2}-\d{2}([T ]\d{2}:\d{2}(:\d{2})?(\.\d+)?(Z|[+-]\d{2}:?\d{2})?)?$/.test(
+      str
+    )
+  ) {
+    return str;
+  }
+  if (
+    str.length === 10 ||
+    str.includes("T00:00:00") ||
+    str.includes(" 00:00:00") ||
+    str.endsWith("T00:00:00Z") ||
+    str.endsWith("T00:00:00+00:00")
+  ) {
+    return formatDate(str);
+  }
+  return formatDateTime(str);
+};
 
 export function formatTime(dateString: string) {
   const d = new Date(dateString);

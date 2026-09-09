@@ -15,6 +15,7 @@ interface TextFieldProps {
   onChange: (value: string | number) => void;
   required?: boolean;
   disabled?: boolean;
+  readOnly?: boolean;
   placeholder?: string;
   error?: string;
   icon?: ReactNode;
@@ -37,6 +38,7 @@ export default function TextField({
   onChange,
   required = false,
   disabled = false,
+  readOnly = false,
   placeholder = "",
   error = "",
   icon = "",
@@ -44,10 +46,10 @@ export default function TextField({
   isPasswordShowable = false,
   onKeyDown,
 }: TextFieldProps) {
-  const baseWrapperClass = "flex flex-col";
+  const baseWrapperClass = "flex flex-col w-full";
   const baseLabelClass = "mb-1 font-medium text-gray-700";
   const baseInputClass =
-    "px-3 py-2 border rounded-sm focus:outline-none focus:border-blue-500 focus:shadow-[0_0_6px_rgba(59,130,246,0.3)] disabled:bg-gray-100 disabled:text-gray-400";
+    "w-full px-3 py-2 border rounded-sm focus:outline-none focus:border-blue-500 focus:shadow-[0_0_6px_rgba(59,130,246,0.3)] disabled:bg-gray-100 disabled:text-gray-400";
   const [displayValue, setDisplayValue] = useState<string>(
     value?.toString() ?? "",
   );
@@ -121,6 +123,7 @@ export default function TextField({
     }
   };
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (readOnly) return;
     const val = e.target.value;
     changeVal(val);
   };
@@ -169,7 +172,7 @@ export default function TextField({
           {label} {required && <span className="text-red-500">*</span>}
         </label>
       )}
-      <div className="relative">
+      <div className="relative w-full">
         {icon}
         <input
           id={id}
@@ -179,10 +182,15 @@ export default function TextField({
           onChange={handleChange}
           placeholder={placeholder}
           disabled={disabled}
-          className={`${baseInputClass} ${border} ${className} ${
+          readOnly={readOnly}
+          className={`${baseInputClass} ${
+            readOnly
+              ? "bg-slate-100 dark:bg-slate-800/80 text-slate-800 dark:text-slate-100 font-mono tracking-wider font-semibold cursor-not-allowed select-all border-slate-300"
+              : ""
+          } ${border} ${className} ${
             type === "password" && isPasswordShowable ? "pr-10" : ""
           }`}
-          onKeyDown={onKeyDown}
+          onKeyDown={readOnly ? (e) => e.preventDefault() : onKeyDown}
         />
         {type === "email" && (
           <div className="absolute right-3 top-1/2 transform -translate-y-1/2">

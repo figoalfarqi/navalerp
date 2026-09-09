@@ -7,7 +7,7 @@ export const VariantClassesButtonMap = {
   "green-solid": "bg-green-500 text-white hover:bg-green-600",
   "purple-solid": "bg-purple-500 text-white hover:bg-purple-600",
   "gray-solid": "bg-gray-500 text-white hover:bg-gray-600",
-  "blue-dkl": "bg-[#004f7f] text-white hover:bg-[#02304d]",
+  "blue-dkl": "bg-[#0a2540] text-white hover:bg-[#061a2d]",
 
   // 🔹 Outline
   "amber-outline": "border border-amber-500 text-amber-500 hover:bg-amber-50",

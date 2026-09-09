@@ -1,6 +1,6 @@
 "use client";
 
-import { FaTruckMoving } from "react-icons/fa6";
+import { FaTruckMoving } from "@/components/icons";
 
 type Props = {
   lat: number;

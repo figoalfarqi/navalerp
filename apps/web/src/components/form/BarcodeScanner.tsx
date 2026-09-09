@@ -3,8 +3,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Html5Qrcode } from "html5-qrcode";
-import { LuScanLine, LuX, LuFlashlight } from "react-icons/lu";
-import { BsArrowRepeat } from "react-icons/bs";
+import { LuScanLine, LuX, LuFlashlight } from "@/components/icons";
+import { BsArrowRepeat } from "@/components/icons";
 import Button from "../form/Button";
 import { usePathname } from "next/navigation";
 

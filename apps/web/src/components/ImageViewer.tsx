@@ -10,7 +10,7 @@ import {
   LuDownload,
   LuTable,
   LuX,
-} from "react-icons/lu";
+} from "@/components/icons";
 import Modal from "./Modal";
 import TextAreaField from "./form/TextAreaField";
 import ApprovalTable, {

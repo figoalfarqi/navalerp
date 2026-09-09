@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { formatSmartDate } from "@/utils/dateTime";
 import { ColumnField } from "@/components/table/Table";
 import { FormField } from "@/components/formCrud/FormCrud";
 import { FilterField } from "@/components/table/FilterFormTable";
@@ -14,7 +15,7 @@ export const columns: ColumnField[] = [
   { key: "retention_years", label: "Retention Years" },
   { key: "confidentiality_level", label: "Confidentiality Level" },
   { key: "description", label: "Description" },
-  { key: "created_at", label: "Created At" },
+  { key: "created_at", label: "Created At", render: (item: any) => formatSmartDate(item.created_at) },
 ];
 
 export const filterFields: FilterField[] = [
@@ -50,7 +51,14 @@ export const formFields = (mode: string): FormField[] => [
     name: "confidentiality_level",
     col: "right",
     label: "Confidentiality Level",
-    fieldType: "text",
+    fieldType: "select",
+    options: [
+      { label: "Sangat Rahasia", value: "SANGAT_RAHASIA" },
+      { label: "Rahasia Negara", value: "RAHASIA_NEGARA" },
+      { label: "Rahasia", value: "RAHASIA" },
+      { label: "Terbatas", value: "TERBATAS" },
+      { label: "Biasa", value: "BIASA" },
+    ],
     required: false,
     disabled: mode === "view",
   },

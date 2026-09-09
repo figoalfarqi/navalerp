@@ -1,175 +1,77 @@
 -- =============================================================================
--- SEED DATA: MODUL 10 - KESIAPAN OPERASI & KOMANDO TEMPUR (READINESS & OPERATIONS)
--- FILE: 10_readiness_operations_command/insert.sql
+-- SEED DATA: MODUL 10 - KESIAPAN KOMBAT & KOMANDO OPERASI MARITIM
 -- =============================================================================
 
--- 1. Wilayah Teater Operasi Laut
-INSERT INTO ops_theaters (
-    theater_id, theater_code, theater_name, responsible_command_unit_id,
-    threat_level, description
-) VALUES
-(
-    '91000000-0000-0000-0000-000000000001',
-    'THEATER-NATUNA',
-    'Teater Operasi Laut Natuna Utara & Selat Karimata',
-    '10000000-0000-0000-0000-000000000003', -- Koarmada II (BKO Kogabwilhan I)
-    'DEFCON_2',
-    'Wilayah pengamanan ZEE perbatasan laut strategis dengan intensitas patroli tinggi'
-),
-(
-    '91000000-0000-0000-0000-000000000002',
-    'THEATER-AMBALAT',
-    'Teater Operasi Laut Sulawesi & Blok Ambalat',
-    '10000000-0000-0000-0000-000000000003', -- Koarmada II
-    'DEFCON_3',
-    'Wilayah kedaulatan maritim blok migas perbatasan Indonesia - Malaysia'
-),
-(
-    '91000000-0000-0000-0000-000000000003',
-    'THEATER-MALAKA',
-    'Teater Operasi Selat Malaka & Selat Singapura',
-    '10000000-0000-0000-0000-000000000002', -- Koarmada I
-    'DEFCON_4',
-    'Jalur Sea Lines of Communication (SLOC) perdagangan internasional tersibuk di dunia'
-)
-ON CONFLICT (theater_id) DO UPDATE SET
-    theater_name = EXCLUDED.theater_name,
-    threat_level = EXCLUDED.threat_level;
+INSERT INTO ops_theaters (theater_id, theater_code, theater_name, responsible_command_unit_id, threat_level, description) VALUES
+    ('c0000000-0000-0000-0000-000000000001', 'THR-NATUNA', 'Wilayah Operasi Laut Natuna Utara & Selat Karimata', '10000000-0000-0000-0000-000000000002', 'DEFCON_2', 'Pengamanan perbatasan ZEE Indonesia dan perlindungan anjungan migas lepas pantai'),
+    ('c0000000-0000-0000-0000-000000000002', 'THR-ALKI-1', 'Wilayah Jalur ALKI I (Selat Sunda - Laut Natuna)', '10000000-0000-0000-0000-000000000002', 'DEFCON_3', 'Pengamanan jalur perdagangan internasional laut barat'),
+    ('c0000000-0000-0000-0000-000000000003', 'THR-ALKI-2', 'Wilayah Jalur ALKI II (Selat Lombok - Selat Makassar)', '10000000-0000-0000-0000-000000000003', 'DEFCON_3', 'Pengawasan pelayaran strategis dan alur kepulauan tengah'),
+    ('c0000000-0000-0000-0000-000000000004', 'THR-ALKI-3', 'Wilayah Jalur ALKI III (Laut Maluku - Laut Sawu)', '10000000-0000-0000-0000-000000000004', 'DEFCON_3', 'Pengamanan kedaulatan laut timur dan wilayah perairan pulau terluar'),
+    ('c0000000-0000-0000-0000-000000000005', 'THR-AMBALAT', 'Wilayah Taktis Blok Ambalat & Laut Sulawesi', '10000000-0000-0000-0000-000000000003', 'DEFCON_2', 'Patroli kedaulatan perbatasan laut RI - Malaysia di perairan Ambalat'),
+    ('c0000000-0000-0000-0000-000000000006', 'THR-PAPUA', 'Wilayah Perairan Pesisir Papua & Laut Arafura', '10000000-0000-0000-0000-000000000004', 'DEFCON_3', 'Operasi pengamanan perbatasan maritim RI - Papua Nugini dan Australia'),
+    ('c0000000-0000-0000-0000-000000000007', 'THR-MALAKA', 'Wilayah Operasi Selat Malaka & Selat Singapura', '10000000-0000-0000-0000-000000000002', 'DEFCON_3', 'Operasi bersama patroli terkoordinasi keamanan selat tersibuk dunia'),
+    ('c0000000-0000-0000-0000-000000000008', 'THR-SAMUDERA-HINDIA', 'Wilayah Samudera Hindia Pantai Barat Sumatera & Selatan Jawa', '10000000-0000-0000-0000-000000000002', 'DEFCON_4', 'Patroli ZEE laut lepas Samudera Hindia')
+ON CONFLICT (theater_id) DO UPDATE SET theater_name = EXCLUDED.theater_name;
 
--- 2. Operasi & Misi Tempur Militer
-INSERT INTO ops_missions (
-    mission_id, theater_id, mission_code, mission_name, mission_type,
-    start_date, end_date, commanding_officer_user_id, mission_status
-) VALUES
-(
-    '91500000-0000-0000-0000-000000000001',
-    '91000000-0000-0000-0000-000000000001', -- Natuna
-    'OPS-GARDA-SAMUDERA-26',
-    'Operasi Siaga Tempur Laut Garda Samudera 26 (Natuna)',
-    'COMBAT_PATROL',
-    '2026-03-01',
-    '2026-06-30',
-    '20000000-0000-0000-0000-000000000002', -- Panglima
-    'ACTIVE'
-),
-(
-    '91500000-0000-0000-0000-000000000002',
-    '91000000-0000-0000-0000-000000000003', -- Selat Malaka
-    'OPS-PATKOR-MALINDO-26',
-    'Patroli Terkoordinasi Malindo Wilayah Selat Malaka',
-    'COMBAT_PATROL',
-    '2026-02-15',
-    '2026-05-15',
-    '20000000-0000-0000-0000-000000000002',
-    'ACTIVE'
-)
+INSERT INTO ops_missions (mission_id, theater_id, mission_code, mission_name, mission_type, start_date, commanding_officer_user_id, mission_status) VALUES
+    ('c1000000-0000-0000-0000-000000000001', 'c0000000-0000-0000-0000-000000000001', 'OPS-MARITIM-001', 'Operasi Laut Terpadu Jaga Samudera Tahap 1 TA 2026', 'COMBAT_PATROL', '2026-01-01', '20000000-0000-0000-0000-000000000002', 'ACTIVE'),
+    ('c1000000-0000-0000-0000-000000000002', 'c0000000-0000-0000-0000-000000000002', 'OPS-MARITIM-002', 'Operasi Laut Terpadu Jaga Samudera Tahap 2 TA 2026', 'COMBAT_PATROL', '2026-01-01', '20000000-0000-0000-0000-000000000002', 'ACTIVE'),
+    ('c1000000-0000-0000-0000-000000000003', 'c0000000-0000-0000-0000-000000000003', 'OPS-MARITIM-003', 'Operasi Laut Terpadu Jaga Samudera Tahap 3 TA 2026', 'COMBAT_PATROL', '2026-01-01', '20000000-0000-0000-0000-000000000002', 'ACTIVE'),
+    ('c1000000-0000-0000-0000-000000000004', 'c0000000-0000-0000-0000-000000000004', 'OPS-MARITIM-004', 'Operasi Laut Terpadu Jaga Samudera Tahap 4 TA 2026', 'COMBAT_PATROL', '2026-01-01', '20000000-0000-0000-0000-000000000002', 'ACTIVE'),
+    ('c1000000-0000-0000-0000-000000000005', 'c0000000-0000-0000-0000-000000000005', 'OPS-MARITIM-005', 'Operasi Laut Terpadu Jaga Samudera Tahap 5 TA 2026', 'COMBAT_PATROL', '2026-01-01', '20000000-0000-0000-0000-000000000002', 'ACTIVE'),
+    ('c1000000-0000-0000-0000-000000000006', 'c0000000-0000-0000-0000-000000000006', 'OPS-MARITIM-006', 'Operasi Laut Terpadu Jaga Samudera Tahap 6 TA 2026', 'COMBAT_PATROL', '2026-01-01', '20000000-0000-0000-0000-000000000002', 'ACTIVE'),
+    ('c1000000-0000-0000-0000-000000000007', 'c0000000-0000-0000-0000-000000000007', 'OPS-MARITIM-007', 'Operasi Laut Terpadu Jaga Samudera Tahap 7 TA 2026', 'COMBAT_PATROL', '2026-01-01', '20000000-0000-0000-0000-000000000002', 'ACTIVE'),
+    ('c1000000-0000-0000-0000-000000000008', 'c0000000-0000-0000-0000-000000000008', 'OPS-MARITIM-008', 'Operasi Laut Terpadu Jaga Samudera Tahap 8 TA 2026', 'COMBAT_PATROL', '2026-01-01', '20000000-0000-0000-0000-000000000002', 'ACTIVE'),
+    ('c1000000-0000-0000-0000-000000000009', 'c0000000-0000-0000-0000-000000000001', 'OPS-MARITIM-009', 'Operasi Laut Terpadu Jaga Samudera Tahap 9 TA 2026', 'COMBAT_PATROL', '2026-01-01', '20000000-0000-0000-0000-000000000002', 'ACTIVE'),
+    ('c1000000-0000-0000-0000-000000000010', 'c0000000-0000-0000-0000-000000000002', 'OPS-MARITIM-010', 'Operasi Laut Terpadu Jaga Samudera Tahap 10 TA 2026', 'COMBAT_PATROL', '2026-01-01', '20000000-0000-0000-0000-000000000002', 'ACTIVE'),
+    ('c1000000-0000-0000-0000-000000000011', 'c0000000-0000-0000-0000-000000000003', 'OPS-MARITIM-011', 'Operasi Laut Terpadu Jaga Samudera Tahap 11 TA 2026', 'COMBAT_PATROL', '2026-01-01', '20000000-0000-0000-0000-000000000002', 'ACTIVE'),
+    ('c1000000-0000-0000-0000-000000000012', 'c0000000-0000-0000-0000-000000000004', 'OPS-MARITIM-012', 'Operasi Laut Terpadu Jaga Samudera Tahap 12 TA 2026', 'COMBAT_PATROL', '2026-01-01', '20000000-0000-0000-0000-000000000002', 'ACTIVE')
 ON CONFLICT (mission_id) DO NOTHING;
 
--- 3. Penugasan Kapal Perang dalam Gugus Tugas
-INSERT INTO ops_mission_ship_assignments (
-    assignment_id, mission_id, ship_id, tactical_callsign,
-    role_in_task_force, joined_date, status
-) VALUES
-(
-    '91800000-0000-0000-0000-000000000001',
-    '91500000-0000-0000-0000-000000000001',
-    '41000000-0000-0000-0000-000000000001', -- KRI REM-331
-    'BRAVO-ONE',
-    'FLAGSHIP',
-    '2026-03-01',
-    'ACTIVE'
-),
-(
-    '91800000-0000-0000-0000-000000000002',
-    '91500000-0000-0000-0000-000000000001',
-    '41000000-0000-0000-0000-000000000002', -- KRI INR-332
-    'BRAVO-TWO',
-    'ESCORT_SURFACE',
-    '2026-03-01',
-    'ACTIVE'
-)
-ON CONFLICT (assignment_id) DO NOTHING;
-
--- 4. Buku Jurnal Harian Kapal Berlayar (Daily Navigational Log)
-INSERT INTO ops_daily_logs (
-    log_id, ship_id, log_date, latitude, longitude,
-    heading_degrees, speed_knots, sea_state, weather_condition,
-    fuel_remaining_liters, fresh_water_remaining_tons,
-    tactical_summary, logged_by_user_id
-) VALUES
-(
-    '92000000-0000-0000-0000-000000000001',
-    '41000000-0000-0000-0000-000000000001', -- KRI REM-331
-    '2026-03-04',
-    4.251400,
-    108.384200,
-    45,
-    16.5,
-    3,
-    'Cerah Berawan, Angin Timur Laut 12 Knots',
-    112500.00,
-    78.00,
-    'Patroli sektor Alpha Laut Natuna Utara. Kontak radar permukaan terpantau normal. Seluruh sensor CMS TACTICOS dan mesin MTU beroperasi optimal.',
-    '20000000-0000-0000-0000-000000000003' -- Kolonel Hendra Kurniawan (Dan KRI REM-331)
-),
-(
-    '92000000-0000-0000-0000-000000000002',
-    '41000000-0000-0000-0000-000000000002', -- KRI INR-332
-    '2026-03-04',
-    4.421000,
-    108.512000,
-    48,
-    17.0,
-    3,
-    'Cerah Berawan, Jarak Pandang 10 NM',
-    135000.00,
-    82.00,
-    'Manuver taktis formasi Line of Bearing mendampingi KRI REM-331.',
-    '20000000-0000-0000-0000-000000000008' -- Kolonel Faisal Anwar (Dan KRI INR-332)
-)
+INSERT INTO ops_daily_logs (log_id, ship_id, log_date, latitude, longitude, heading_degrees, speed_knots, sea_state, weather_condition, fuel_remaining_liters, fresh_water_remaining_tons, tactical_summary, logged_by_user_id) VALUES
+    ('c2000000-0000-0000-0000-000000000001', '31000000-0000-0000-0000-000000000001', '2026-03-02', 3.8540, 108.4500, 45, 14.5, 3, 'CERAH_BERAWAN', 285000.0, 42.5, 'Patroli sektor ZEE aman, kontak radar 12 kapal niaga dan 3 kapal nelayan asing di luar teritorial.', '20000000-0000-0000-0000-000000000009'),
+    ('c2000000-0000-0000-0000-000000000002', '31000000-0000-0000-0000-000000000002', '2026-03-03', 3.8540, 108.4500, 45, 14.5, 3, 'CERAH_BERAWAN', 285000.0, 42.5, 'Patroli sektor ZEE aman, kontak radar 12 kapal niaga dan 3 kapal nelayan asing di luar teritorial.', '20000000-0000-0000-0000-000000000009'),
+    ('c2000000-0000-0000-0000-000000000003', '31000000-0000-0000-0000-000000000003', '2026-03-04', 3.8540, 108.4500, 45, 14.5, 3, 'CERAH_BERAWAN', 285000.0, 42.5, 'Patroli sektor ZEE aman, kontak radar 12 kapal niaga dan 3 kapal nelayan asing di luar teritorial.', '20000000-0000-0000-0000-000000000009'),
+    ('c2000000-0000-0000-0000-000000000004', '31000000-0000-0000-0000-000000000004', '2026-03-05', 3.8540, 108.4500, 45, 14.5, 3, 'CERAH_BERAWAN', 285000.0, 42.5, 'Patroli sektor ZEE aman, kontak radar 12 kapal niaga dan 3 kapal nelayan asing di luar teritorial.', '20000000-0000-0000-0000-000000000009'),
+    ('c2000000-0000-0000-0000-000000000005', '31000000-0000-0000-0000-000000000005', '2026-03-01', 3.8540, 108.4500, 45, 14.5, 3, 'CERAH_BERAWAN', 285000.0, 42.5, 'Patroli sektor ZEE aman, kontak radar 12 kapal niaga dan 3 kapal nelayan asing di luar teritorial.', '20000000-0000-0000-0000-000000000009'),
+    ('c2000000-0000-0000-0000-000000000006', '31000000-0000-0000-0000-000000000006', '2026-03-02', 3.8540, 108.4500, 45, 14.5, 3, 'CERAH_BERAWAN', 285000.0, 42.5, 'Patroli sektor ZEE aman, kontak radar 12 kapal niaga dan 3 kapal nelayan asing di luar teritorial.', '20000000-0000-0000-0000-000000000009'),
+    ('c2000000-0000-0000-0000-000000000007', '31000000-0000-0000-0000-000000000007', '2026-03-03', 3.8540, 108.4500, 45, 14.5, 3, 'CERAH_BERAWAN', 285000.0, 42.5, 'Patroli sektor ZEE aman, kontak radar 12 kapal niaga dan 3 kapal nelayan asing di luar teritorial.', '20000000-0000-0000-0000-000000000009'),
+    ('c2000000-0000-0000-0000-000000000008', '31000000-0000-0000-0000-000000000008', '2026-03-04', 3.8540, 108.4500, 45, 14.5, 3, 'CERAH_BERAWAN', 285000.0, 42.5, 'Patroli sektor ZEE aman, kontak radar 12 kapal niaga dan 3 kapal nelayan asing di luar teritorial.', '20000000-0000-0000-0000-000000000009'),
+    ('c2000000-0000-0000-0000-000000000009', '31000000-0000-0000-0000-000000000009', '2026-03-05', 3.8540, 108.4500, 45, 14.5, 3, 'CERAH_BERAWAN', 285000.0, 42.5, 'Patroli sektor ZEE aman, kontak radar 12 kapal niaga dan 3 kapal nelayan asing di luar teritorial.', '20000000-0000-0000-0000-000000000009'),
+    ('c2000000-0000-0000-0000-000000000010', '31000000-0000-0000-0000-000000000010', '2026-03-01', 3.8540, 108.4500, 45, 14.5, 3, 'CERAH_BERAWAN', 285000.0, 42.5, 'Patroli sektor ZEE aman, kontak radar 12 kapal niaga dan 3 kapal nelayan asing di luar teritorial.', '20000000-0000-0000-0000-000000000009'),
+    ('c2000000-0000-0000-0000-000000000011', '31000000-0000-0000-0000-000000000011', '2026-03-02', 3.8540, 108.4500, 45, 14.5, 3, 'CERAH_BERAWAN', 285000.0, 42.5, 'Patroli sektor ZEE aman, kontak radar 12 kapal niaga dan 3 kapal nelayan asing di luar teritorial.', '20000000-0000-0000-0000-000000000009'),
+    ('c2000000-0000-0000-0000-000000000012', '31000000-0000-0000-0000-000000000012', '2026-03-03', 3.8540, 108.4500, 45, 14.5, 3, 'CERAH_BERAWAN', 285000.0, 42.5, 'Patroli sektor ZEE aman, kontak radar 12 kapal niaga dan 3 kapal nelayan asing di luar teritorial.', '20000000-0000-0000-0000-000000000009')
 ON CONFLICT (log_id) DO NOTHING;
 
--- 5. Indeks Kesiapan Komposit Alutsista KRI (Composite Readiness Index)
-INSERT INTO ops_ship_readiness_snapshots (
-    snapshot_id, ship_id, snapshot_timestamp, readiness_category,
-    mro_readiness_score, personnel_manning_score, logistics_supply_score, remarks
-) VALUES
-(
-    '92500000-0000-0000-0000-000000000001',
-    '41000000-0000-0000-0000-000000000001', -- KRI REM-331
-    '2026-03-04 08:00:00+07',
-    'C-1', -- Siap Tempur Penuh
-    96.50,
-    98.00,
-    94.00,
-    'Kesiapan tempur KRI REM-331 level tertinggi (C-1 Siap Tempur Penuh) untuk misi patroli kedaulatan maritim laut terluar.'
-),
-(
-    '92500000-0000-0000-0000-000000000002',
-    '41000000-0000-0000-0000-000000000003', -- KRI DPO-365
-    '2026-03-04 08:00:00+07',
-    'C-4', -- Docking / Non-Operasional Sementara
-    60.00,
-    85.00,
-    70.00,
-    'KRI DPO-365 berada dalam tahap docking pemeliharaan rutin di Fasharkan Surabaya. Dijadwalkan kembali C-1 pada akhir bulan.'
-)
+INSERT INTO ops_ship_readiness_snapshots (snapshot_id, ship_id, snapshot_timestamp, readiness_category, mro_readiness_score, personnel_manning_score, logistics_supply_score, remarks) VALUES
+    ('c3000000-0000-0000-0000-000000000001', '31000000-0000-0000-0000-000000000001', CURRENT_TIMESTAMP, 'C-1', 94.50, 96.00, 92.00, 'Kapal siap tempur penuh untuk operasi laut jarak jauh.'),
+    ('c3000000-0000-0000-0000-000000000002', '31000000-0000-0000-0000-000000000002', CURRENT_TIMESTAMP, 'C-1', 94.50, 96.00, 92.00, 'Kapal siap tempur penuh untuk operasi laut jarak jauh.'),
+    ('c3000000-0000-0000-0000-000000000003', '31000000-0000-0000-0000-000000000003', CURRENT_TIMESTAMP, 'C-1', 94.50, 96.00, 92.00, 'Kapal siap tempur penuh untuk operasi laut jarak jauh.'),
+    ('c3000000-0000-0000-0000-000000000004', '31000000-0000-0000-0000-000000000004', CURRENT_TIMESTAMP, 'C-1', 94.50, 96.00, 92.00, 'Kapal siap tempur penuh untuk operasi laut jarak jauh.'),
+    ('c3000000-0000-0000-0000-000000000005', '31000000-0000-0000-0000-000000000005', CURRENT_TIMESTAMP, 'C-1', 94.50, 96.00, 92.00, 'Kapal siap tempur penuh untuk operasi laut jarak jauh.'),
+    ('c3000000-0000-0000-0000-000000000006', '31000000-0000-0000-0000-000000000006', CURRENT_TIMESTAMP, 'C-1', 94.50, 96.00, 92.00, 'Kapal siap tempur penuh untuk operasi laut jarak jauh.'),
+    ('c3000000-0000-0000-0000-000000000007', '31000000-0000-0000-0000-000000000007', CURRENT_TIMESTAMP, 'C-1', 94.50, 96.00, 92.00, 'Kapal siap tempur penuh untuk operasi laut jarak jauh.'),
+    ('c3000000-0000-0000-0000-000000000008', '31000000-0000-0000-0000-000000000008', CURRENT_TIMESTAMP, 'C-1', 94.50, 96.00, 92.00, 'Kapal siap tempur penuh untuk operasi laut jarak jauh.'),
+    ('c3000000-0000-0000-0000-000000000009', '31000000-0000-0000-0000-000000000009', CURRENT_TIMESTAMP, 'C-1', 94.50, 96.00, 92.00, 'Kapal siap tempur penuh untuk operasi laut jarak jauh.'),
+    ('c3000000-0000-0000-0000-000000000010', '31000000-0000-0000-0000-000000000010', CURRENT_TIMESTAMP, 'C-1', 94.50, 96.00, 92.00, 'Kapal siap tempur penuh untuk operasi laut jarak jauh.'),
+    ('c3000000-0000-0000-0000-000000000011', '31000000-0000-0000-0000-000000000011', CURRENT_TIMESTAMP, 'C-1', 94.50, 96.00, 92.00, 'Kapal siap tempur penuh untuk operasi laut jarak jauh.'),
+    ('c3000000-0000-0000-0000-000000000012', '31000000-0000-0000-0000-000000000012', CURRENT_TIMESTAMP, 'C-1', 94.50, 96.00, 92.00, 'Kapal siap tempur penuh untuk operasi laut jarak jauh.'),
+    ('c3000000-0000-0000-0000-000000000013', '31000000-0000-0000-0000-000000000013', CURRENT_TIMESTAMP, 'C-1', 94.50, 96.00, 92.00, 'Kapal siap tempur penuh untuk operasi laut jarak jauh.'),
+    ('c3000000-0000-0000-0000-000000000014', '31000000-0000-0000-0000-000000000014', CURRENT_TIMESTAMP, 'C-1', 94.50, 96.00, 92.00, 'Kapal siap tempur penuh untuk operasi laut jarak jauh.'),
+    ('c3000000-0000-0000-0000-000000000015', '31000000-0000-0000-0000-000000000001', CURRENT_TIMESTAMP, 'C-1', 94.50, 96.00, 92.00, 'Kapal siap tempur penuh untuk operasi laut jarak jauh.')
 ON CONFLICT (snapshot_id) DO NOTHING;
 
--- 6. Peringatan Dini Kesiapan (Readiness Alert)
-INSERT INTO ops_readiness_alerts (
-    alert_id, ship_id, equipment_id, severity, alert_type,
-    alert_message, is_acknowledged, acknowledged_by_user_id, acknowledged_at
-) VALUES
-(
-    '93000000-0000-0000-0000-000000000001',
-    '41000000-0000-0000-0000-000000000001', -- KRI REM-331
-    '43000000-0000-0000-0000-000000000001', -- Mesin MTU
-    'MEDIUM',
-    'CASREP_DEFECT',
-    'Jam kerja mesin MTU Port telah mencapai 4.250 jam. Persiapkan jadwal perawatan berkala 500 jam berikutnya (PMS Level 2).',
-    TRUE,
-    '20000000-0000-0000-0000-000000000005', -- Kadepsin Arif Wijaya
-    '2026-03-04 10:00:00+07'
-)
+INSERT INTO ops_readiness_alerts (alert_id, ship_id, equipment_id, severity, alert_type, alert_message, is_acknowledged, acknowledged_by_user_id, acknowledged_at) VALUES
+    ('c4000000-0000-0000-0000-000000000001', '31000000-0000-0000-0000-000000000001', '33000000-0000-0000-0000-000000000001', 'MEDIUM', 'CASREP_DEFECT', 'Peringatan pemeliharaan terjadwal sistem sensor radar.', TRUE, '20000000-0000-0000-0000-000000000005', CURRENT_TIMESTAMP),
+    ('c4000000-0000-0000-0000-000000000002', '31000000-0000-0000-0000-000000000002', '33000000-0000-0000-0000-000000000002', 'MEDIUM', 'CASREP_DEFECT', 'Peringatan pemeliharaan terjadwal sistem sensor radar.', TRUE, '20000000-0000-0000-0000-000000000005', CURRENT_TIMESTAMP),
+    ('c4000000-0000-0000-0000-000000000003', '31000000-0000-0000-0000-000000000003', '33000000-0000-0000-0000-000000000003', 'MEDIUM', 'CASREP_DEFECT', 'Peringatan pemeliharaan terjadwal sistem sensor radar.', TRUE, '20000000-0000-0000-0000-000000000005', CURRENT_TIMESTAMP),
+    ('c4000000-0000-0000-0000-000000000004', '31000000-0000-0000-0000-000000000004', '33000000-0000-0000-0000-000000000004', 'MEDIUM', 'CASREP_DEFECT', 'Peringatan pemeliharaan terjadwal sistem sensor radar.', TRUE, '20000000-0000-0000-0000-000000000005', CURRENT_TIMESTAMP),
+    ('c4000000-0000-0000-0000-000000000005', '31000000-0000-0000-0000-000000000005', '33000000-0000-0000-0000-000000000005', 'MEDIUM', 'CASREP_DEFECT', 'Peringatan pemeliharaan terjadwal sistem sensor radar.', TRUE, '20000000-0000-0000-0000-000000000005', CURRENT_TIMESTAMP),
+    ('c4000000-0000-0000-0000-000000000006', '31000000-0000-0000-0000-000000000006', '33000000-0000-0000-0000-000000000006', 'MEDIUM', 'CASREP_DEFECT', 'Peringatan pemeliharaan terjadwal sistem sensor radar.', TRUE, '20000000-0000-0000-0000-000000000005', CURRENT_TIMESTAMP),
+    ('c4000000-0000-0000-0000-000000000007', '31000000-0000-0000-0000-000000000007', '33000000-0000-0000-0000-000000000007', 'MEDIUM', 'CASREP_DEFECT', 'Peringatan pemeliharaan terjadwal sistem sensor radar.', TRUE, '20000000-0000-0000-0000-000000000005', CURRENT_TIMESTAMP),
+    ('c4000000-0000-0000-0000-000000000008', '31000000-0000-0000-0000-000000000008', '33000000-0000-0000-0000-000000000008', 'MEDIUM', 'CASREP_DEFECT', 'Peringatan pemeliharaan terjadwal sistem sensor radar.', TRUE, '20000000-0000-0000-0000-000000000005', CURRENT_TIMESTAMP),
+    ('c4000000-0000-0000-0000-000000000009', '31000000-0000-0000-0000-000000000009', '33000000-0000-0000-0000-000000000009', 'MEDIUM', 'CASREP_DEFECT', 'Peringatan pemeliharaan terjadwal sistem sensor radar.', TRUE, '20000000-0000-0000-0000-000000000005', CURRENT_TIMESTAMP),
+    ('c4000000-0000-0000-0000-000000000010', '31000000-0000-0000-0000-000000000010', '33000000-0000-0000-0000-000000000010', 'MEDIUM', 'CASREP_DEFECT', 'Peringatan pemeliharaan terjadwal sistem sensor radar.', TRUE, '20000000-0000-0000-0000-000000000005', CURRENT_TIMESTAMP),
+    ('c4000000-0000-0000-0000-000000000011', '31000000-0000-0000-0000-000000000011', '33000000-0000-0000-0000-000000000011', 'MEDIUM', 'CASREP_DEFECT', 'Peringatan pemeliharaan terjadwal sistem sensor radar.', TRUE, '20000000-0000-0000-0000-000000000005', CURRENT_TIMESTAMP),
+    ('c4000000-0000-0000-0000-000000000012', '31000000-0000-0000-0000-000000000012', '33000000-0000-0000-0000-000000000012', 'MEDIUM', 'CASREP_DEFECT', 'Peringatan pemeliharaan terjadwal sistem sensor radar.', TRUE, '20000000-0000-0000-0000-000000000005', CURRENT_TIMESTAMP)
 ON CONFLICT (alert_id) DO NOTHING;

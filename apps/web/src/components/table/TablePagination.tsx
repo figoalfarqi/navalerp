@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { FaChevronLeft, FaChevronRight } from "react-icons/fa6";
+import { FaChevronLeft, FaChevronRight } from "@/components/icons";
 
 interface TablePaginationProps {
   page: number;
@@ -70,7 +70,7 @@ export default function TablePagination({
           className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition border select-none ${
             page <= 1 || isLoading
               ? "bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed opacity-60"
-              : "bg-white text-slate-700 border-slate-300 hover:bg-slate-50 hover:text-navy-900 active:bg-slate-100 shadow-sm"
+              : "bg-white text-slate-700 border-slate-300 hover:bg-slate-50 hover:text-navy-900 active:bg-slate-100 shadow-sm cursor-pointer"
           }`}
           title="Halaman Sebelumnya"
         >
@@ -96,8 +96,8 @@ export default function TablePagination({
                 onClick={() => onPageChange(p as number)}
                 className={`min-w-[28px] h-7 px-2 text-xs font-semibold rounded transition border select-none ${
                   p === page
-                    ? "bg-[#004f7f] text-white border-[#004f7f] shadow-sm"
-                    : "bg-white text-slate-600 border-slate-300 hover:bg-slate-50"
+                    ? "bg-[#0a2540] text-white border-[#0a2540] shadow-sm"
+                    : "bg-white text-slate-600 border-slate-300 hover:bg-slate-50 cursor-pointer"
                 }`}
               >
                 {p}
@@ -120,7 +120,7 @@ export default function TablePagination({
           className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition border select-none ${
             page >= totalPages || isLoading
               ? "bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed opacity-60"
-              : "bg-white text-slate-700 border-slate-300 hover:bg-slate-50 hover:text-navy-900 active:bg-slate-100 shadow-sm"
+              : "bg-white text-slate-700 border-slate-300 hover:bg-slate-50 hover:text-navy-900 active:bg-slate-100 shadow-sm cursor-pointer"
           }`}
           title="Halaman Berikutnya"
         >

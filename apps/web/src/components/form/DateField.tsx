@@ -6,7 +6,7 @@ import DatePicker from "./picker/DatePicker";
 import DateTimeActions from "./picker/ActionPicker";
 import { formatDate } from "@/utils/dateTime";
 import { usePopoverPosition } from "@/hooks/usePopoverPosition";
-import { FaX } from "react-icons/fa6";
+import { FaX, FaCalendarDays } from "@/components/icons";
 import { useCloseOnScrollDistance } from "@/hooks/useCloseOnScrollDistance";
 
 interface DateFieldProps {
@@ -16,6 +16,7 @@ interface DateFieldProps {
   onChange: (value: string | null | number) => void;
   required?: boolean;
   disabled?: boolean;
+  uncloseable?: boolean;
   placeholder?: string;
   error?: string;
   className?: string;
@@ -33,6 +34,7 @@ export default function DateField({
   onChange,
   required = false,
   disabled = false,
+  uncloseable = false,
   placeholder = "Pilih Tanggal",
   error = "",
   className = "",
@@ -42,15 +44,19 @@ export default function DateField({
   maxDate,
   isYearOnly = false,
 }: DateFieldProps) {
-  const baseWrapperClass = "flex flex-col";
+  const baseWrapperClass = "flex flex-col w-full";
   const baseLabelClass = "mb-1 font-medium text-gray-700";
   const baseInputClass =
-    "px-3 py-2 border rounded-sm focus:outline-none focus:border-blue-500 focus:shadow-[0_0_6px_rgba(59,130,246,0.3)] disabled:bg-gray-100 disabled:text-gray-400 cursor-pointer flex items-center justify-start gap-2";
+    "w-full px-3 py-2 border rounded-sm focus:outline-none focus:border-blue-500 focus:shadow-[0_0_6px_rgba(59,130,246,0.3)] disabled:bg-gray-100 disabled:text-gray-400 cursor-pointer flex items-center justify-between gap-2";
 
   const parsedValue =
     value && !isNaN(new Date(value).getTime()) ? new Date(value) : null;
   const [tempDate, setTempDate] = useState<Date | null>(parsedValue);
   const [showPopover, setShowPopover] = useState(false);
+
+  useEffect(() => {
+    setTempDate(parsedValue);
+  }, [value]);
 
   const inputRef = useRef<HTMLButtonElement>(null);
   const popoverRef = useRef<HTMLDivElement>(null);
@@ -127,8 +133,18 @@ export default function DateField({
         ref={inputRef}
         value={displayValue}
         type="button"
-        onClick={() => !disabled && setShowPopover(true)}
-        onFocus={() => !disabled && setShowPopover(true)}
+        onClick={() => {
+          if (!disabled) {
+            setTempDate(parsedValue);
+            setShowPopover(true);
+          }
+        }}
+        onFocus={() => {
+          if (!disabled) {
+            setTempDate(parsedValue);
+            setShowPopover(true);
+          }
+        }}
         onBlur={(e) => {
           const nextFocused = e.relatedTarget as Node | null;
           if (
@@ -143,22 +159,25 @@ export default function DateField({
         disabled={disabled}
         className={`${baseInputClass} ${className}`}
       >
-        {displayValue && (
-          <div
-            onClick={(e) => {
-              e.stopPropagation();
-              onChange(null);
-            }}
-            className="text-red-500 hover:bg-red-100 hover:text-red-600 rounded-xs p-0.5"
-          >
-            <FaX size={10} />
-          </div>
-        )}
-        {displayValue ? (
-          displayValue
-        ) : (
-          <div className="text-gray-400">{placeholder}</div>
-        )}
+        <div className="flex items-center gap-2 overflow-hidden">
+          {displayValue && !uncloseable && (
+            <div
+              onClick={(e) => {
+                e.stopPropagation();
+                onChange(null);
+              }}
+              className="cursor-pointer text-red-500 hover:bg-red-100 hover:text-red-600 rounded-xs p-0.5 shrink-0"
+            >
+              <FaX size={10} />
+            </div>
+          )}
+          {displayValue ? (
+            <span className="truncate">{displayValue}</span>
+          ) : (
+            <span className="text-gray-400 truncate">{placeholder}</span>
+          )}
+        </div>
+        <FaCalendarDays className="text-gray-400 ml-auto shrink-0" size={14} />
       </button>
 
       {showPopover &&

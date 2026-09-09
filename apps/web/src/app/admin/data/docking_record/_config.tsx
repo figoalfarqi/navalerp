@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { formatSmartDate } from "@/utils/dateTime";
 import { ColumnField } from "@/components/table/Table";
 import { FormField } from "@/components/formCrud/FormCrud";
 import { FilterField } from "@/components/table/FilterFormTable";
@@ -12,9 +13,9 @@ export const columns: ColumnField[] = [
   { key: "ship_name", label: "Kapal KRI" },
   { key: "shipyard_name", label: "Shipyard Name" },
   { key: "docking_type", label: "Docking Type" },
-  { key: "entry_date", label: "Entry Date" },
-  { key: "scheduled_exit_date", label: "Scheduled Exit Date" },
-  { key: "actual_exit_date", label: "Actual Exit Date" },
+  { key: "entry_date", label: "Entry Date", render: (item: any) => formatSmartDate(item.entry_date) },
+  { key: "scheduled_exit_date", label: "Scheduled Exit Date", render: (item: any) => formatSmartDate(item.scheduled_exit_date) },
+  { key: "actual_exit_date", label: "Actual Exit Date", render: (item: any) => formatSmartDate(item.actual_exit_date) },
 ];
 
 export const filterFields: FilterField[] = [
@@ -47,7 +48,13 @@ export const formFields = (mode: string): FormField[] => [
     name: "docking_type",
     col: "left",
     label: "Docking Type",
-    fieldType: "text",
+    fieldType: "select",
+    options: [
+      { label: "Annual Docking", value: "ANNUAL_DOCKING" },
+      { label: "Special Docking", value: "SPECIAL_DOCKING" },
+      { label: "Repair Docking", value: "REPAIR_DOCKING" },
+      { label: "Modernization", value: "MODERNIZATION" },
+    ],
     required: true,
     disabled: mode === "view",
   },

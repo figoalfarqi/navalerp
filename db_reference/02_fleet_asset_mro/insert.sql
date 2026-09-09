@@ -1,113 +1,144 @@
 -- =============================================================================
--- MODUL 2: FLEET, ASSET & HIERARKI PERALATAN KAPAL (MRO & ASSET) (NAVALERP)
--- FILE: 02_fleet_asset_mro/insert.sql
+-- SEED DATA: MODUL 2 - ARMADA KAPAL PERANG, MRO & KELAIKAN MATERIAL
 -- =============================================================================
 
--- 1. Insert Master Kelas Kapal
-INSERT INTO mro_ship_classes (class_id, class_code, class_name, category, specifications, builder, total_built, created_at)
-VALUES
-    ('40000000-0000-0000-0000-000000000001', 'SIGMA_10514', 'Martadinata Class Guided-Missile Frigate', 'FRIGATE', '{"length_m": 105.14, "beam_m": 14.02, "draft_m": 3.75, "displacement_tons": 2365, "speed_knots": 28, "range_nm": 5000, "endurance_days": 20}', 'Damen Schelde Naval Shipbuilding / PT PAL Indonesia', 2, CURRENT_TIMESTAMP),
-    ('40000000-0000-0000-0000-000000000002', 'SIGMA_9113', 'Diponegoro Class Guided-Missile Corvette', 'CORVETTE', '{"length_m": 90.71, "beam_m": 13.02, "draft_m": 3.60, "displacement_tons": 1692, "speed_knots": 28, "range_nm": 4000, "endurance_days": 14}', 'Damen Schelde Naval Shipbuilding', 4, CURRENT_TIMESTAMP),
-    ('40000000-0000-0000-0000-000000000003', 'MAKASSAR_LPD', 'Makassar Class Landing Platform Dock', 'LPD', '{"length_m": 122.00, "beam_m": 22.00, "draft_m": 4.90, "displacement_tons": 7300, "speed_knots": 16, "range_nm": 10000, "endurance_days": 30}', 'Daesun Shipbuilding / PT PAL Indonesia', 5, CURRENT_TIMESTAMP),
-    ('40000000-0000-0000-0000-000000000004', 'KCR_60M', 'Sampari Class Fast Missile Boat', 'FAST_ATTACK', '{"length_m": 60.00, "beam_m": 8.10, "draft_m": 2.60, "displacement_tons": 460, "speed_knots": 28, "range_nm": 2400, "endurance_days": 8}', 'PT PAL Indonesia (Persero)', 6, CURRENT_TIMESTAMP)
-ON CONFLICT (class_id) DO UPDATE SET
-    class_code = EXCLUDED.class_code,
-    class_name = EXCLUDED.class_name,
-    specifications = EXCLUDED.specifications;
+INSERT INTO mro_ship_classes (class_id, class_code, class_name, category, builder, total_built) VALUES
+    ('30000000-0000-0000-0000-000000000001', 'FFG-SIGMA', 'Frigat SIGMA 10514 PKR', 'FRIGATE', 'PT PAL Indonesia / Damen Schelde', 4),
+    ('30000000-0000-0000-0000-000000000002', 'KCR-60M', 'Kapal Cepat Rudal 60 Meter', 'FAST_ATTACK', 'PT PAL Indonesia', 4),
+    ('30000000-0000-0000-0000-000000000003', 'LPD-122M', 'Landing Platform Dock Makassar Class', 'LPD', 'PT PAL Indonesia / Daesun', 4),
+    ('30000000-0000-0000-0000-000000000004', 'SSK-NAGAPASA', 'Kapal Selam Nagapasa Class Type 209/1400', 'SUBMARINE', 'DSME Korea / PT PAL Indonesia', 4),
+    ('30000000-0000-0000-0000-000000000005', 'CORVETTE-SIGMA', 'Korvet SIGMA 9113 Diponegoro Class', 'CORVETTE', 'Damen Schelde Naval Shipbuilding', 4),
+    ('30000000-0000-0000-0000-000000000006', 'CORVETTE-BUNG-TOMO', 'Korvet Bung Tomo Class (F2000)', 'CORVETTE', 'BAE Systems Marine', 4),
+    ('30000000-0000-0000-0000-000000000007', 'PC-40M', 'Kapal Patroli Cepat 40 Meter', 'PATROL', 'PT Palindo Marine Batam', 4),
+    ('30000000-0000-0000-0000-000000000008', 'MCMV-PULAU-FANI', 'Mine Counter-Measure Vessel Pulau Fani Class', 'PATROL', 'Abeking & Rasmussen Germany', 4),
+    ('30000000-0000-0000-0000-000000000009', 'BCM-TARAKAN', 'Kapal Bantu Cair Minyak (Tanker Armada)', 'AUXILIARY', 'PT Daya Radar Utama', 4),
+    ('30000000-0000-0000-0000-000000000010', 'OPV-90M', 'Offshore Patrol Vessel 90 Meter', 'PATROL', 'PT Daya Radar Utama', 4)
+ON CONFLICT (class_id) DO UPDATE SET class_name = EXCLUDED.class_name;
 
--- 2. Insert Master Kapal Perang Republik Indonesia (KRI)
-INSERT INTO mro_ships (ship_id, class_id, assigned_unit_id, hull_number, ship_name, call_sign, commission_date, home_port, length_m, beam_m, draft_m, displacement_tons, max_speed_knots, cruise_range_nm, crew_capacity, fuel_capacity_liters, fresh_water_capacity_liters, status, current_readiness_status, created_at)
-VALUES
-    ('41000000-0000-0000-0000-000000000001', '40000000-0000-0000-0000-000000000001', '10000000-0000-0000-0000-000000000007', '331', 'KRI Raden Eddy Martadinata', '7EAA', '2017-04-07', 'Pangkalan Surabaya (Koarmada II)', 105.14, 14.02, 3.75, 2365.00, 28.00, 5000.00, 122, 280000.00, 45000.00, 'ACTIVE', 'FULLY_MISSION_CAPABLE', CURRENT_TIMESTAMP),
-    ('41000000-0000-0000-0000-000000000002', '40000000-0000-0000-0000-000000000001', '10000000-0000-0000-0000-000000000007', '332', 'KRI I Gusti Ngurah Rai', '7EAB', '2018-01-10', 'Pangkalan Surabaya (Koarmada II)', 105.14, 14.02, 3.75, 2365.00, 28.00, 5000.00, 122, 280000.00, 45000.00, 'ACTIVE', 'FULLY_MISSION_CAPABLE', CURRENT_TIMESTAMP),
-    ('41000000-0000-0000-0000-000000000003', '40000000-0000-0000-0000-000000000002', '10000000-0000-0000-0000-000000000007', '365', 'KRI Diponegoro', '7EAC', '2007-07-02', 'Pangkalan Surabaya (Koarmada II)', 90.71, 13.02, 3.60, 1692.00, 28.00, 4000.00, 80, 190000.00, 30000.00, 'ACTIVE', 'FULLY_MISSION_CAPABLE', CURRENT_TIMESTAMP),
-    ('41000000-0000-0000-0000-000000000004', '40000000-0000-0000-0000-000000000003', '10000000-0000-0000-0000-000000000005', '590', 'KRI Makassar', '7EAD', '2007-04-29', 'Pangkalan Jakarta (Kolinlamil)', 122.00, 22.00, 4.90, 7300.00, 16.00, 10000.00, 518, 650000.00, 120000.00, 'ACTIVE', 'FULLY_MISSION_CAPABLE', CURRENT_TIMESTAMP),
-    ('41000000-0000-0000-0000-000000000005', '40000000-0000-0000-0000-000000000002', '10000000-0000-0000-0000-000000000007', '368', 'KRI Frans Kaisiepo', '7EAE', '2009-09-02', 'Pangkalan Surabaya (Koarmada II)', 90.71, 13.02, 3.60, 1692.00, 28.00, 4000.00, 80, 190000.00, 30000.00, 'ACTIVE', 'FULLY_MISSION_CAPABLE', CURRENT_TIMESTAMP),
-    ('41000000-0000-0000-0000-000000000006', '40000000-0000-0000-0000-000000000004', '10000000-0000-0000-0000-000000000008', '628', 'KRI Sampari', '7EAF', '2014-05-28', 'Pangkalan Surabaya (Koarmada II)', 60.00, 8.10, 2.60, 460.00, 28.00, 2400.00, 55, 65000.00, 15000.00, 'STANDBY', 'PARTIALLY_MISSION_CAPABLE', CURRENT_TIMESTAMP)
-ON CONFLICT (ship_id) DO UPDATE SET
-    ship_name = EXCLUDED.ship_name,
-    hull_number = EXCLUDED.hull_number,
-    status = EXCLUDED.status,
-    current_readiness_status = EXCLUDED.current_readiness_status;
+INSERT INTO mro_ships (ship_id, class_id, assigned_unit_id, hull_number, ship_name, call_sign, commission_date, home_port, length_m, beam_m, draft_m, displacement_tons, max_speed_knots, cruise_range_nm, crew_capacity, fuel_capacity_liters, fresh_water_capacity_liters, status, current_readiness_status) VALUES
+    ('31000000-0000-0000-0000-000000000001', '30000000-0000-0000-0000-000000000001', '10000000-0000-0000-0000-000000000007', '331', 'KRI Raden Eddy Martadinata', 'YBRE', '2017-04-07', 'Pangkalan Koarmada II Ujung Surabaya', 105.11, 14.02, 3.75, 3216, 28, 5000.0, 122, 350000, 50000.0, 'ACTIVE', 'FULLY_MISSION_CAPABLE'),
+    ('31000000-0000-0000-0000-000000000002', '30000000-0000-0000-0000-000000000001', '10000000-0000-0000-0000-000000000011', '332', 'KRI I Gusti Ngurah Rai', 'YBRF', '2017-04-07', 'Pangkalan Koarmada II Ujung Surabaya', 105.11, 14.02, 3.75, 3216, 28, 5000.0, 122, 350000, 50000.0, 'ACTIVE', 'FULLY_MISSION_CAPABLE'),
+    ('31000000-0000-0000-0000-000000000003', '30000000-0000-0000-0000-000000000005', '10000000-0000-0000-0000-000000000007', '365', 'KRI Diponegoro', 'YBDP', '2017-04-07', 'Pangkalan Koarmada II Ujung Surabaya', 105.11, 14.02, 3.75, 1692, 28, 5000.0, 80, 210000, 50000.0, 'ACTIVE', 'FULLY_MISSION_CAPABLE'),
+    ('31000000-0000-0000-0000-000000000004', '30000000-0000-0000-0000-000000000003', '10000000-0000-0000-0000-000000000005', '590', 'KRI Makassar', 'YBMK', '2017-04-07', 'Pangkalan Koarmada II Ujung Surabaya', 105.11, 14.02, 3.75, 11394, 16, 5000.0, 518, 800000, 50000.0, 'ACTIVE', 'FULLY_MISSION_CAPABLE'),
+    ('31000000-0000-0000-0000-000000000005', '30000000-0000-0000-0000-000000000002', '10000000-0000-0000-0000-000000000007', '628', 'KRI Sampari', 'YBSP', '2017-04-07', 'Pangkalan Koarmada II Ujung Surabaya', 105.11, 14.02, 3.75, 460, 28, 5000.0, 55, 90000, 50000.0, 'ACTIVE', 'FULLY_MISSION_CAPABLE'),
+    ('31000000-0000-0000-0000-000000000006', '30000000-0000-0000-0000-000000000002', '10000000-0000-0000-0000-000000000007', '629', 'KRI Tombak', 'YBTB', '2017-04-07', 'Pangkalan Koarmada II Ujung Surabaya', 105.11, 14.02, 3.75, 460, 28, 5000.0, 55, 90000, 50000.0, 'ACTIVE', 'FULLY_MISSION_CAPABLE'),
+    ('31000000-0000-0000-0000-000000000007', '30000000-0000-0000-0000-000000000004', '10000000-0000-0000-0000-000000000012', '403', 'KRI Nagapasa', 'YBNG', '2017-04-07', 'Pangkalan Koarmada II Ujung Surabaya', 105.11, 14.02, 3.75, 1400, 21.5, 5000.0, 40, 250000, 50000.0, 'ACTIVE', 'FULLY_MISSION_CAPABLE'),
+    ('31000000-0000-0000-0000-000000000008', '30000000-0000-0000-0000-000000000004', '10000000-0000-0000-0000-000000000012', '404', 'KRI Ardadedali', 'YBND', '2017-04-07', 'Pangkalan Koarmada II Ujung Surabaya', 105.11, 14.02, 3.75, 1400, 21.5, 5000.0, 40, 250000, 50000.0, 'ACTIVE', 'FULLY_MISSION_CAPABLE'),
+    ('31000000-0000-0000-0000-000000000009', '30000000-0000-0000-0000-000000000006', '10000000-0000-0000-0000-000000000007', '357', 'KRI Bung Tomo', 'YBBT', '2017-04-07', 'Pangkalan Koarmada II Ujung Surabaya', 105.11, 14.02, 3.75, 1930, 30, 5000.0, 100, 280000, 50000.0, 'ACTIVE', 'FULLY_MISSION_CAPABLE'),
+    ('31000000-0000-0000-0000-000000000010', '30000000-0000-0000-0000-000000000006', '10000000-0000-0000-0000-000000000011', '358', 'KRI John Lie', 'YBJL', '2017-04-07', 'Pangkalan Koarmada II Ujung Surabaya', 105.11, 14.02, 3.75, 1930, 30, 5000.0, 100, 280000, 50000.0, 'ACTIVE', 'FULLY_MISSION_CAPABLE'),
+    ('31000000-0000-0000-0000-000000000011', '30000000-0000-0000-0000-000000000007', '10000000-0000-0000-0000-000000000010', '868', 'KRI Albacora', 'YBAL', '2017-04-07', 'Pangkalan Koarmada II Ujung Surabaya', 105.11, 14.02, 3.75, 250, 24, 5000.0, 35, 60000, 50000.0, 'ACTIVE', 'FULLY_MISSION_CAPABLE'),
+    ('31000000-0000-0000-0000-000000000012', '30000000-0000-0000-0000-000000000008', '10000000-0000-0000-0000-000000000007', '731', 'KRI Pulau Fani', 'YBPF', '2017-04-07', 'Pangkalan Koarmada II Ujung Surabaya', 105.11, 14.02, 3.75, 900, 18, 5000.0, 45, 120000, 50000.0, 'ACTIVE', 'FULLY_MISSION_CAPABLE'),
+    ('31000000-0000-0000-0000-000000000013', '30000000-0000-0000-0000-000000000009', '10000000-0000-0000-0000-000000000008', '905', 'KRI Tarakan', 'YBTR', '2017-04-07', 'Pangkalan Koarmada II Ujung Surabaya', 105.11, 14.02, 3.75, 5500, 18, 5000.0, 95, 1150000, 50000.0, 'ACTIVE', 'FULLY_MISSION_CAPABLE'),
+    ('31000000-0000-0000-0000-000000000014', '30000000-0000-0000-0000-000000000005', '10000000-0000-0000-0000-000000000007', '366', 'KRI Sultan Hasanuddin', 'YBSH', '2017-04-07', 'Pangkalan Koarmada II Ujung Surabaya', 105.11, 14.02, 3.75, 1692, 28, 5000.0, 80, 210000, 50000.0, 'ACTIVE', 'FULLY_MISSION_CAPABLE')
+ON CONFLICT (ship_id) DO UPDATE SET ship_name = EXCLUDED.ship_name, current_readiness_status = EXCLUDED.current_readiness_status;
 
--- 3. Insert Hierarki Sistem Kapal (KRI REM-331)
-INSERT INTO mro_systems (system_id, ship_id, parent_system_id, system_code, system_name, system_category, system_level, description, created_at)
-VALUES
-    ('42000000-0000-0000-0000-000000000001', '41000000-0000-0000-0000-000000000001', NULL, 'PROPULSION', 'Sistem Propulsi Gabungan Diesel & Elektrik (CODOE)', 'PROPULSION', 'SYSTEM', '2x MTU 20V 4000 M93L Diesel + 2x Electric Motors', CURRENT_TIMESTAMP),
-    ('42000000-0000-0000-0000-000000000002', '41000000-0000-0000-0000-000000000001', NULL, 'ELECTRICAL', 'Sistem Pembangkit & Distribusi Daya Listrik', 'ELECTRICAL', 'SYSTEM', '4x Caterpillar 3412C Diesel Generators', CURRENT_TIMESTAMP),
-    ('42000000-0000-0000-0000-000000000003', '41000000-0000-0000-0000-000000000001', NULL, 'RADAR_SENSOR', 'Sistem Sensor, Radar Pengintai & Sonar', 'SENSOR_RADAR', 'SYSTEM', 'Thales SMART-S Mk2, STIR 1.2 EO Mk2, Kingklip Sonar', CURRENT_TIMESTAMP),
-    ('42000000-0000-0000-0000-000000000004', '41000000-0000-0000-0000-000000000001', NULL, 'WEAPON_SYSTEM', 'Sistem Artileri & Peluncur Rudal Pertahanan Tempur', 'WEAPON', 'SYSTEM', 'Oto Melara 76mm, VL MICA SAM, Exocet MM40 Block 3', CURRENT_TIMESTAMP),
-    ('42000000-0000-0000-0000-000000000005', '41000000-0000-0000-0000-000000000001', NULL, 'NAVIGATION', 'Sistem Navigasi Maritim & Komunikasi Tempur', 'NAVIGATION', 'SYSTEM', 'Sperry Marine BridgeMaster Radar, ECDIS, Link-Y Data Bus', CURRENT_TIMESTAMP)
-ON CONFLICT (system_id) DO UPDATE SET
-    system_name = EXCLUDED.system_name,
-    description = EXCLUDED.description;
+INSERT INTO mro_systems (system_id, ship_id, system_code, system_name, system_category, system_level) VALUES
+    ('32000000-0000-0000-0000-000000000001', '31000000-0000-0000-0000-000000000001', 'SYS-PROP-331', 'Sistem Pendorong Pokok (CODOE)', 'PROPULSION', 'SYSTEM'),
+    ('32000000-0000-0000-0000-000000000002', '31000000-0000-0000-0000-000000000001', 'SYS-RAD-331', 'Radar Surveillance SMART-S Mk2', 'SENSOR_RADAR', 'SYSTEM'),
+    ('32000000-0000-0000-0000-000000000003', '31000000-0000-0000-0000-000000000001', 'SYS-CMS-331', 'Combat Management System TACTICOS', 'SENSOR_RADAR', 'SYSTEM'),
+    ('32000000-0000-0000-0000-000000000004', '31000000-0000-0000-0000-000000000001', 'SYS-WPN-331', 'Meriam Utama Oto Melara 76mm/62 Super Rapid', 'WEAPON', 'SYSTEM'),
+    ('32000000-0000-0000-0000-000000000005', '31000000-0000-0000-0000-000000000001', 'SYS-MSL-331', 'Sistem Peluru Kendali Exocet MM40 Block 3', 'WEAPON', 'SYSTEM'),
+    ('32000000-0000-0000-0000-000000000006', '31000000-0000-0000-0000-000000000002', 'SYS-PROP-332', 'Sistem Pendorong Pokok KRI GNR', 'PROPULSION', 'SYSTEM'),
+    ('32000000-0000-0000-0000-000000000007', '31000000-0000-0000-0000-000000000003', 'SYS-PROP-365', 'Sistem Mesin Diesel SEMT Pielstick', 'PROPULSION', 'SYSTEM'),
+    ('32000000-0000-0000-0000-000000000008', '31000000-0000-0000-0000-000000000004', 'SYS-PROP-590', 'Sistem Mesin Pendorong MAN B&W', 'PROPULSION', 'SYSTEM'),
+    ('32000000-0000-0000-0000-000000000009', '31000000-0000-0000-0000-000000000005', 'SYS-RAD-628', 'Sistem Radar Terpadu SR-47AG', 'SENSOR_RADAR', 'SYSTEM'),
+    ('32000000-0000-0000-0000-000000000010', '31000000-0000-0000-0000-000000000007', 'SYS-PROP-403', 'Sistem Pendorong Elektrik & Baterai Kapal Selam', 'PROPULSION', 'SYSTEM'),
+    ('32000000-0000-0000-0000-000000000011', '31000000-0000-0000-0000-000000000007', 'SYS-SONAR-403', 'Sistem Sonar Terpadu CSU-90', 'SENSOR_RADAR', 'SYSTEM'),
+    ('32000000-0000-0000-0000-000000000012', '31000000-0000-0000-0000-000000000009', 'SYS-PROP-357', 'Sistem Turbin Gas Rolls-Royce Spey', 'PROPULSION', 'SYSTEM'),
+    ('32000000-0000-0000-0000-000000000013', '31000000-0000-0000-0000-000000000012', 'SYS-SONAR-731', 'Sistem Sonar Pemburu Ranjau HMS-12M', 'SENSOR_RADAR', 'SYSTEM'),
+    ('32000000-0000-0000-0000-000000000014', '31000000-0000-0000-0000-000000000013', 'SYS-CARGO-905', 'Sistem Transfer BBM Replenishment At Sea (RAS)', 'AUXILIARY', 'SYSTEM'),
+    ('32000000-0000-0000-0000-000000000015', '31000000-0000-0000-0000-000000000001', 'SYS-SON-331', 'Sonar Lambung Kingklip Hull Mounted Sonar', 'SENSOR_RADAR', 'SYSTEM')
+ON CONFLICT (system_id) DO UPDATE SET system_name = EXCLUDED.system_name;
 
--- 4. Insert Equipment Terpasang
-INSERT INTO mro_equipments (equipment_id, system_id, serial_number, equipment_tag, equipment_name, manufacturer, model_number, country_of_origin, installation_date, total_operating_hours, design_life_hours, criticality_level, health_status, created_at)
-VALUES
-    ('43000000-0000-0000-0000-000000000001', '42000000-0000-0000-0000-000000000001', 'MTU-20V-4000-01', 'ME-STBD', 'Main Engine Diesel Kanan (Starboard)', 'MTU Friedrichshafen', '20V 4000 M93L', 'Germany', '2016-08-15', 3450.50, 30000.00, 'CRITICAL_SAFETY', 'OPERATIONAL', CURRENT_TIMESTAMP),
-    ('43000000-0000-0000-0000-000000000002', '42000000-0000-0000-0000-000000000002', 'CAT-3412-GEN-01', 'DG-01', 'Diesel Generator Utama No 1', 'Caterpillar Marine', 'CAT 3412C', 'USA', '2016-08-15', 5210.00, 40000.00, 'CRITICAL_SAFETY', 'OPERATIONAL', CURRENT_TIMESTAMP),
-    ('43000000-0000-0000-0000-000000000003', '42000000-0000-0000-0000-000000000003', 'THALES-SMARTS-01', 'RADAR-3D', '3D Multi-Beam Air & Surface Surveillance Radar', 'Thales Nederland', 'SMART-S Mk2', 'Netherlands', '2016-10-20', 2890.00, 25000.00, 'MISSION_ESSENTIAL', 'OPERATIONAL', CURRENT_TIMESTAMP),
-    ('43000000-0000-0000-0000-000000000004', '42000000-0000-0000-0000-000000000004', 'OTO-76SR-01', 'GUN-MAIN-76', 'Meriam Utama 76mm Super Rapid Gun', 'Leonardo / Oto Melara', '76/62 SR', 'Italy', '2016-11-05', 420.00, 15000.00, 'MISSION_ESSENTIAL', 'OPERATIONAL', CURRENT_TIMESTAMP),
-    ('43000000-0000-0000-0000-000000000005', '42000000-0000-0000-0000-000000000005', 'SPERRY-NAV-01', 'GYRO-01', 'Master Gyrocompass & Inertial Navigation System', 'Sperry Marine', 'MK-39 Mod 3A', 'UK', '2016-09-12', 6120.00, 35000.00, 'MISSION_ESSENTIAL', 'OPERATIONAL', CURRENT_TIMESTAMP)
-ON CONFLICT (equipment_id) DO UPDATE SET
-    equipment_name = EXCLUDED.equipment_name,
-    health_status = EXCLUDED.health_status,
-    total_operating_hours = EXCLUDED.total_operating_hours;
+INSERT INTO mro_equipments (equipment_id, system_id, serial_number, equipment_tag, equipment_name, manufacturer, model_number, total_operating_hours, health_status) VALUES
+    ('33000000-0000-0000-0000-000000000001', '32000000-0000-0000-0000-000000000001', 'MTU-20V4000-01', 'ME-STBD-331', 'Mesin Diesel MTU 20V 4000 M53B Kanan', 'MTU Friedrichshafen', '20V 4000 M53B', 4250, 'OPERATIONAL'),
+    ('33000000-0000-0000-0000-000000000002', '32000000-0000-0000-0000-000000000001', 'MTU-20V4000-02', 'ME-PORT-331', 'Mesin Diesel MTU 20V 4000 M53B Kiri', 'MTU Friedrichshafen', '20V 4000 M53B', 4180, 'OPERATIONAL'),
+    ('33000000-0000-0000-0000-000000000003', '32000000-0000-0000-0000-000000000001', 'EM-PROP-01', 'EM-STBD-331', 'Electric Motor Pendorong Senyap', 'Thales Nederland', 'EL-MOT-800KW', 1890, 'OPERATIONAL'),
+    ('33000000-0000-0000-0000-000000000004', '32000000-0000-0000-0000-000000000002', 'THL-SMARTS-331', 'RAD-3D-331', '3D Multibeam Radar Antenna SMART-S', 'Thales Naval', 'SMART-S Mk2', 6800, 'OPERATIONAL'),
+    ('33000000-0000-0000-0000-000000000005', '32000000-0000-0000-0000-000000000003', 'THL-TACT-331', 'CMS-SERV-01', 'Server Utama TACTICOS Naval CMS', 'Thales Nederland', 'TACTICOS V3.2', 9500, 'OPERATIONAL'),
+    ('33000000-0000-0000-0000-000000000006', '32000000-0000-0000-0000-000000000004', 'OTO-76SR-01', 'GUN-76-331', 'Kubah Meriam Oto Melara 76/62 SR', 'Leonardo Defence', '76/62 Super Rapid', 850, 'OPERATIONAL'),
+    ('33000000-0000-0000-0000-000000000007', '32000000-0000-0000-0000-000000000005', 'MBDA-MM40-01', 'MSL-LNCH-01', 'Peluncur Rudal Exocet MM40 Blok 3 Quad', 'MBDA France', 'ITL-40 Mk3', 1200, 'OPERATIONAL'),
+    ('33000000-0000-0000-0000-000000000008', '32000000-0000-0000-0000-000000000006', 'MTU-20V4000-03', 'ME-STBD-332', 'Mesin Diesel MTU KRI GNR Kanan', 'MTU Friedrichshafen', '20V 4000 M53B', 3900, 'OPERATIONAL'),
+    ('33000000-0000-0000-0000-000000000009', '32000000-0000-0000-0000-000000000007', 'SEMT-PIEL-01', 'ME-PORT-365', 'Mesin Diesel SEMT Pielstick KRI Diponegoro', 'SEMT Pielstick', '20PA6B STC', 8200, 'OPERATIONAL'),
+    ('33000000-0000-0000-0000-000000000010', '32000000-0000-0000-0000-000000000008', 'MAN-BW-590-01', 'ME-PORT-590', 'Mesin Utama Kapal Angkut LPD 590', 'MAN Energy Solutions', 'MAN B&W 8L28/32A', 11200, 'OPERATIONAL'),
+    ('33000000-0000-0000-0000-000000000011', '32000000-0000-0000-0000-000000000010', 'MTU-SSK-403', 'ME-GEN-403', 'Diesel Generator Pengisian Baterai SSK', 'MTU Friedrichshafen', 'MTU 12V 493', 3100, 'OPERATIONAL'),
+    ('33000000-0000-0000-0000-000000000012', '32000000-0000-0000-0000-000000000011', 'ATLAS-CSU90', 'SON-CSU-403', 'Transducer Array Sonar Pasif SSK', 'Atlas Elektronik', 'CSU-90 Submarine', 5400, 'OPERATIONAL'),
+    ('33000000-0000-0000-0000-000000000013', '32000000-0000-0000-0000-000000000012', 'RR-SPEY-01', 'GT-STBD-357', 'Marine Gas Turbine Rolls-Royce Spey', 'Rolls-Royce Marine', 'Spey SM1A', 4700, 'OPERATIONAL'),
+    ('33000000-0000-0000-0000-000000000014', '32000000-0000-0000-0000-000000000013', 'HMS12M-731', 'SON-MCMV-731', 'Sonar Pemburu Ranjau Bawah Air', 'Atlas Elektronik', 'HMS-12M MineHunter', 2100, 'OPERATIONAL'),
+    ('33000000-0000-0000-0000-000000000015', '32000000-0000-0000-0000-000000000015', 'THL-KINGKLIP-01', 'SON-HULL-331', 'Kingklip Sonar Transceiver Unit', 'Thales Underwater Systems', 'Kingklip Mk2', 3400, 'OPERATIONAL')
+ON CONFLICT (equipment_id) DO UPDATE SET equipment_name = EXCLUDED.equipment_name, health_status = EXCLUDED.health_status;
 
--- 5. Insert Telemetri Kondisi Mesin
-INSERT INTO mro_equipment_parameters (param_id, equipment_id, recorded_at, rpm, temperature_celsius, pressure_bar, vibration_level, oil_pressure_bar, running_hours_snapshot, status_flag, recorded_by_user_id)
-VALUES
-    ('43100000-0000-0000-0000-000000000001', '43000000-0000-0000-0000-000000000001', CURRENT_TIMESTAMP, 1800.00, 84.50, 4.80, 0.045, 5.20, 3450.50, 'NORMAL', '20000000-0000-0000-0000-000000000005'),
-    ('43100000-0000-0000-0000-000000000002', '43000000-0000-0000-0000-000000000002', CURRENT_TIMESTAMP, 1500.00, 81.20, 3.20, 0.038, 4.80, 5210.00, 'NORMAL', '20000000-0000-0000-0000-000000000005')
-ON CONFLICT (param_id) DO NOTHING;
+INSERT INTO mro_failure_reports (report_id, equipment_id, reported_by_user_id, report_number, incident_date, severity, failure_mode, description, operational_impact, immediate_action_taken, status) VALUES
+    ('35000000-0000-0000-0000-000000000001', '33000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-000000000005', 'REP-2026-0001', '2026-02-10 08:00:00+07', 'CAT3', 'VIBRATION_ABNORMAL', 'Terdeteksi anomali getaran dan penurunan tekanan oli pada komponen ME-STBD-331', 'Degradasi kesiapan tempur parsial', 'Mengalihkan daya ke unit sekunder dan pemantauan temperatur', 'CLOSED'),
+    ('35000000-0000-0000-0000-000000000002', '33000000-0000-0000-0000-000000000002', '20000000-0000-0000-0000-000000000005', 'REP-2026-0002', '2026-03-10 08:00:00+07', 'CAT2', 'VIBRATION_ABNORMAL', 'Terdeteksi anomali getaran dan penurunan tekanan oli pada komponen ME-PORT-331', 'Degradasi kesiapan tempur parsial', 'Mengalihkan daya ke unit sekunder dan pemantauan temperatur', 'CLOSED'),
+    ('35000000-0000-0000-0000-000000000003', '33000000-0000-0000-0000-000000000003', '20000000-0000-0000-0000-000000000005', 'REP-2026-0003', '2026-04-10 08:00:00+07', 'CAT1', 'VIBRATION_ABNORMAL', 'Terdeteksi anomali getaran dan penurunan tekanan oli pada komponen EM-STBD-331', 'Degradasi kesiapan tempur parsial', 'Mengalihkan daya ke unit sekunder dan pemantauan temperatur', 'CLOSED'),
+    ('35000000-0000-0000-0000-000000000004', '33000000-0000-0000-0000-000000000004', '20000000-0000-0000-0000-000000000005', 'REP-2026-0004', '2026-05-10 08:00:00+07', 'CAT2', 'VIBRATION_ABNORMAL', 'Terdeteksi anomali getaran dan penurunan tekanan oli pada komponen RAD-3D-331', 'Degradasi kesiapan tempur parsial', 'Mengalihkan daya ke unit sekunder dan pemantauan temperatur', 'CLOSED'),
+    ('35000000-0000-0000-0000-000000000005', '33000000-0000-0000-0000-000000000005', '20000000-0000-0000-0000-000000000005', 'REP-2026-0005', '2026-01-10 08:00:00+07', 'CAT3', 'VIBRATION_ABNORMAL', 'Terdeteksi anomali getaran dan penurunan tekanan oli pada komponen CMS-SERV-01', 'Degradasi kesiapan tempur parsial', 'Mengalihkan daya ke unit sekunder dan pemantauan temperatur', 'CLOSED'),
+    ('35000000-0000-0000-0000-000000000006', '33000000-0000-0000-0000-000000000006', '20000000-0000-0000-0000-000000000005', 'REP-2026-0006', '2026-02-10 08:00:00+07', 'CAT1', 'VIBRATION_ABNORMAL', 'Terdeteksi anomali getaran dan penurunan tekanan oli pada komponen GUN-76-331', 'Degradasi kesiapan tempur parsial', 'Mengalihkan daya ke unit sekunder dan pemantauan temperatur', 'CLOSED'),
+    ('35000000-0000-0000-0000-000000000007', '33000000-0000-0000-0000-000000000007', '20000000-0000-0000-0000-000000000005', 'REP-2026-0007', '2026-03-10 08:00:00+07', 'CAT3', 'VIBRATION_ABNORMAL', 'Terdeteksi anomali getaran dan penurunan tekanan oli pada komponen MSL-LNCH-01', 'Degradasi kesiapan tempur parsial', 'Mengalihkan daya ke unit sekunder dan pemantauan temperatur', 'CLOSED'),
+    ('35000000-0000-0000-0000-000000000008', '33000000-0000-0000-0000-000000000008', '20000000-0000-0000-0000-000000000005', 'REP-2026-0008', '2026-04-10 08:00:00+07', 'CAT2', 'VIBRATION_ABNORMAL', 'Terdeteksi anomali getaran dan penurunan tekanan oli pada komponen ME-STBD-332', 'Degradasi kesiapan tempur parsial', 'Mengalihkan daya ke unit sekunder dan pemantauan temperatur', 'CLOSED'),
+    ('35000000-0000-0000-0000-000000000009', '33000000-0000-0000-0000-000000000009', '20000000-0000-0000-0000-000000000005', 'REP-2026-0009', '2026-05-10 08:00:00+07', 'CAT1', 'VIBRATION_ABNORMAL', 'Terdeteksi anomali getaran dan penurunan tekanan oli pada komponen ME-PORT-365', 'Degradasi kesiapan tempur parsial', 'Mengalihkan daya ke unit sekunder dan pemantauan temperatur', 'CLOSED'),
+    ('35000000-0000-0000-0000-000000000010', '33000000-0000-0000-0000-000000000010', '20000000-0000-0000-0000-000000000005', 'REP-2026-0010', '2026-01-10 08:00:00+07', 'CAT2', 'VIBRATION_ABNORMAL', 'Terdeteksi anomali getaran dan penurunan tekanan oli pada komponen ME-PORT-590', 'Degradasi kesiapan tempur parsial', 'Mengalihkan daya ke unit sekunder dan pemantauan temperatur', 'CLOSED'),
+    ('35000000-0000-0000-0000-000000000011', '33000000-0000-0000-0000-000000000011', '20000000-0000-0000-0000-000000000005', 'REP-2026-0011', '2026-02-10 08:00:00+07', 'CAT3', 'VIBRATION_ABNORMAL', 'Terdeteksi anomali getaran dan penurunan tekanan oli pada komponen ME-GEN-403', 'Degradasi kesiapan tempur parsial', 'Mengalihkan daya ke unit sekunder dan pemantauan temperatur', 'CLOSED'),
+    ('35000000-0000-0000-0000-000000000012', '33000000-0000-0000-0000-000000000012', '20000000-0000-0000-0000-000000000005', 'REP-2026-0012', '2026-03-10 08:00:00+07', 'CAT1', 'VIBRATION_ABNORMAL', 'Terdeteksi anomali getaran dan penurunan tekanan oli pada komponen SON-CSU-403', 'Degradasi kesiapan tempur parsial', 'Mengalihkan daya ke unit sekunder dan pemantauan temperatur', 'CLOSED')
+ON CONFLICT (report_id) DO NOTHING;
 
--- 6. Insert Jadwal Pemeliharaan Preventif (PMS)
-INSERT INTO mro_pm_schedules (pm_id, equipment_id, pm_code, pm_title, interval_hours, interval_days, last_performed_at, next_due_at, task_instructions, estimated_duration_hours, is_active, created_at)
-VALUES
-    ('43200000-0000-0000-0000-000000000001', '43000000-0000-0000-0000-000000000001', 'PMS-MTU-500H', 'Inspeksi Berkala & Penggantian Filter Pelumas 500 Jam', 500, 90, '2025-11-10', '2026-03-15', 'Ganti filter oli, periksa tekanan bahan bakar, cek celah katup silinder', 6.00, TRUE, CURRENT_TIMESTAMP),
-    ('43200000-0000-0000-0000-000000000002', '43000000-0000-0000-0000-000000000004', 'PMS-OTO-300D', 'Uji Mekanisme Otomatis Elevasi & Traversal Meriam 76mm', 300, 180, '2025-12-05', '2026-06-05', 'Cek sistem hidrolik, lumas gear transversal, uji penembakan simulasi', 8.00, TRUE, CURRENT_TIMESTAMP)
-ON CONFLICT (pm_id) DO UPDATE SET
-    pm_title = EXCLUDED.pm_title,
-    task_instructions = EXCLUDED.task_instructions;
+INSERT INTO mro_pm_schedules (pm_id, equipment_id, pm_code, pm_title, interval_hours, interval_days, task_instructions, estimated_duration_hours, is_active) VALUES
+    ('34000000-0000-0000-0000-000000000001', '33000000-0000-0000-0000-000000000001', 'PMS-001', 'Inspeksi & Pemeliharaan Berkala ME-STBD-331', 500, 90, 'Lakukan pengecekan filter, penggantian oli pelumas, uji coba putaran, dan kalibrasi sensor.', 8.0, TRUE),
+    ('34000000-0000-0000-0000-000000000002', '33000000-0000-0000-0000-000000000002', 'PMS-002', 'Inspeksi & Pemeliharaan Berkala ME-PORT-331', 500, 90, 'Lakukan pengecekan filter, penggantian oli pelumas, uji coba putaran, dan kalibrasi sensor.', 8.0, TRUE),
+    ('34000000-0000-0000-0000-000000000003', '33000000-0000-0000-0000-000000000003', 'PMS-003', 'Inspeksi & Pemeliharaan Berkala EM-STBD-331', 500, 90, 'Lakukan pengecekan filter, penggantian oli pelumas, uji coba putaran, dan kalibrasi sensor.', 8.0, TRUE),
+    ('34000000-0000-0000-0000-000000000004', '33000000-0000-0000-0000-000000000004', 'PMS-004', 'Inspeksi & Pemeliharaan Berkala RAD-3D-331', 500, 90, 'Lakukan pengecekan filter, penggantian oli pelumas, uji coba putaran, dan kalibrasi sensor.', 8.0, TRUE),
+    ('34000000-0000-0000-0000-000000000005', '33000000-0000-0000-0000-000000000005', 'PMS-005', 'Inspeksi & Pemeliharaan Berkala CMS-SERV-01', 500, 90, 'Lakukan pengecekan filter, penggantian oli pelumas, uji coba putaran, dan kalibrasi sensor.', 8.0, TRUE),
+    ('34000000-0000-0000-0000-000000000006', '33000000-0000-0000-0000-000000000006', 'PMS-006', 'Inspeksi & Pemeliharaan Berkala GUN-76-331', 500, 90, 'Lakukan pengecekan filter, penggantian oli pelumas, uji coba putaran, dan kalibrasi sensor.', 8.0, TRUE),
+    ('34000000-0000-0000-0000-000000000007', '33000000-0000-0000-0000-000000000007', 'PMS-007', 'Inspeksi & Pemeliharaan Berkala MSL-LNCH-01', 500, 90, 'Lakukan pengecekan filter, penggantian oli pelumas, uji coba putaran, dan kalibrasi sensor.', 8.0, TRUE),
+    ('34000000-0000-0000-0000-000000000008', '33000000-0000-0000-0000-000000000008', 'PMS-008', 'Inspeksi & Pemeliharaan Berkala ME-STBD-332', 500, 90, 'Lakukan pengecekan filter, penggantian oli pelumas, uji coba putaran, dan kalibrasi sensor.', 8.0, TRUE),
+    ('34000000-0000-0000-0000-000000000009', '33000000-0000-0000-0000-000000000009', 'PMS-009', 'Inspeksi & Pemeliharaan Berkala ME-PORT-365', 500, 90, 'Lakukan pengecekan filter, penggantian oli pelumas, uji coba putaran, dan kalibrasi sensor.', 8.0, TRUE),
+    ('34000000-0000-0000-0000-000000000010', '33000000-0000-0000-0000-000000000010', 'PMS-010', 'Inspeksi & Pemeliharaan Berkala ME-PORT-590', 500, 90, 'Lakukan pengecekan filter, penggantian oli pelumas, uji coba putaran, dan kalibrasi sensor.', 8.0, TRUE),
+    ('34000000-0000-0000-0000-000000000011', '33000000-0000-0000-0000-000000000011', 'PMS-011', 'Inspeksi & Pemeliharaan Berkala ME-GEN-403', 500, 90, 'Lakukan pengecekan filter, penggantian oli pelumas, uji coba putaran, dan kalibrasi sensor.', 8.0, TRUE),
+    ('34000000-0000-0000-0000-000000000012', '33000000-0000-0000-0000-000000000012', 'PMS-012', 'Inspeksi & Pemeliharaan Berkala SON-CSU-403', 500, 90, 'Lakukan pengecekan filter, penggantian oli pelumas, uji coba putaran, dan kalibrasi sensor.', 8.0, TRUE)
+ON CONFLICT (pm_id) DO NOTHING;
 
--- 7. Insert Laporan Kerusakan (Failure Report)
-INSERT INTO mro_failure_reports (report_id, equipment_id, reported_by_user_id, report_number, incident_date, severity, failure_mode, description, operational_impact, immediate_action_taken, status, created_at)
-VALUES
-    ('44000000-0000-0000-0000-000000000001', '43000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-000000000005', 'FR-REM331-2026-001', '2026-02-10 08:30:00+07', 'CAT2', 'Fuel Injector Leakage', 'Fluktuasi tekanan bahan bakar silinder 4 pada Main Engine Starboard MTU 20V 4000', 'Kecepatan maksimum kapal terbatasi 18 knot', 'Pengurangan RPM mesin kanan dan isolasi saluran injektor silinder 4', 'WORK_ORDER_CREATED', CURRENT_TIMESTAMP),
-    ('44000000-0000-0000-0000-000000000002', '43000000-0000-0000-0000-000000000002', '20000000-0000-0000-0000-000000000005', 'FR-REM331-2026-002', '2026-02-18 14:15:00+07', 'CAT3', 'Oil Pressure Fluctuation', 'Sensor indikator oli generator 1 memberikan pembacaan deviasi 0.4 bar', 'Daya cadangan dialihkan ke generator 2', 'Penggantian sensor tekanan dan filter sekunder', 'CLOSED', CURRENT_TIMESTAMP)
-ON CONFLICT (report_id) DO UPDATE SET
-    status = EXCLUDED.status,
-    description = EXCLUDED.description;
+INSERT INTO mro_work_orders (work_order_id, failure_report_id, pm_schedule_id, equipment_id, work_order_number, work_order_type, priority, scheduled_start_date, scheduled_end_date, actual_start_date, actual_end_date, lead_engineer_user_id, assigned_facility, status, total_labor_hours, estimated_cost, actual_cost, completion_notes) VALUES
+    ('36000000-0000-0000-0000-000000000001', '35000000-0000-0000-0000-000000000001', '34000000-0000-0000-0000-000000000001', '33000000-0000-0000-0000-000000000001', 'WO-2026-0001', 'CORRECTIVE', 'URGENT', '2026-02-12', '2026-02-15', '2026-02-12', '2026-02-14', '20000000-0000-0000-0000-000000000005', 'Bengkel Mesin Fasharkan Surabaya', 'COMPLETED', 24.0, 75000000.00, 72500000.00, 'Pekerjaan perbaikan selesai dan seluruh parameter uji coba normal.'),
+    ('36000000-0000-0000-0000-000000000002', '35000000-0000-0000-0000-000000000002', '34000000-0000-0000-0000-000000000002', '33000000-0000-0000-0000-000000000002', 'WO-2026-0002', 'CORRECTIVE', 'URGENT', '2026-03-12', '2026-03-15', '2026-03-12', '2026-03-14', '20000000-0000-0000-0000-000000000005', 'Bengkel Mesin Fasharkan Surabaya', 'COMPLETED', 24.0, 75000000.00, 72500000.00, 'Pekerjaan perbaikan selesai dan seluruh parameter uji coba normal.'),
+    ('36000000-0000-0000-0000-000000000003', '35000000-0000-0000-0000-000000000003', '34000000-0000-0000-0000-000000000003', '33000000-0000-0000-0000-000000000003', 'WO-2026-0003', 'CORRECTIVE', 'URGENT', '2026-04-12', '2026-04-15', '2026-04-12', '2026-04-14', '20000000-0000-0000-0000-000000000005', 'Bengkel Mesin Fasharkan Surabaya', 'COMPLETED', 24.0, 75000000.00, 72500000.00, 'Pekerjaan perbaikan selesai dan seluruh parameter uji coba normal.'),
+    ('36000000-0000-0000-0000-000000000004', '35000000-0000-0000-0000-000000000004', '34000000-0000-0000-0000-000000000004', '33000000-0000-0000-0000-000000000004', 'WO-2026-0004', 'CORRECTIVE', 'URGENT', '2026-05-12', '2026-05-15', '2026-05-12', '2026-05-14', '20000000-0000-0000-0000-000000000005', 'Bengkel Mesin Fasharkan Surabaya', 'COMPLETED', 24.0, 75000000.00, 72500000.00, 'Pekerjaan perbaikan selesai dan seluruh parameter uji coba normal.'),
+    ('36000000-0000-0000-0000-000000000005', '35000000-0000-0000-0000-000000000005', '34000000-0000-0000-0000-000000000005', '33000000-0000-0000-0000-000000000005', 'WO-2026-0005', 'CORRECTIVE', 'URGENT', '2026-01-12', '2026-01-15', '2026-01-12', '2026-01-14', '20000000-0000-0000-0000-000000000005', 'Bengkel Mesin Fasharkan Surabaya', 'COMPLETED', 24.0, 75000000.00, 72500000.00, 'Pekerjaan perbaikan selesai dan seluruh parameter uji coba normal.'),
+    ('36000000-0000-0000-0000-000000000006', '35000000-0000-0000-0000-000000000006', '34000000-0000-0000-0000-000000000006', '33000000-0000-0000-0000-000000000006', 'WO-2026-0006', 'CORRECTIVE', 'URGENT', '2026-02-12', '2026-02-15', '2026-02-12', '2026-02-14', '20000000-0000-0000-0000-000000000005', 'Bengkel Mesin Fasharkan Surabaya', 'COMPLETED', 24.0, 75000000.00, 72500000.00, 'Pekerjaan perbaikan selesai dan seluruh parameter uji coba normal.'),
+    ('36000000-0000-0000-0000-000000000007', '35000000-0000-0000-0000-000000000007', '34000000-0000-0000-0000-000000000007', '33000000-0000-0000-0000-000000000007', 'WO-2026-0007', 'CORRECTIVE', 'URGENT', '2026-03-12', '2026-03-15', '2026-03-12', '2026-03-14', '20000000-0000-0000-0000-000000000005', 'Bengkel Mesin Fasharkan Surabaya', 'COMPLETED', 24.0, 75000000.00, 72500000.00, 'Pekerjaan perbaikan selesai dan seluruh parameter uji coba normal.'),
+    ('36000000-0000-0000-0000-000000000008', '35000000-0000-0000-0000-000000000008', '34000000-0000-0000-0000-000000000008', '33000000-0000-0000-0000-000000000008', 'WO-2026-0008', 'CORRECTIVE', 'URGENT', '2026-04-12', '2026-04-15', '2026-04-12', '2026-04-14', '20000000-0000-0000-0000-000000000005', 'Bengkel Mesin Fasharkan Surabaya', 'COMPLETED', 24.0, 75000000.00, 72500000.00, 'Pekerjaan perbaikan selesai dan seluruh parameter uji coba normal.'),
+    ('36000000-0000-0000-0000-000000000009', '35000000-0000-0000-0000-000000000009', '34000000-0000-0000-0000-000000000009', '33000000-0000-0000-0000-000000000009', 'WO-2026-0009', 'CORRECTIVE', 'URGENT', '2026-05-12', '2026-05-15', '2026-05-12', '2026-05-14', '20000000-0000-0000-0000-000000000005', 'Bengkel Mesin Fasharkan Surabaya', 'COMPLETED', 24.0, 75000000.00, 72500000.00, 'Pekerjaan perbaikan selesai dan seluruh parameter uji coba normal.'),
+    ('36000000-0000-0000-0000-000000000010', '35000000-0000-0000-0000-000000000010', '34000000-0000-0000-0000-000000000010', '33000000-0000-0000-0000-000000000010', 'WO-2026-0010', 'CORRECTIVE', 'URGENT', '2026-01-12', '2026-01-15', '2026-01-12', '2026-01-14', '20000000-0000-0000-0000-000000000005', 'Bengkel Mesin Fasharkan Surabaya', 'COMPLETED', 24.0, 75000000.00, 72500000.00, 'Pekerjaan perbaikan selesai dan seluruh parameter uji coba normal.'),
+    ('36000000-0000-0000-0000-000000000011', '35000000-0000-0000-0000-000000000011', '34000000-0000-0000-0000-000000000011', '33000000-0000-0000-0000-000000000011', 'WO-2026-0011', 'CORRECTIVE', 'URGENT', '2026-02-12', '2026-02-15', '2026-02-12', '2026-02-14', '20000000-0000-0000-0000-000000000005', 'Bengkel Mesin Fasharkan Surabaya', 'COMPLETED', 24.0, 75000000.00, 72500000.00, 'Pekerjaan perbaikan selesai dan seluruh parameter uji coba normal.'),
+    ('36000000-0000-0000-0000-000000000012', '35000000-0000-0000-0000-000000000012', '34000000-0000-0000-0000-000000000012', '33000000-0000-0000-0000-000000000012', 'WO-2026-0012', 'CORRECTIVE', 'URGENT', '2026-03-12', '2026-03-15', '2026-03-12', '2026-03-14', '20000000-0000-0000-0000-000000000005', 'Bengkel Mesin Fasharkan Surabaya', 'COMPLETED', 24.0, 75000000.00, 72500000.00, 'Pekerjaan perbaikan selesai dan seluruh parameter uji coba normal.')
+ON CONFLICT (work_order_id) DO NOTHING;
 
--- 8. Insert Perintah Kerja Pemeliharaan (Work Order)
-INSERT INTO mro_work_orders (work_order_id, failure_report_id, pm_schedule_id, equipment_id, work_order_number, work_order_type, priority, scheduled_start_date, scheduled_end_date, actual_start_date, actual_end_date, lead_engineer_user_id, assigned_facility, status, total_labor_hours, estimated_cost, actual_cost, completion_notes, created_at)
-VALUES
-    ('45000000-0000-0000-0000-000000000001', '44000000-0000-0000-0000-000000000001', NULL, '43000000-0000-0000-0000-000000000001', 'WO-REM331-2026-008', 'CORRECTIVE', 'URGENT', '2026-02-12', '2026-02-15', '2026-02-12', '2026-02-14', '20000000-0000-0000-0000-000000000005', 'Dermaga Madura Koarmada II Surabaya', 'COMPLETED', 24.50, 50000000.00, 45000000.00, 'Penggantian fuel injector silinder 4 selesai. Uji harbour acceptance trial dan sea acceptance trial 24 knot normal.', CURRENT_TIMESTAMP),
-    ('45000000-0000-0000-0000-000000000002', NULL, '43200000-0000-0000-0000-000000000001', '43000000-0000-0000-0000-000000000001', 'WO-REM331-2026-012', 'PREVENTIVE', 'ROUTINE', '2026-03-10', '2026-03-12', '2026-03-10', NULL, '20000000-0000-0000-0000-000000000005', 'Pangkalan Dermaga Ujung Surabaya', 'IN_PROGRESS', 12.00, 15000000.00, 0.00, 'Sedang dalam pengerjaan perawatan periodik pelumas 500 jam.', CURRENT_TIMESTAMP)
-ON CONFLICT (work_order_id) DO UPDATE SET
-    status = EXCLUDED.status,
-    completion_notes = EXCLUDED.completion_notes;
+INSERT INTO mro_docking_records (docking_id, ship_id, shipyard_name, docking_type, entry_date, scheduled_exit_date, actual_exit_date, sea_trial_passed, classification_surveyor, certificate_number, total_docking_cost, docking_summary) VALUES
+    ('37000000-0000-0000-0000-000000000001', '31000000-0000-0000-0000-000000000001', 'PT PAL Indonesia (Persero) Graving Dock Surabaya', 'SPECIAL_DOCKING', '2025-02-01', '2025-02-28', '2025-02-27', TRUE, 'Biro Klasifikasi Indonesia (BKI)', 'BKI-MIL-CERT-0001/2025', 1850000000.00, 'Pembersihan teritip lambung bawah air, replating pelat baja lambung 12mm, dan overhauling poros baling-baling.'),
+    ('37000000-0000-0000-0000-000000000002', '31000000-0000-0000-0000-000000000002', 'Fasharkan Surabaya Graving Dock 1', 'SPECIAL_DOCKING', '2025-03-01', '2025-03-28', '2025-03-27', TRUE, 'Biro Klasifikasi Indonesia (BKI)', 'BKI-MIL-CERT-0002/2025', 1850000000.00, 'Pembersihan teritip lambung bawah air, replating pelat baja lambung 12mm, dan overhauling poros baling-baling.'),
+    ('37000000-0000-0000-0000-000000000003', '31000000-0000-0000-0000-000000000003', 'PT Dok & Perkapalan Surabaya (DPS)', 'SPECIAL_DOCKING', '2025-04-01', '2025-04-28', '2025-04-27', TRUE, 'Biro Klasifikasi Indonesia (BKI)', 'BKI-MIL-CERT-0003/2025', 1850000000.00, 'Pembersihan teritip lambung bawah air, replating pelat baja lambung 12mm, dan overhauling poros baling-baling.'),
+    ('37000000-0000-0000-0000-000000000004', '31000000-0000-0000-0000-000000000004', 'Fasharkan Mentigi Lantamal IV Tanjung Uban', 'SPECIAL_DOCKING', '2025-05-01', '2025-05-28', '2025-05-27', TRUE, 'Biro Klasifikasi Indonesia (BKI)', 'BKI-MIL-CERT-0004/2025', 1850000000.00, 'Pembersihan teritip lambung bawah air, replating pelat baja lambung 12mm, dan overhauling poros baling-baling.'),
+    ('37000000-0000-0000-0000-000000000005', '31000000-0000-0000-0000-000000000005', 'PT Dumas Tanjung Perak Shipyards', 'SPECIAL_DOCKING', '2025-06-01', '2025-06-28', '2025-06-27', TRUE, 'Biro Klasifikasi Indonesia (BKI)', 'BKI-MIL-CERT-0005/2025', 1850000000.00, 'Pembersihan teritip lambung bawah air, replating pelat baja lambung 12mm, dan overhauling poros baling-baling.'),
+    ('37000000-0000-0000-0000-000000000006', '31000000-0000-0000-0000-000000000006', 'PT PAL Indonesia (Persero) Graving Dock Surabaya', 'SPECIAL_DOCKING', '2025-07-01', '2025-07-28', '2025-07-27', TRUE, 'Biro Klasifikasi Indonesia (BKI)', 'BKI-MIL-CERT-0006/2025', 1850000000.00, 'Pembersihan teritip lambung bawah air, replating pelat baja lambung 12mm, dan overhauling poros baling-baling.'),
+    ('37000000-0000-0000-0000-000000000007', '31000000-0000-0000-0000-000000000007', 'Fasharkan Surabaya Graving Dock 1', 'SPECIAL_DOCKING', '2025-08-01', '2025-08-28', '2025-08-27', TRUE, 'Biro Klasifikasi Indonesia (BKI)', 'BKI-MIL-CERT-0007/2025', 1850000000.00, 'Pembersihan teritip lambung bawah air, replating pelat baja lambung 12mm, dan overhauling poros baling-baling.'),
+    ('37000000-0000-0000-0000-000000000008', '31000000-0000-0000-0000-000000000008', 'PT Dok & Perkapalan Surabaya (DPS)', 'SPECIAL_DOCKING', '2025-01-01', '2025-01-28', '2025-01-27', TRUE, 'Biro Klasifikasi Indonesia (BKI)', 'BKI-MIL-CERT-0008/2025', 1850000000.00, 'Pembersihan teritip lambung bawah air, replating pelat baja lambung 12mm, dan overhauling poros baling-baling.'),
+    ('37000000-0000-0000-0000-000000000009', '31000000-0000-0000-0000-000000000009', 'Fasharkan Mentigi Lantamal IV Tanjung Uban', 'SPECIAL_DOCKING', '2025-02-01', '2025-02-28', '2025-02-27', TRUE, 'Biro Klasifikasi Indonesia (BKI)', 'BKI-MIL-CERT-0009/2025', 1850000000.00, 'Pembersihan teritip lambung bawah air, replating pelat baja lambung 12mm, dan overhauling poros baling-baling.'),
+    ('37000000-0000-0000-0000-000000000010', '31000000-0000-0000-0000-000000000010', 'PT Dumas Tanjung Perak Shipyards', 'SPECIAL_DOCKING', '2025-03-01', '2025-03-28', '2025-03-27', TRUE, 'Biro Klasifikasi Indonesia (BKI)', 'BKI-MIL-CERT-0010/2025', 1850000000.00, 'Pembersihan teritip lambung bawah air, replating pelat baja lambung 12mm, dan overhauling poros baling-baling.'),
+    ('37000000-0000-0000-0000-000000000011', '31000000-0000-0000-0000-000000000011', 'PT PAL Indonesia (Persero) Graving Dock Surabaya', 'SPECIAL_DOCKING', '2025-04-01', '2025-04-28', '2025-04-27', TRUE, 'Biro Klasifikasi Indonesia (BKI)', 'BKI-MIL-CERT-0011/2025', 1850000000.00, 'Pembersihan teritip lambung bawah air, replating pelat baja lambung 12mm, dan overhauling poros baling-baling.'),
+    ('37000000-0000-0000-0000-000000000012', '31000000-0000-0000-0000-000000000012', 'Fasharkan Surabaya Graving Dock 1', 'SPECIAL_DOCKING', '2025-05-01', '2025-05-28', '2025-05-27', TRUE, 'Biro Klasifikasi Indonesia (BKI)', 'BKI-MIL-CERT-0012/2025', 1850000000.00, 'Pembersihan teritip lambung bawah air, replating pelat baja lambung 12mm, dan overhauling poros baling-baling.')
+ON CONFLICT (docking_id) DO NOTHING;
 
--- 9. Insert Rincian Langkah Pemeliharaan
-INSERT INTO mro_work_order_tasks (task_id, work_order_id, step_number, task_description, estimated_minutes, actual_minutes, is_completed, completed_by_user_id, notes, created_at)
-VALUES
-    ('45100000-0000-0000-0000-000000000001', '45000000-0000-0000-0000-000000000001', 1, 'Shut-down dan isolasi sistem bahan bakar Main Engine Starboard', 60, 45, TRUE, '20000000-0000-0000-0000-000000000005', 'Selesai sesuai SOP K3 Fasharkan', CURRENT_TIMESTAMP),
-    ('45100000-0000-0000-0000-000000000002', '45000000-0000-0000-0000-000000000001', 2, 'Pelepasan injector assembly silinder 4 dan kalibrasi tekanan pembukaan nozzle', 180, 160, TRUE, '20000000-0000-0000-0000-000000000005', 'Injektor lama aus, diganti kit baru', CURRENT_TIMESTAMP),
-    ('45100000-0000-0000-0000-000000000003', '45000000-0000-0000-0000-000000000001', 3, 'Pemasangan kit baru, uji kebocoran tekanan tinggi dan pengetesan beban', 120, 110, TRUE, '20000000-0000-0000-0000-000000000005', 'Hasil pengujian tekanan 1600 bar stabil', CURRENT_TIMESTAMP)
-ON CONFLICT (task_id) DO NOTHING;
-
--- 10. Insert Konsumsi Suku Cadang WO
-INSERT INTO mro_work_order_items (wo_item_id, work_order_id, material_id, quantity_required, quantity_issued, unit_cost, total_cost, is_critical_spare, created_at)
-VALUES
-    ('46000000-0000-0000-0000-000000000001', '45000000-0000-0000-0000-000000000001', '51000000-0000-0000-0000-000000000001', 2.00, 2.00, 22500000.00, 45000000.00, TRUE, CURRENT_TIMESTAMP)
+INSERT INTO mro_work_order_items (wo_item_id, work_order_id, material_id, quantity_required, quantity_issued, unit_cost, total_cost, is_critical_spare) VALUES
+    ('36500000-0000-0000-0000-000000000001', '36000000-0000-0000-0000-000000000001', '51000000-0000-0000-0000-000000000001', 4.00, 4.00, 8500000.00, 34000000.00, TRUE),
+    ('36500000-0000-0000-0000-000000000002', '36000000-0000-0000-0000-000000000002', '51000000-0000-0000-0000-000000000002', 2.00, 2.00, 22500000.00, 45000000.00, TRUE),
+    ('36500000-0000-0000-0000-000000000003', '36000000-0000-0000-0000-000000000003', '51000000-0000-0000-0000-000000000003', 5.00, 5.00, 7200000.00, 36000000.00, FALSE),
+    ('36500000-0000-0000-0000-000000000004', '36000000-0000-0000-0000-000000000004', '51000000-0000-0000-0000-000000000006', 1.00, 1.00, 185000000.00, 185000000.00, TRUE),
+    ('36500000-0000-0000-0000-000000000005', '36000000-0000-0000-0000-000000000005', '51000000-0000-0000-0000-000000000008', 2.00, 2.00, 45000000.00, 90000000.00, TRUE),
+    ('36500000-0000-0000-0000-000000000006', '36000000-0000-0000-0000-000000000006', '51000000-0000-0000-0000-000000000009', 1.00, 1.00, 125000000.00, 125000000.00, FALSE),
+    ('36500000-0000-0000-0000-000000000007', '36000000-0000-0000-0000-000000000007', '51000000-0000-0000-0000-000000000013', 10.00, 10.00, 1800000.00, 18000000.00, FALSE),
+    ('36500000-0000-0000-0000-000000000008', '36000000-0000-0000-0000-000000000008', '51000000-0000-0000-0000-000000000014', 8.00, 8.00, 4200000.00, 33600000.00, FALSE),
+    ('36500000-0000-0000-0000-000000000009', '36000000-0000-0000-0000-000000000009', '51000000-0000-0000-0000-000000000017', 2.00, 2.00, 9800000.00, 19600000.00, TRUE),
+    ('36500000-0000-0000-0000-000000000010', '36000000-0000-0000-0000-000000000010', '51000000-0000-0000-0000-000000000018', 1.00, 1.00, 280000000.00, 280000000.00, TRUE),
+    ('36500000-0000-0000-0000-000000000011', '36000000-0000-0000-0000-000000000011', '51000000-0000-0000-0000-000000000001', 2.00, 2.00, 8500000.00, 17000000.00, FALSE),
+    ('36500000-0000-0000-0000-000000000012', '36000000-0000-0000-0000-000000000012', '51000000-0000-0000-0000-000000000003', 4.00, 4.00, 7200000.00, 28800000.00, FALSE)
 ON CONFLICT (wo_item_id) DO NOTHING;
-
--- 11. Insert Catatan Docking Galangan
-INSERT INTO mro_docking_records (docking_id, ship_id, shipyard_name, docking_type, entry_date, scheduled_exit_date, actual_exit_date, sea_trial_passed, classification_surveyor, certificate_number, total_docking_cost, docking_summary, created_at)
-VALUES
-    ('47000000-0000-0000-0000-000000000001', '41000000-0000-0000-0000-000000000001', 'PT PAL Indonesia (Persero) Surabaya', 'ANNUAL_DOCKING', '2025-06-01', '2025-07-15', '2025-07-12', TRUE, 'Biro Klasifikasi Indonesia (BKI)', 'BKI-NAV-2025-081', 12500000000.00, 'Docking tahunan, pembersihan lambung bawah air, penggantian sacrificial anode zink, inspeksi shaft propeller dan sea valve.', CURRENT_TIMESTAMP),
-    ('47000000-0000-0000-0000-000000000002', '41000000-0000-0000-0000-000000000003', 'Fasharkan Surabaya Dok Graving', 'SPECIAL_DOCKING', '2026-03-01', '2026-03-25', NULL, FALSE, 'Dislaikmatal Mabesal', 'LAIK-SURV-2026-004', 3800000000.00, 'Pembersihan lambung bawah air, sandblasting dan pergantian seal katup pendingin laut.', CURRENT_TIMESTAMP)
-ON CONFLICT (docking_id) DO UPDATE SET
-    docking_summary = EXCLUDED.docking_summary,
-    total_docking_cost = EXCLUDED.total_docking_cost;

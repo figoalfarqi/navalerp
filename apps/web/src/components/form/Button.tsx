@@ -17,6 +17,8 @@ interface ButtonProps {
   wrapperClassName?: string;
   onClick?: () => void;
   disabled?: boolean;
+  title?: string;
+  "aria-label"?: string;
   children?: ReactNode;
 }
 
@@ -29,6 +31,8 @@ export default function Button({
   wrapperClassName = "",
   onClick,
   disabled = false,
+  title,
+  "aria-label": ariaLabel,
   children,
 }: ButtonProps) {
   const baseWrapperClass = `inline-flex ${wrapperClassName}`;
@@ -79,6 +83,8 @@ export default function Button({
         ref={buttonRef}
         onClick={handleClick}
         disabled={disabled}
+        title={title}
+        aria-label={ariaLabel || title}
         className={`${baseButtonClass} ${SizeClassButtonMap[size]} ${VariantClassesButtonMap[variant]} ${className}`}
       >
         {children}

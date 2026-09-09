@@ -1,20 +1,80 @@
-import type { IconType } from "react-icons";
+import type { ComponentType } from "react";
+import type { IconProps } from "@/components/icons";
 import {
-  FaBoxesStacked,
-  FaChartLine,
-  FaCity,
-  FaClipboardList,
-  FaFileInvoiceDollar,
-  FaGear,
-  FaMapLocationDot,
-  FaRoute,
-  FaShip,
-  FaTruck,
-  FaUsersGear,
-  FaWarehouse,
-} from "react-icons/fa6";
-import { HiOutlineDocumentReport } from "react-icons/hi";
-import { LuBanknote, LuSettings2 } from "react-icons/lu";
+  // Group icons
+  OverviewGroupIcon,
+  OrganizationGroupIcon,
+  FleetGroupIcon,
+  LogisticsGroupIcon,
+  ProcurementGroupIcon,
+  FinanceGroupIcon,
+  PersonnelGroupIcon,
+  BaseFacilityGroupIcon,
+  TransportGroupIcon,
+  EdrmsGroupIcon,
+  CommandReadinessGroupIcon,
+  // 00. Overview
+  DashboardIcon,
+  ReportIcon,
+  // 01. Organisasi & Pengguna
+  OrgUnitIcon,
+  SysUserIcon,
+  AuditLogIcon,
+  // 02. Armada Kapal & MRO
+  ShipClassIcon,
+  WarshipIcon,
+  ShipSystemIcon,
+  EquipmentIcon,
+  PmScheduleIcon,
+  FailureReportIcon,
+  WorkOrderIcon,
+  DockingRecordIcon,
+  // 03. Logistik & Pergudangan
+  WarehouseIcon,
+  MaterialIcon,
+  StockBalanceIcon,
+  ItemInstanceIcon,
+  StockTransferIcon,
+  StockAdjustmentIcon,
+  // 04. Pengadaan Pertahanan
+  VendorIcon,
+  RequisitionIcon,
+  TenderIcon,
+  ContractIcon,
+  PurchaseOrderIcon,
+  GoodsReceiptIcon,
+  // 05. Keuangan & Anggaran
+  ChartOfAccountIcon,
+  BudgetProgramIcon,
+  BudgetCommitmentIcon,
+  InvoiceIcon,
+  PaymentIcon,
+  JournalEntryIcon,
+  PlatformTcoIcon,
+  // 06. SDM Militer (HCM)
+  MilitaryRankIcon,
+  MilitaryCorpsIcon,
+  QualificationIcon,
+  PersonnelIcon,
+  CrewAssignmentIcon,
+  // 07. Pangkalan & Fasilitas
+  BaseFacilityIcon,
+  BerthBookingIcon,
+  FuelBunkerIcon,
+  // 08. Transportasi Militer
+  TransportUnitIcon,
+  RouteIcon,
+  ShipmentIcon,
+  // 09. EDRMS Dokumen Digital
+  DocumentCategoryIcon,
+  DocumentIcon,
+  // 10. Komando & Kesiapan
+  TheaterIcon,
+  MissionIcon,
+  DailyLogIcon,
+  ReadinessReportIcon,
+  ReadinessAlertIcon,
+} from "@/components/icons";
 
 export type AdminRoleId = 3 | 4 | 5 | 6;
 
@@ -30,14 +90,14 @@ export interface AdminNavigationItem {
   label: string;
   href: string;
   url?: string;
-  icon: IconType;
+  icon: ComponentType<IconProps>;
   roles: AdminRoleId[];
 }
 
 export interface AdminNavigationGroup {
   title?: string;
   label: string;
-  icon: IconType;
+  icon: ComponentType<IconProps>;
   items: AdminNavigationItem[];
 }
 
@@ -47,14 +107,14 @@ export const ADMIN_NAVIGATION: AdminNavigationGroup[] = [
   {
     label: "Overview",
     title: "Overview",
-    icon: FaChartLine,
+    icon: OverviewGroupIcon,
     items: [
       {
         label: "Dashboard",
         name: "Dashboard",
         href: "/admin",
         url: "/admin",
-        icon: FaChartLine,
+        icon: DashboardIcon,
         roles: allAdminRoles,
       },
       {
@@ -62,7 +122,7 @@ export const ADMIN_NAVIGATION: AdminNavigationGroup[] = [
         name: "Laporan",
         href: "/admin/report",
         url: "/admin/report",
-        icon: HiOutlineDocumentReport,
+        icon: ReportIcon,
         roles: allAdminRoles,
       },
     ],
@@ -70,14 +130,14 @@ export const ADMIN_NAVIGATION: AdminNavigationGroup[] = [
   {
     label: "01. Organisasi & Pengguna",
     title: "01. Organisasi & Pengguna",
-    icon: FaUsersGear,
+    icon: OrganizationGroupIcon,
     items: [
       {
         label: "Satuan Kerja",
         name: "Satuan Kerja",
         href: "/admin/data/org_unit",
         url: "/admin/data/org_unit",
-        icon: FaUsersGear,
+        icon: OrgUnitIcon,
         roles: allAdminRoles,
       },
       {
@@ -85,7 +145,7 @@ export const ADMIN_NAVIGATION: AdminNavigationGroup[] = [
         name: "Pengguna Sistem",
         href: "/admin/data/sys_user",
         url: "/admin/data/sys_user",
-        icon: FaUsersGear,
+        icon: SysUserIcon,
         roles: allAdminRoles,
       },
       {
@@ -93,7 +153,7 @@ export const ADMIN_NAVIGATION: AdminNavigationGroup[] = [
         name: "Audit Log",
         href: "/admin/data/audit_log",
         url: "/admin/data/audit_log",
-        icon: FaUsersGear,
+        icon: AuditLogIcon,
         roles: allAdminRoles,
       },
     ],
@@ -101,14 +161,14 @@ export const ADMIN_NAVIGATION: AdminNavigationGroup[] = [
   {
     label: "02. Armada Kapal & MRO",
     title: "02. Armada Kapal & MRO",
-    icon: FaShip,
+    icon: FleetGroupIcon,
     items: [
       {
         label: "Kelas Kapal",
         name: "Kelas Kapal",
         href: "/admin/data/ship_class",
         url: "/admin/data/ship_class",
-        icon: FaShip,
+        icon: ShipClassIcon,
         roles: allAdminRoles,
       },
       {
@@ -116,7 +176,7 @@ export const ADMIN_NAVIGATION: AdminNavigationGroup[] = [
         name: "Kapal Perang KRI",
         href: "/admin/data/ship",
         url: "/admin/data/ship",
-        icon: FaShip,
+        icon: WarshipIcon,
         roles: allAdminRoles,
       },
       {
@@ -124,7 +184,7 @@ export const ADMIN_NAVIGATION: AdminNavigationGroup[] = [
         name: "Sistem Kapal",
         href: "/admin/data/ship_system",
         url: "/admin/data/ship_system",
-        icon: LuSettings2,
+        icon: ShipSystemIcon,
         roles: allAdminRoles,
       },
       {
@@ -132,7 +192,7 @@ export const ADMIN_NAVIGATION: AdminNavigationGroup[] = [
         name: "Peralatan Mesin",
         href: "/admin/data/equipment",
         url: "/admin/data/equipment",
-        icon: FaGear,
+        icon: EquipmentIcon,
         roles: allAdminRoles,
       },
       {
@@ -140,7 +200,7 @@ export const ADMIN_NAVIGATION: AdminNavigationGroup[] = [
         name: "Jadwal PMS",
         href: "/admin/data/pm_schedule",
         url: "/admin/data/pm_schedule",
-        icon: FaClipboardList,
+        icon: PmScheduleIcon,
         roles: allAdminRoles,
       },
       {
@@ -148,7 +208,7 @@ export const ADMIN_NAVIGATION: AdminNavigationGroup[] = [
         name: "Laporan Kerusakan",
         href: "/admin/data/failure_report",
         url: "/admin/data/failure_report",
-        icon: HiOutlineDocumentReport,
+        icon: FailureReportIcon,
         roles: allAdminRoles,
       },
       {
@@ -156,7 +216,7 @@ export const ADMIN_NAVIGATION: AdminNavigationGroup[] = [
         name: "Perintah Kerja MRO",
         href: "/admin/data/work_order",
         url: "/admin/data/work_order",
-        icon: FaClipboardList,
+        icon: WorkOrderIcon,
         roles: allAdminRoles,
       },
       {
@@ -164,7 +224,7 @@ export const ADMIN_NAVIGATION: AdminNavigationGroup[] = [
         name: "Riwayat Docking",
         href: "/admin/data/docking_record",
         url: "/admin/data/docking_record",
-        icon: FaShip,
+        icon: DockingRecordIcon,
         roles: allAdminRoles,
       },
     ],
@@ -172,14 +232,14 @@ export const ADMIN_NAVIGATION: AdminNavigationGroup[] = [
   {
     label: "03. Logistik & Pergudangan",
     title: "03. Logistik & Pergudangan",
-    icon: FaWarehouse,
+    icon: LogisticsGroupIcon,
     items: [
       {
         label: "Gudang Militer",
         name: "Gudang Militer",
         href: "/admin/data/warehouse",
         url: "/admin/data/warehouse",
-        icon: FaWarehouse,
+        icon: WarehouseIcon,
         roles: allAdminRoles,
       },
       {
@@ -187,7 +247,7 @@ export const ADMIN_NAVIGATION: AdminNavigationGroup[] = [
         name: "Material & Suku Cadang",
         href: "/admin/data/material",
         url: "/admin/data/material",
-        icon: FaBoxesStacked,
+        icon: MaterialIcon,
         roles: allAdminRoles,
       },
       {
@@ -195,7 +255,7 @@ export const ADMIN_NAVIGATION: AdminNavigationGroup[] = [
         name: "Saldo Stok",
         href: "/admin/data/stock_balance",
         url: "/admin/data/stock_balance",
-        icon: FaBoxesStacked,
+        icon: StockBalanceIcon,
         roles: allAdminRoles,
       },
       {
@@ -203,7 +263,7 @@ export const ADMIN_NAVIGATION: AdminNavigationGroup[] = [
         name: "Nomor Seri / Batch",
         href: "/admin/data/item_instance",
         url: "/admin/data/item_instance",
-        icon: FaBoxesStacked,
+        icon: ItemInstanceIcon,
         roles: allAdminRoles,
       },
       {
@@ -211,7 +271,7 @@ export const ADMIN_NAVIGATION: AdminNavigationGroup[] = [
         name: "Transfer Bebekal",
         href: "/admin/data/stock_transfer",
         url: "/admin/data/stock_transfer",
-        icon: FaRoute,
+        icon: StockTransferIcon,
         roles: allAdminRoles,
       },
       {
@@ -219,7 +279,7 @@ export const ADMIN_NAVIGATION: AdminNavigationGroup[] = [
         name: "Penyesuaian Stok",
         href: "/admin/data/stock_adjustment",
         url: "/admin/data/stock_adjustment",
-        icon: LuSettings2,
+        icon: StockAdjustmentIcon,
         roles: allAdminRoles,
       },
     ],
@@ -227,14 +287,14 @@ export const ADMIN_NAVIGATION: AdminNavigationGroup[] = [
   {
     label: "04. Pengadaan Pertahanan",
     title: "04. Pengadaan Pertahanan",
-    icon: FaClipboardList,
+    icon: ProcurementGroupIcon,
     items: [
       {
         label: "Rekanan Industri",
         name: "Rekanan Industri",
         href: "/admin/data/vendor",
         url: "/admin/data/vendor",
-        icon: FaUsersGear,
+        icon: VendorIcon,
         roles: allAdminRoles,
       },
       {
@@ -242,7 +302,7 @@ export const ADMIN_NAVIGATION: AdminNavigationGroup[] = [
         name: "Permintaan Pengadaan",
         href: "/admin/data/requisition",
         url: "/admin/data/requisition",
-        icon: FaClipboardList,
+        icon: RequisitionIcon,
         roles: allAdminRoles,
       },
       {
@@ -250,7 +310,7 @@ export const ADMIN_NAVIGATION: AdminNavigationGroup[] = [
         name: "Tender & Lelang",
         href: "/admin/data/tender",
         url: "/admin/data/tender",
-        icon: FaClipboardList,
+        icon: TenderIcon,
         roles: allAdminRoles,
       },
       {
@@ -258,7 +318,7 @@ export const ADMIN_NAVIGATION: AdminNavigationGroup[] = [
         name: "Kontrak Militer",
         href: "/admin/data/contract",
         url: "/admin/data/contract",
-        icon: FaClipboardList,
+        icon: ContractIcon,
         roles: allAdminRoles,
       },
       {
@@ -266,7 +326,7 @@ export const ADMIN_NAVIGATION: AdminNavigationGroup[] = [
         name: "Purchase Order",
         href: "/admin/data/purchase_order",
         url: "/admin/data/purchase_order",
-        icon: FaFileInvoiceDollar,
+        icon: PurchaseOrderIcon,
         roles: allAdminRoles,
       },
       {
@@ -274,7 +334,7 @@ export const ADMIN_NAVIGATION: AdminNavigationGroup[] = [
         name: "Penerimaan BAPHP",
         href: "/admin/data/goods_receipt",
         url: "/admin/data/goods_receipt",
-        icon: FaBoxesStacked,
+        icon: GoodsReceiptIcon,
         roles: allAdminRoles,
       },
     ],
@@ -282,14 +342,14 @@ export const ADMIN_NAVIGATION: AdminNavigationGroup[] = [
   {
     label: "05. Keuangan & Anggaran",
     title: "05. Keuangan & Anggaran",
-    icon: FaFileInvoiceDollar,
+    icon: FinanceGroupIcon,
     items: [
       {
         label: "Bagan Akun (COA)",
         name: "Bagan Akun (COA)",
         href: "/admin/data/chart_of_account",
         url: "/admin/data/chart_of_account",
-        icon: LuBanknote,
+        icon: ChartOfAccountIcon,
         roles: allAdminRoles,
       },
       {
@@ -297,7 +357,7 @@ export const ADMIN_NAVIGATION: AdminNavigationGroup[] = [
         name: "Program DIPA",
         href: "/admin/data/budget_program",
         url: "/admin/data/budget_program",
-        icon: FaChartLine,
+        icon: BudgetProgramIcon,
         roles: allAdminRoles,
       },
       {
@@ -305,7 +365,7 @@ export const ADMIN_NAVIGATION: AdminNavigationGroup[] = [
         name: "Komitmen Anggaran",
         href: "/admin/data/budget_commitment",
         url: "/admin/data/budget_commitment",
-        icon: FaFileInvoiceDollar,
+        icon: BudgetCommitmentIcon,
         roles: allAdminRoles,
       },
       {
@@ -313,7 +373,7 @@ export const ADMIN_NAVIGATION: AdminNavigationGroup[] = [
         name: "Tagihan Rekanan",
         href: "/admin/data/invoice",
         url: "/admin/data/invoice",
-        icon: FaFileInvoiceDollar,
+        icon: InvoiceIcon,
         roles: allAdminRoles,
       },
       {
@@ -321,7 +381,7 @@ export const ADMIN_NAVIGATION: AdminNavigationGroup[] = [
         name: "Pembayaran SP2D",
         href: "/admin/data/payment",
         url: "/admin/data/payment",
-        icon: LuBanknote,
+        icon: PaymentIcon,
         roles: allAdminRoles,
       },
       {
@@ -329,7 +389,7 @@ export const ADMIN_NAVIGATION: AdminNavigationGroup[] = [
         name: "Jurnal Akuntansi",
         href: "/admin/data/journal_entry",
         url: "/admin/data/journal_entry",
-        icon: FaClipboardList,
+        icon: JournalEntryIcon,
         roles: allAdminRoles,
       },
       {
@@ -337,7 +397,7 @@ export const ADMIN_NAVIGATION: AdminNavigationGroup[] = [
         name: "Total Cost of Ownership",
         href: "/admin/data/platform_tco",
         url: "/admin/data/platform_tco",
-        icon: FaChartLine,
+        icon: PlatformTcoIcon,
         roles: allAdminRoles,
       },
     ],
@@ -345,14 +405,14 @@ export const ADMIN_NAVIGATION: AdminNavigationGroup[] = [
   {
     label: "06. SDM Militer (HCM)",
     title: "06. SDM Militer (HCM)",
-    icon: FaUsersGear,
+    icon: PersonnelGroupIcon,
     items: [
       {
         label: "Pangkat Militer",
         name: "Pangkat Militer",
         href: "/admin/data/military_rank",
         url: "/admin/data/military_rank",
-        icon: FaUsersGear,
+        icon: MilitaryRankIcon,
         roles: allAdminRoles,
       },
       {
@@ -360,7 +420,7 @@ export const ADMIN_NAVIGATION: AdminNavigationGroup[] = [
         name: "Korps Militer",
         href: "/admin/data/military_corps",
         url: "/admin/data/military_corps",
-        icon: FaUsersGear,
+        icon: MilitaryCorpsIcon,
         roles: allAdminRoles,
       },
       {
@@ -368,7 +428,7 @@ export const ADMIN_NAVIGATION: AdminNavigationGroup[] = [
         name: "Kualifikasi & Brevet",
         href: "/admin/data/qualification",
         url: "/admin/data/qualification",
-        icon: FaUsersGear,
+        icon: QualificationIcon,
         roles: allAdminRoles,
       },
       {
@@ -376,7 +436,7 @@ export const ADMIN_NAVIGATION: AdminNavigationGroup[] = [
         name: "Prajurit TNI AL",
         href: "/admin/data/personnel",
         url: "/admin/data/personnel",
-        icon: FaUsersGear,
+        icon: PersonnelIcon,
         roles: allAdminRoles,
       },
       {
@@ -384,7 +444,7 @@ export const ADMIN_NAVIGATION: AdminNavigationGroup[] = [
         name: "Awak KRI",
         href: "/admin/data/crew_assignment",
         url: "/admin/data/crew_assignment",
-        icon: FaUsersGear,
+        icon: CrewAssignmentIcon,
         roles: allAdminRoles,
       },
     ],
@@ -392,14 +452,14 @@ export const ADMIN_NAVIGATION: AdminNavigationGroup[] = [
   {
     label: "07. Pangkalan & Fasilitas",
     title: "07. Pangkalan & Fasilitas",
-    icon: FaCity,
+    icon: BaseFacilityGroupIcon,
     items: [
       {
         label: "Fasilitas Pangkalan",
         name: "Fasilitas Pangkalan",
         href: "/admin/data/base_facility",
         url: "/admin/data/base_facility",
-        icon: FaCity,
+        icon: BaseFacilityIcon,
         roles: allAdminRoles,
       },
       {
@@ -407,7 +467,7 @@ export const ADMIN_NAVIGATION: AdminNavigationGroup[] = [
         name: "Penjadwalan Sandar",
         href: "/admin/data/berth_booking",
         url: "/admin/data/berth_booking",
-        icon: FaShip,
+        icon: BerthBookingIcon,
         roles: allAdminRoles,
       },
       {
@@ -415,7 +475,7 @@ export const ADMIN_NAVIGATION: AdminNavigationGroup[] = [
         name: "Bunker BBM",
         href: "/admin/data/fuel_bunker",
         url: "/admin/data/fuel_bunker",
-        icon: FaCity,
+        icon: FuelBunkerIcon,
         roles: allAdminRoles,
       },
     ],
@@ -423,14 +483,14 @@ export const ADMIN_NAVIGATION: AdminNavigationGroup[] = [
   {
     label: "08. Transportasi Militer",
     title: "08. Transportasi Militer",
-    icon: FaTruck,
+    icon: TransportGroupIcon,
     items: [
       {
         label: "Armada Transportasi",
         name: "Armada Transportasi",
         href: "/admin/data/transport_unit",
         url: "/admin/data/transport_unit",
-        icon: FaTruck,
+        icon: TransportUnitIcon,
         roles: allAdminRoles,
       },
       {
@@ -438,7 +498,7 @@ export const ADMIN_NAVIGATION: AdminNavigationGroup[] = [
         name: "Rute Pelayaran",
         href: "/admin/data/route",
         url: "/admin/data/route",
-        icon: FaRoute,
+        icon: RouteIcon,
         roles: allAdminRoles,
       },
       {
@@ -446,7 +506,7 @@ export const ADMIN_NAVIGATION: AdminNavigationGroup[] = [
         name: "Pengiriman Konvoi",
         href: "/admin/data/shipment",
         url: "/admin/data/shipment",
-        icon: FaTruck,
+        icon: ShipmentIcon,
         roles: allAdminRoles,
       },
     ],
@@ -454,14 +514,14 @@ export const ADMIN_NAVIGATION: AdminNavigationGroup[] = [
   {
     label: "09. EDRMS Dokumen Digital",
     title: "09. EDRMS Dokumen Digital",
-    icon: HiOutlineDocumentReport,
+    icon: EdrmsGroupIcon,
     items: [
       {
         label: "Kategori Dokumen",
         name: "Kategori Dokumen",
         href: "/admin/data/document_category",
         url: "/admin/data/document_category",
-        icon: HiOutlineDocumentReport,
+        icon: DocumentCategoryIcon,
         roles: allAdminRoles,
       },
       {
@@ -469,7 +529,7 @@ export const ADMIN_NAVIGATION: AdminNavigationGroup[] = [
         name: "Dokumen Militer",
         href: "/admin/data/document",
         url: "/admin/data/document",
-        icon: HiOutlineDocumentReport,
+        icon: DocumentIcon,
         roles: allAdminRoles,
       },
     ],
@@ -477,14 +537,14 @@ export const ADMIN_NAVIGATION: AdminNavigationGroup[] = [
   {
     label: "10. Komando & Kesiapan",
     title: "10. Komando & Kesiapan",
-    icon: FaMapLocationDot,
+    icon: CommandReadinessGroupIcon,
     items: [
       {
         label: "Teater Operasi",
         name: "Teater Operasi",
         href: "/admin/data/theater",
         url: "/admin/data/theater",
-        icon: FaMapLocationDot,
+        icon: TheaterIcon,
         roles: allAdminRoles,
       },
       {
@@ -492,7 +552,7 @@ export const ADMIN_NAVIGATION: AdminNavigationGroup[] = [
         name: "Misi Tempur",
         href: "/admin/data/mission",
         url: "/admin/data/mission",
-        icon: FaMapLocationDot,
+        icon: MissionIcon,
         roles: allAdminRoles,
       },
       {
@@ -500,7 +560,7 @@ export const ADMIN_NAVIGATION: AdminNavigationGroup[] = [
         name: "Log Harian KRI",
         href: "/admin/data/daily_log",
         url: "/admin/data/daily_log",
-        icon: FaClipboardList,
+        icon: DailyLogIcon,
         roles: allAdminRoles,
       },
       {
@@ -508,7 +568,7 @@ export const ADMIN_NAVIGATION: AdminNavigationGroup[] = [
         name: "Kesiapan KRI",
         href: "/admin/data/readiness_report",
         url: "/admin/data/readiness_report",
-        icon: FaShip,
+        icon: ReadinessReportIcon,
         roles: allAdminRoles,
       },
       {
@@ -516,7 +576,7 @@ export const ADMIN_NAVIGATION: AdminNavigationGroup[] = [
         name: "Peringatan Dini",
         href: "/admin/data/readiness_alert",
         url: "/admin/data/readiness_alert",
-        icon: FaClipboardList,
+        icon: ReadinessAlertIcon,
         roles: allAdminRoles,
       },
     ],
@@ -539,4 +599,3 @@ export function canAccessAdminPath(roleId: number, pathname: string): boolean {
   if (!isAdminRoleId(roleId)) return false;
   return true;
 }
-

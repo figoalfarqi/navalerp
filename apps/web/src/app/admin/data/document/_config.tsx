@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { formatSmartDate } from "@/utils/dateTime";
 import { ColumnField } from "@/components/table/Table";
 import { FormField } from "@/components/formCrud/FormCrud";
 import { FilterField } from "@/components/table/FilterFormTable";
@@ -14,7 +15,7 @@ export const columns: ColumnField[] = [
   { key: "category_name", label: "Kategori Dokumen" },
   { key: "unit_name", label: "Satuan Asal" },
   { key: "classification_level", label: "Classification Level" },
-  { key: "effective_date", label: "Effective Date" },
+  { key: "effective_date", label: "Effective Date", render: (item: any) => formatSmartDate(item.effective_date) },
 ];
 
 export const filterFields: FilterField[] = [
@@ -28,7 +29,10 @@ export const formFields = (mode: string): FormField[] => [
     label: "Document Number",
     fieldType: "text",
     required: true,
+    readOnly: true,
     disabled: mode === "view",
+    autoGenerate: true,
+    autoPrefix: "DOC",
   },
   {
     name: "title",
@@ -68,7 +72,14 @@ export const formFields = (mode: string): FormField[] => [
     name: "classification_level",
     col: "left",
     label: "Classification Level",
-    fieldType: "text",
+    fieldType: "select",
+    options: [
+      { label: "Sangat Rahasia", value: "SANGAT_RAHASIA" },
+      { label: "Rahasia Negara", value: "RAHASIA_NEGARA" },
+      { label: "Rahasia", value: "RAHASIA" },
+      { label: "Terbatas", value: "TERBATAS" },
+      { label: "Biasa", value: "BIASA" },
+    ],
     required: false,
     disabled: mode === "view",
   },
@@ -92,7 +103,15 @@ export const formFields = (mode: string): FormField[] => [
     name: "status",
     col: "right",
     label: "Status",
-    fieldType: "text",
+    fieldType: "select",
+    options: [
+      { label: "Draft", value: "DRAFT" },
+      { label: "Review", value: "REVIEW" },
+      { label: "Approved", value: "APPROVED" },
+      { label: "Active", value: "ACTIVE" },
+      { label: "Archived", value: "ARCHIVED" },
+      { label: "Superseded", value: "SUPERSEDED" },
+    ],
     required: false,
     disabled: mode === "view",
   },

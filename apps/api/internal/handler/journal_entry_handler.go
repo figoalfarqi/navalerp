@@ -53,7 +53,7 @@ func (h *JournalEntryHandler) Get(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	query := r.URL.Query()
+	query := queryValues(r)
 	page, _ := strconv.Atoi(query.Get("page"))
 	if page <= 0 { page = 1 }
 	limit, _ := strconv.Atoi(query.Get("limit"))

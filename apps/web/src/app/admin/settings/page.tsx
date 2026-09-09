@@ -6,7 +6,7 @@ import {
   FaSliders,
   FaUsers,
   FaUsersGear,
-} from "react-icons/fa6";
+} from "@/components/icons";
 import { useAuth } from "@/context/AuthContext";
 
 export default function AdminSettingsPage() {
@@ -65,7 +65,7 @@ export default function AdminSettingsPage() {
                 key={card.href}
                 type="button"
                 onClick={() => router.push(card.href)}
-                className="group flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-5 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md"
+                className="group flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-5 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md cursor-pointer"
               >
                 <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-blue-50 text-blue-700">
                   <Icon size={20} />

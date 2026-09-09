@@ -1,60 +1,56 @@
-﻿-- =============================================================================
--- MODUL 1: ORGANISASI, PENGGUNA & COMMON MASTER DATA (NAVALERP)
--- FILE: 01_organization_user/insert.sql
+-- =============================================================================
+-- SEED DATA: MODUL 1 - ORGANISASI, PANGKALAN & IDENTITAS PENGGUNA
 -- =============================================================================
 
--- 1. Insert Satuan Organisasi TNI AL
-INSERT INTO org_units (unit_id, parent_unit_id, unit_code, unit_name, unit_type, description, command_level, latitude, longitude, address, phone, is_active, created_at)
-VALUES
-    ('10000000-0000-0000-0000-000000000001', NULL, 'MABESAL', 'Markas Besar TNI Angkatan Laut', 'HEADQUARTERS', 'Pusat Komando Strategis TNI AL Cilangkap', 1, -6.3195000, 106.9032000, 'Jl. Raya Hankam Cilangkap, Jakarta Timur', '+62218720100', TRUE, CURRENT_TIMESTAMP),
-    ('10000000-0000-0000-0000-000000000002', '10000000-0000-0000-0000-000000000001', 'KOARMADA1', 'Komando Armada I (Tanjung Pinang)', 'FLEET', 'Komando Operasional Wilayah Laut Barat', 2, 0.9167000, 104.4500000, 'Jl. Yos Sudarso No. 1, Tanjung Pinang, Kepri', '+6277121234', TRUE, CURRENT_TIMESTAMP),
-    ('10000000-0000-0000-0000-000000000003', '10000000-0000-0000-0000-000000000001', 'KOARMADA2', 'Komando Armada II (Surabaya)', 'FLEET', 'Komando Operasional Wilayah Laut Tengah & Pangkalan Utama KRI', 2, -7.2023000, 112.7410000, 'Dermaga Ujung, Semampir, Surabaya', '+62313291001', TRUE, CURRENT_TIMESTAMP),
-    ('10000000-0000-0000-0000-000000000004', '10000000-0000-0000-0000-000000000001', 'KOARMADA3', 'Komando Armada III (Sorong)', 'FLEET', 'Komando Operasional Wilayah Laut Timur', 2, -0.8950000, 131.2550000, 'Klamono Km 16, Sorong, Papua Barat Daya', '+62951321000', TRUE, CURRENT_TIMESTAMP),
-    ('10000000-0000-0000-0000-000000000005', '10000000-0000-0000-0000-000000000001', 'KOLINLAMIL', 'Komando Lintas Laut Militer (Jakarta)', 'FLEET', 'Komando Angkutan Laut Militer & Proyeksi Kekuatan Amfibi', 2, -6.1165000, 106.8833000, 'Pelabuhan Tanjung Priok, Jakarta Utara', '+62214301001', TRUE, CURRENT_TIMESTAMP),
-    ('10000000-0000-0000-0000-000000000006', '10000000-0000-0000-0000-000000000003', 'LANTAMAL5', 'Pangkalan Utama TNI AL V (Surabaya)', 'LANTAMAL', 'Penyedia Dukungan Logistik Pangkalan Koarmada II', 3, -7.2150000, 112.7350000, 'Jl. Laksda M. Nasir No. 56, Surabaya', '+62313293005', TRUE, CURRENT_TIMESTAMP),
-    ('10000000-0000-0000-0000-000000000007', '10000000-0000-0000-0000-000000000003', 'SATKOR_ARMADA2', 'Satuan Kapal Eskorta Koarmada II', 'SQUADRON', 'Satuan Pembina Kapal Frigate dan Corvette', 4, -7.2050000, 112.7420000, 'Dermaga Madura Ujung, Surabaya', '+62313292002', TRUE, CURRENT_TIMESTAMP),
-    ('10000000-0000-0000-0000-000000000008', '10000000-0000-0000-0000-000000000003', 'SATKAT_ARMADA2', 'Satuan Kapal Cepat Koarmada II', 'SQUADRON', 'Satuan Pembina Kapal Cepat Rudal (KCR 60M)', 4, -7.2040000, 112.7430000, 'Dermaga Semampir, Surabaya', '+62313292004', TRUE, CURRENT_TIMESTAMP),
-    ('10000000-0000-0000-0000-000000000009', '10000000-0000-0000-0000-000000000006', 'FASHARKAN_SBY', 'Fasilitas Pemeliharaan & Perbaikan Fasharkan Surabaya', 'FASHARKAN', 'Unit Pelaksana Teknis Pemeliharaan & Docking KRI', 4, -7.2080000, 112.7440000, 'Kawasan Dok Fasharkan Ujung, Surabaya', '+62313294001', TRUE, CURRENT_TIMESTAMP),
-    ('10000000-0000-0000-0000-000000000010', '10000000-0000-0000-0000-000000000002', 'LANTAMAL4', 'Pangkalan Utama TNI AL IV (Batam)', 'LANTAMAL', 'Dukungan Operasi Wilayah Selat Malaka & Natuna', 3, 1.1300000, 104.0500000, 'Tanjung Sengkuang, Batu Ampar, Batam', '+62778412345', TRUE, CURRENT_TIMESTAMP)
-ON CONFLICT (unit_id) DO UPDATE SET
-    unit_name = EXCLUDED.unit_name,
-    unit_code = EXCLUDED.unit_code,
-    description = EXCLUDED.description,
-    is_active = TRUE;
+INSERT INTO org_units (unit_id, parent_unit_id, unit_code, unit_name, unit_type, command_level, latitude, longitude, address, is_active) VALUES
+    ('10000000-0000-0000-0000-000000000001', NULL, 'MABESAL', 'Markas Besar TNI Angkatan Laut', 'HEADQUARTERS', 1, -6.319, 106.902, 'Cilangkap, Cipayung, Jakarta Timur', TRUE),
+    ('10000000-0000-0000-0000-000000000002', '10000000-0000-0000-0000-000000000001', 'KOARMADA-1', 'Komando Armada I (Tanjungpinang)', 'FLEET', 2, 0.9167, 104.4667, 'Jl. Yos Sudarso No.1, Batu Hitam, Tanjungpinang', TRUE),
+    ('10000000-0000-0000-0000-000000000003', '10000000-0000-0000-0000-000000000001', 'KOARMADA-2', 'Komando Armada II (Surabaya)', 'FLEET', 2, -7.199, 112.7444, 'Ujung, Semampir, Surabaya, Jawa Timur', TRUE),
+    ('10000000-0000-0000-0000-000000000004', '10000000-0000-0000-0000-000000000001', 'KOARMADA-3', 'Komando Armada III (Sorong)', 'FLEET', 2, -0.8762, 131.2558, 'Klamana, Sorong Timur, Kota Sorong, Papua Barat Daya', TRUE),
+    ('10000000-0000-0000-0000-000000000005', '10000000-0000-0000-0000-000000000001', 'KOLINLAMIL', 'Komando Lintas Laut Militer', 'FLEET', 2, -6.109, 106.883, 'Tanjung Priok, Jakarta Utara', TRUE),
+    ('10000000-0000-0000-0000-000000000006', '10000000-0000-0000-0000-000000000003', 'LANTAMAL-V', 'Pangkalan Utama TNI AL V Surabaya', 'LANTAMAL', 3, -7.2147, 112.7389, 'Jl. Laksda M. Nasir No.56, Perak Barat, Surabaya', TRUE),
+    ('10000000-0000-0000-0000-000000000007', '10000000-0000-0000-0000-000000000003', 'SATKOR-K2', 'Satuan Kapal Eskorta Koarmada II', 'SQUADRON', 3, -7.195, 112.742, 'Dermaga Madura, Ujung Surabaya', TRUE),
+    ('10000000-0000-0000-0000-000000000008', '10000000-0000-0000-0000-000000000003', 'DISBEKAL-K2', 'Dinas Perbekalan Koarmada II', 'DEPOT', 4, -7.202, 112.74, 'Komplek Koarmada II Ujung, Surabaya', TRUE),
+    ('10000000-0000-0000-0000-000000000009', '10000000-0000-0000-0000-000000000003', 'FASHARKAN-SBY', 'Fasilitas Pemeliharaan & Perbaikan Pangkalan Surabaya', 'FASHARKAN', 4, -7.201, 112.743, 'Jl. Hangtuah No.1, Ujung, Surabaya', TRUE),
+    ('10000000-0000-0000-0000-000000000010', '10000000-0000-0000-0000-000000000002', 'LANTAMAL-IV', 'Pangkalan Utama TNI AL IV Batam', 'LANTAMAL', 3, 1.1301, 104.0529, 'Tanjung Sengkuang, Batu Ampar, Batam', TRUE),
+    ('10000000-0000-0000-0000-000000000011', '10000000-0000-0000-0000-000000000002', 'SATKOR-K1', 'Satuan Kapal Eskorta Koarmada I', 'SQUADRON', 3, 0.92, 104.47, 'Tanjungpinang, Kepulauan Riau', TRUE),
+    ('10000000-0000-0000-0000-000000000012', '10000000-0000-0000-0000-000000000003', 'SATSILAM-K2', 'Satuan Kapal Selam Koarmada II', 'SQUADRON', 3, -7.197, 112.741, 'Dermaga Kapal Selam Ujung Surabaya', TRUE),
+    ('10000000-0000-0000-0000-000000000013', '10000000-0000-0000-0000-000000000004', 'LANTAMAL-XIV', 'Pangkalan Utama TNI AL XIV Sorong', 'LANTAMAL', 3, -0.885, 131.26, 'Jl. Bubara No.1, Kota Sorong', TRUE),
+    ('10000000-0000-0000-0000-000000000014', '10000000-0000-0000-0000-000000000004', 'FASHARKAN-MNK', 'Fasilitas Pemeliharaan & Perbaikan Pangkalan Manokwari', 'FASHARKAN', 4, -0.8614, 134.062, 'Manokwari, Papua Barat', TRUE),
+    ('10000000-0000-0000-0000-000000000015', '10000000-0000-0000-0000-000000000001', 'DISLAIKMATAL', 'Dinas Kelaikan Material TNI AL', 'HEADQUARTERS', 1, -6.3195, 106.9015, 'Mabesal Cilangkap, Jakarta', TRUE),
+    ('10000000-0000-0000-0000-000000000016', '10000000-0000-0000-0000-000000000001', 'DISBEKAL-MBS', 'Dinas Pembekalan Angkatan Laut Mabesal', 'DEPOT', 1, -6.318, 106.903, 'Mabesal Cilangkap, Jakarta', TRUE)
+ON CONFLICT (unit_id) DO UPDATE SET unit_name = EXCLUDED.unit_name, address = EXCLUDED.address;
 
--- 2. Insert Pengguna Sistem dengan Role, Rank, dan Department
--- Password untuk SELURUH pengguna adalah: Password123!
--- Hash Bcrypt: $2a$10$7xMvtLLBCyffehFn5sKAmetDVxApVcMnudS9eLJgi4/8xour8YVFe
-INSERT INTO sys_users (user_id, unit_id, username, password_hash, full_name, email, phone, military_id, rank_title, department, role, is_active, created_at)
-VALUES
-    ('20000000-0000-0000-0000-000000000001', '10000000-0000-0000-0000-000000000001', 'admin', '$2a$10$7xMvtLLBCyffehFn5sKAmetDVxApVcMnudS9eLJgi4/8xour8YVFe', 'Administrator Sistem NavalERP', 'admin@navalerp.tni.mil.id', '+62811000001', 'NRP-SYS-001', 'MAYOR_LAUT', 'SRENA', 'SUPER_ADMIN', TRUE, CURRENT_TIMESTAMP),
-    ('20000000-0000-0000-0000-000000000002', '10000000-0000-0000-0000-000000000001', 'panglima', '$2a$10$7xMvtLLBCyffehFn5sKAmetDVxApVcMnudS9eLJgi4/8xour8YVFe', 'Laksamana Pertama TNI Judijanto', 'judijanto@navalerp.tni.mil.id', '+62811000002', 'NRP-987654', 'LAKSAMANA_PERTAMA_TNI', 'KOMANDO', 'COMMAND_OFFICER', TRUE, CURRENT_TIMESTAMP),
-    ('20000000-0000-0000-0000-000000000003', '10000000-0000-0000-0000-000000000007', 'komandan.rem331', '$2a$10$7xMvtLLBCyffehFn5sKAmetDVxApVcMnudS9eLJgi4/8xour8YVFe', 'Kolonel Laut (P) Hendra Kurniawan', 'komandan.rem331@navalerp.tni.mil.id', '+62811000003', 'NRP-876543', 'KOLONEL_LAUT', 'DEPOPS', 'KRI_COMMANDER', TRUE, CURRENT_TIMESTAMP),
-    ('20000000-0000-0000-0000-000000000004', '10000000-0000-0000-0000-000000000006', 'perwira.logistik', '$2a$10$7xMvtLLBCyffehFn5sKAmetDVxApVcMnudS9eLJgi4/8xour8YVFe', 'Letkol Laut (S) Bambang Prasetyo', 'logistik.lantamal5@navalerp.tni.mil.id', '+62811000004', 'NRP-765432', 'LETKOL_LAUT', 'SLOG', 'LOGISTICS_OFFICER', TRUE, CURRENT_TIMESTAMP),
-    ('20000000-0000-0000-0000-000000000005', '10000000-0000-0000-0000-000000000007', 'kadepsin.rem331', '$2a$10$7xMvtLLBCyffehFn5sKAmetDVxApVcMnudS9eLJgi4/8xour8YVFe', 'Mayor Laut (T) Arif Wijaya', 'kadepsin.rem331@navalerp.tni.mil.id', '+62811000005', 'NRP-654321', 'MAYOR_LAUT', 'DEPSIN', 'MAINTENANCE_OFFICER', TRUE, CURRENT_TIMESTAMP),
-    ('20000000-0000-0000-0000-000000000006', '10000000-0000-0000-0000-000000000001', 'perwira.keuangan', '$2a$10$7xMvtLLBCyffehFn5sKAmetDVxApVcMnudS9eLJgi4/8xour8YVFe', 'Letkol Laut (S) Deni Mulyadi', 'keuangan.mabesal@navalerp.tni.mil.id', '+62811000006', 'NRP-754312', 'LETKOL_LAUT', 'SRENA', 'FINANCE_OFFICER', TRUE, CURRENT_TIMESTAMP),
-    ('20000000-0000-0000-0000-000000000007', '10000000-0000-0000-0000-000000000001', 'perwira.personel', '$2a$10$7xMvtLLBCyffehFn5sKAmetDVxApVcMnudS9eLJgi4/8xour8YVFe', 'Kolonel Laut (E) Agus Santoso', 'spers.mabesal@navalerp.tni.mil.id', '+62811000007', 'NRP-843219', 'KOLONEL_LAUT', 'SPERS', 'PERSONNEL_OFFICER', TRUE, CURRENT_TIMESTAMP),
-    ('20000000-0000-0000-0000-000000000008', '10000000-0000-0000-0000-000000000007', 'komandan.inr332', '$2a$10$7xMvtLLBCyffehFn5sKAmetDVxApVcMnudS9eLJgi4/8xour8YVFe', 'Kolonel Laut (P) Faisal Anwar', 'komandan.inr332@navalerp.tni.mil.id', '+62811000008', 'NRP-890123', 'KOLONEL_LAUT', 'DEPOPS', 'KRI_COMMANDER', TRUE, CURRENT_TIMESTAMP),
-    ('20000000-0000-0000-0000-000000000009', '10000000-0000-0000-0000-000000000007', 'operator.radar', '$2a$10$7xMvtLLBCyffehFn5sKAmetDVxApVcMnudS9eLJgi4/8xour8YVFe', 'Serka Nav Dwi Prasetyo', 'operator.radar@navalerp.tni.mil.id', '+62811000009', 'NRP-102938', 'SERKA', 'DEPOPS', 'OPERATOR', TRUE, CURRENT_TIMESTAMP),
-    ('20000000-0000-0000-0000-000000000010', '10000000-0000-0000-0000-000000000006', 'operator.gudang', '$2a$10$7xMvtLLBCyffehFn5sKAmetDVxApVcMnudS9eLJgi4/8xour8YVFe', 'Sertu Bek Rahmat Hidayat', 'operator.gudang@navalerp.tni.mil.id', '+62811000010', 'NRP-104829', 'SERTU', 'DISBEKAL', 'OPERATOR', TRUE, CURRENT_TIMESTAMP)
-ON CONFLICT (user_id) DO UPDATE SET
-    password_hash = EXCLUDED.password_hash,
-    full_name = EXCLUDED.full_name,
-    email = EXCLUDED.email,
-    phone = EXCLUDED.phone,
-    military_id = EXCLUDED.military_id,
-    rank_title = EXCLUDED.rank_title,
-    department = EXCLUDED.department,
-    role = EXCLUDED.role,
-    is_active = TRUE;
+INSERT INTO sys_users (user_id, unit_id, username, password_hash, full_name, email, rank_title, military_id, department, role, is_active, auth_version) VALUES
+    ('20000000-0000-0000-0000-000000000001', '10000000-0000-0000-0000-000000000001', 'admin', '$2a$10$7xMvtLLBCyffehFn5sKAmetDVxApVcMnudS9eLJgi4/8xour8YVFe', 'Administrator Sistem NavalERP', 'admin.navalerp@tnial.mil.id', 'LAKSAMANA_PERTAMA_TNI', 'NRP-990001', 'KOMANDO', 'SUPER_ADMIN', TRUE, 1),
+    ('20000000-0000-0000-0000-000000000002', '10000000-0000-0000-0000-000000000003', 'pangarmada2', '$2a$10$7xMvtLLBCyffehFn5sKAmetDVxApVcMnudS9eLJgi4/8xour8YVFe', 'Laksamana Muda TNI Ariantyo Condrowibowo', 'pangarmada2@tnial.mil.id', 'LAKSAMANA_MUDA_TNI', 'NRP-910002', 'KOMANDO', 'COMMAND_OFFICER', TRUE, 1),
+    ('20000000-0000-0000-0000-000000000003', '10000000-0000-0000-0000-000000000007', 'komandan.rem331', '$2a$10$7xMvtLLBCyffehFn5sKAmetDVxApVcMnudS9eLJgi4/8xour8YVFe', 'Kolonel Laut (P) Hendra Kurniawan', 'dan.kri331@tnial.mil.id', 'KOLONEL_LAUT', 'NRP-876543', 'DEPOPS', 'KRI_COMMANDER', TRUE, 1),
+    ('20000000-0000-0000-0000-000000000004', '10000000-0000-0000-0000-000000000006', 'perwira.logistik', '$2a$10$7xMvtLLBCyffehFn5sKAmetDVxApVcMnudS9eLJgi4/8xour8YVFe', 'Letkol Laut (S) Bambang Prasetyo', 'palog.lantamal5@tnial.mil.id', 'LETKOL_LAUT', 'NRP-765432', 'DISBEKAL', 'LOGISTICS_OFFICER', TRUE, 1),
+    ('20000000-0000-0000-0000-000000000005', '10000000-0000-0000-0000-000000000007', 'kadepsin.rem331', '$2a$10$7xMvtLLBCyffehFn5sKAmetDVxApVcMnudS9eLJgi4/8xour8YVFe', 'Mayor Laut (T) Arif Wijaya', 'kadepsin.rem331@tnial.mil.id', 'MAYOR_LAUT', 'NRP-654321', 'DEPSIN', 'MAINTENANCE_OFFICER', TRUE, 1),
+    ('20000000-0000-0000-0000-000000000006', '10000000-0000-0000-0000-000000000001', 'panglima', '$2a$10$7xMvtLLBCyffehFn5sKAmetDVxApVcMnudS9eLJgi4/8xour8YVFe', 'Laksamana Pertama TNI Judijanto', 'panglima.ops@tnial.mil.id', 'LAKSAMANA_PERTAMA_TNI', 'NRP-880012', 'SOPS', 'COMMAND_OFFICER', TRUE, 1),
+    ('20000000-0000-0000-0000-000000000007', '10000000-0000-0000-0000-000000000001', 'perwira.personel', '$2a$10$7xMvtLLBCyffehFn5sKAmetDVxApVcMnudS9eLJgi4/8xour8YVFe', 'Kolonel Laut (E) Agus Santoso', 'paban.pers@tnial.mil.id', 'KOLONEL_LAUT', 'NRP-843219', 'SPERS', 'PERSONNEL_OFFICER', TRUE, 1),
+    ('20000000-0000-0000-0000-000000000008', '10000000-0000-0000-0000-000000000001', 'perwira.keuangan', '$2a$10$7xMvtLLBCyffehFn5sKAmetDVxApVcMnudS9eLJgi4/8xour8YVFe', 'Letkol Laut (S) Deni Mulyadi', 'paku.mabesal@tnial.mil.id', 'LETKOL_LAUT', 'NRP-789012', 'SLOG', 'FINANCE_OFFICER', TRUE, 1),
+    ('20000000-0000-0000-0000-000000000009', '10000000-0000-0000-0000-000000000007', 'operator.radar', '$2a$10$7xMvtLLBCyffehFn5sKAmetDVxApVcMnudS9eLJgi4/8xour8YVFe', 'Serka Nav Dwi Prasetyo', 'radar.rem331@tnial.mil.id', 'SERKA', 'NRP-102938', 'DEPOPS', 'OPERATOR', TRUE, 1),
+    ('20000000-0000-0000-0000-000000000010', '10000000-0000-0000-0000-000000000008', 'operator.gudang', '$2a$10$7xMvtLLBCyffehFn5sKAmetDVxApVcMnudS9eLJgi4/8xour8YVFe', 'Sertu Bek Rahmat Hidayat', 'gudang.disbekal@tnial.mil.id', 'SERTU', 'NRP-112233', 'DISBEKAL', 'OPERATOR', TRUE, 1),
+    ('20000000-0000-0000-0000-000000000011', '10000000-0000-0000-0000-000000000009', 'ka.fasharkan', '$2a$10$7xMvtLLBCyffehFn5sKAmetDVxApVcMnudS9eLJgi4/8xour8YVFe', 'Kolonel Laut (T) Sugeng Riyadi', 'kafasharkan.sby@tnial.mil.id', 'KOLONEL_LAUT', 'NRP-830045', 'FASHARKAN', 'MAINTENANCE_OFFICER', TRUE, 1),
+    ('20000000-0000-0000-0000-000000000012', '10000000-0000-0000-0000-000000000007', 'palaksa.rem331', '$2a$10$7xMvtLLBCyffehFn5sKAmetDVxApVcMnudS9eLJgi4/8xour8YVFe', 'Mayor Laut (P) Rian Kurniawan', 'palaksa.rem331@tnial.mil.id', 'MAYOR_LAUT', 'NRP-712345', 'DEPOPS', 'KRI_COMMANDER', TRUE, 1),
+    ('20000000-0000-0000-0000-000000000013', '10000000-0000-0000-0000-000000000016', 'kadisbekal', '$2a$10$7xMvtLLBCyffehFn5sKAmetDVxApVcMnudS9eLJgi4/8xour8YVFe', 'Laksamana Pertama TNI Kurniawan Utama', 'kadisbekal@tnial.mil.id', 'LAKSAMANA_PERTAMA_TNI', 'NRP-860078', 'DISBEKAL', 'LOGISTICS_OFFICER', TRUE, 1),
+    ('20000000-0000-0000-0000-000000000014', '10000000-0000-0000-0000-000000000008', 'juru.bayar', '$2a$10$7xMvtLLBCyffehFn5sKAmetDVxApVcMnudS9eLJgi4/8xour8YVFe', 'Kapten Laut (S) Danang Wicaksono', 'jurubayar.k2@tnial.mil.id', 'KAPTEN_LAUT', 'NRP-678901', 'SLOG', 'FINANCE_OFFICER', TRUE, 1),
+    ('20000000-0000-0000-0000-000000000015', '10000000-0000-0000-0000-000000000011', 'komandan.inr332', '$2a$10$7xMvtLLBCyffehFn5sKAmetDVxApVcMnudS9eLJgi4/8xour8YVFe', 'Kolonel Laut (P) Faisal Anwar', 'dan.kri332@tnial.mil.id', 'KOLONEL_LAUT', 'NRP-850123', 'DEPOPS', 'KRI_COMMANDER', TRUE, 1),
+    ('20000000-0000-0000-0000-000000000016', '10000000-0000-0000-0000-000000000012', 'komandan.ngp403', '$2a$10$7xMvtLLBCyffehFn5sKAmetDVxApVcMnudS9eLJgi4/8xour8YVFe', 'Mayor Laut (P) Yudha Pratama', 'dan.kri403@tnial.mil.id', 'MAYOR_LAUT', 'NRP-734567', 'DEPOPS', 'KRI_COMMANDER', TRUE, 1)
+ON CONFLICT (user_id) DO UPDATE SET password_hash = EXCLUDED.password_hash, is_active = TRUE;
 
--- Update auth_version dan pastikan seluruh user memiliki hash Password123!
-UPDATE sys_users SET 
-    password_hash = '$2a$10$7xMvtLLBCyffehFn5sKAmetDVxApVcMnudS9eLJgi4/8xour8YVFe',
-    is_active = TRUE;
-
--- 3. Audit Log Awal
-INSERT INTO sys_audit_logs (log_id, user_id, action, entity_table, entity_id, new_values, ip_address, created_at)
-VALUES
-    ('21000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-000000000001', 'INITIALIZE', 'org_units', '10000000-0000-0000-0000-000000000001', '{"status": "System Initialized", "version": "2.0", "security": "Bcrypt Password123!"}', '127.0.0.1', CURRENT_TIMESTAMP)
+INSERT INTO sys_audit_logs (log_id, user_id, action, entity_table, entity_id, ip_address, user_agent, created_at) VALUES
+    ('25000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-000000000001', 'LOGIN', 'sys_users', '20000000-0000-0000-0000-000000000001', '10.10.1.1', 'NavalERP-Desktop/2.0 SecureClient', CURRENT_TIMESTAMP - INTERVAL '12 hour'),
+    ('25000000-0000-0000-0000-000000000002', '20000000-0000-0000-0000-000000000002', 'LOGIN', 'sys_users', '20000000-0000-0000-0000-000000000002', '10.10.1.2', 'NavalERP-Desktop/2.0 SecureClient', CURRENT_TIMESTAMP - INTERVAL '11 hour'),
+    ('25000000-0000-0000-0000-000000000003', '20000000-0000-0000-0000-000000000003', 'LOGIN', 'sys_users', '20000000-0000-0000-0000-000000000003', '10.10.1.3', 'NavalERP-Desktop/2.0 SecureClient', CURRENT_TIMESTAMP - INTERVAL '10 hour'),
+    ('25000000-0000-0000-0000-000000000004', '20000000-0000-0000-0000-000000000004', 'LOGIN', 'sys_users', '20000000-0000-0000-0000-000000000004', '10.10.1.4', 'NavalERP-Desktop/2.0 SecureClient', CURRENT_TIMESTAMP - INTERVAL '9 hour'),
+    ('25000000-0000-0000-0000-000000000005', '20000000-0000-0000-0000-000000000005', 'LOGIN', 'sys_users', '20000000-0000-0000-0000-000000000005', '10.10.1.5', 'NavalERP-Desktop/2.0 SecureClient', CURRENT_TIMESTAMP - INTERVAL '8 hour'),
+    ('25000000-0000-0000-0000-000000000006', '20000000-0000-0000-0000-000000000006', 'LOGIN', 'sys_users', '20000000-0000-0000-0000-000000000006', '10.10.1.6', 'NavalERP-Desktop/2.0 SecureClient', CURRENT_TIMESTAMP - INTERVAL '7 hour'),
+    ('25000000-0000-0000-0000-000000000007', '20000000-0000-0000-0000-000000000007', 'LOGIN', 'sys_users', '20000000-0000-0000-0000-000000000007', '10.10.1.7', 'NavalERP-Desktop/2.0 SecureClient', CURRENT_TIMESTAMP - INTERVAL '6 hour'),
+    ('25000000-0000-0000-0000-000000000008', '20000000-0000-0000-0000-000000000008', 'LOGIN', 'sys_users', '20000000-0000-0000-0000-000000000008', '10.10.1.8', 'NavalERP-Desktop/2.0 SecureClient', CURRENT_TIMESTAMP - INTERVAL '5 hour'),
+    ('25000000-0000-0000-0000-000000000009', '20000000-0000-0000-0000-000000000009', 'LOGIN', 'sys_users', '20000000-0000-0000-0000-000000000009', '10.10.1.9', 'NavalERP-Desktop/2.0 SecureClient', CURRENT_TIMESTAMP - INTERVAL '4 hour'),
+    ('25000000-0000-0000-0000-000000000010', '20000000-0000-0000-0000-000000000010', 'LOGIN', 'sys_users', '20000000-0000-0000-0000-000000000010', '10.10.1.10', 'NavalERP-Desktop/2.0 SecureClient', CURRENT_TIMESTAMP - INTERVAL '3 hour'),
+    ('25000000-0000-0000-0000-000000000011', '20000000-0000-0000-0000-000000000011', 'LOGIN', 'sys_users', '20000000-0000-0000-0000-000000000011', '10.10.1.11', 'NavalERP-Desktop/2.0 SecureClient', CURRENT_TIMESTAMP - INTERVAL '2 hour'),
+    ('25000000-0000-0000-0000-000000000012', '20000000-0000-0000-0000-000000000012', 'LOGIN', 'sys_users', '20000000-0000-0000-0000-000000000012', '10.10.1.12', 'NavalERP-Desktop/2.0 SecureClient', CURRENT_TIMESTAMP - INTERVAL '1 hour')
 ON CONFLICT (log_id) DO NOTHING;

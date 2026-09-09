@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { formatSmartDate } from "@/utils/dateTime";
 import { ColumnField } from "@/components/table/Table";
 import { FormField } from "@/components/formCrud/FormCrud";
 import { FilterField } from "@/components/table/FilterFormTable";
@@ -14,7 +15,7 @@ export const columns: ColumnField[] = [
   { key: "crew_role", label: "Crew Role" },
   { key: "department", label: "Department" },
   { key: "watch_bill_duty", label: "Watch Bill Duty" },
-  { key: "assigned_date", label: "Assigned Date" },
+  { key: "assigned_date", label: "Assigned Date", render: (item: any) => formatSmartDate(item.assigned_date) },
 ];
 
 export const filterFields: FilterField[] = [
@@ -60,7 +61,13 @@ export const formFields = (mode: string): FormField[] => [
     name: "department",
     col: "right",
     label: "Department",
-    fieldType: "text",
+    fieldType: "select",
+    options: [
+      { label: "DEPOPS", value: "DEPOPS" },
+      { label: "DEPSIN", value: "DEPSIN" },
+      { label: "DEPLOG", value: "DEPLOG" },
+      { label: "DEPSENAU", value: "DEPSENAU" },
+    ],
     required: true,
     disabled: mode === "view",
   },
@@ -68,7 +75,15 @@ export const formFields = (mode: string): FormField[] => [
     name: "watch_bill_duty",
     col: "left",
     label: "Watch Bill Duty",
-    fieldType: "text",
+    fieldType: "select",
+    options: [
+      { label: "Vigour A", value: "VIGOUR_A" },
+      { label: "Vigour B", value: "VIGOUR_B" },
+      { label: "Siaga 1", value: "SIAGA_1" },
+      { label: "Combat Station", value: "COMBAT_STATION" },
+      { label: "Command Post", value: "COMMAND_POST" },
+      { label: "Engineering Control Room", value: "ENGINEERING_CONTROL_ROOM" },
+    ],
     required: false,
     disabled: mode === "view",
   },

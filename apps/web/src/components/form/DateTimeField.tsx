@@ -8,7 +8,7 @@ import TimePicker from "./picker/TimePicker";
 import DateTimeActions from "./picker/ActionPicker";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { usePopoverPosition } from "@/hooks/usePopoverPosition";
-import { FaX } from "react-icons/fa6";
+import { FaX } from "@/components/icons";
 import { useCloseOnScrollDistance } from "@/hooks/useCloseOnScrollDistance";
 
 interface DateTimeFieldProps {
@@ -140,7 +140,7 @@ export default function DateTimeField({
               e.stopPropagation();
               onChange(null);
             }}
-            className="text-red-500 hover:bg-red-100 hover:text-red-600 rounded-xs p-0.5"
+            className="cursor-pointer text-red-500 hover:bg-red-100 hover:text-red-600 rounded-xs p-0.5"
           >
             <FaX size={10} />
           </div>

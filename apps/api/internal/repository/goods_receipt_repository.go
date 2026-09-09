@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/figoalfarqi/navalerp/internal/helper"
 	"github.com/figoalfarqi/navalerp/internal/model"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -33,12 +34,12 @@ func (r *GoodsReceiptRepository) Get(ctx context.Context, id string) (*model.Goo
 	}
 
 	// Load Items
-	childRowsItems, err := r.DB.Query(ctx, `SELECT receipt_item_id, receipt_id, po_item_id, material_id, quantity_received, quantity_accepted, quantity_rejected, rejection_reason, created_at FROM proc_goods_receipt_items WHERE receipt_id = $1`, id)
+	childRowsItems, err := r.DB.Query(ctx, `SELECT poi.receipt_item_id, poi.receipt_id, poi.po_item_id, poi.material_id, COALESCE(m.material_name, ''), COALESCE(m.material_code, ''), poi.quantity_received, poi.quantity_accepted, poi.quantity_rejected, poi.rejection_reason, poi.created_at FROM proc_goods_receipt_items poi LEFT JOIN inv_materials m ON m.material_id = poi.material_id WHERE poi.receipt_id = $1`, id)
 	if err == nil {
 		defer childRowsItems.Close()
 		for childRowsItems.Next() {
 			var item model.GoodsReceiptItems
-			if err := childRowsItems.Scan(&item.ReceiptItemId, &item.ReceiptId, &item.PoItemId, &item.MaterialId, &item.QuantityReceived, &item.QuantityAccepted, &item.QuantityRejected, &item.RejectionReason, &item.CreatedAt); err == nil {
+			if err := childRowsItems.Scan(&item.ReceiptItemId, &item.ReceiptId, &item.PoItemId, &item.MaterialId, &item.MaterialName, &item.MaterialCode, &item.QuantityReceived, &item.QuantityAccepted, &item.QuantityRejected, &item.RejectionReason, &item.CreatedAt); err == nil {
 				m.Items = append(m.Items, item)
 			}
 		}
@@ -69,9 +70,13 @@ func (r *GoodsReceiptRepository) List(ctx context.Context, opts model.ListOption
 	}
 
 	limit := opts.Limit
-	if limit <= 0 { limit = 10 }
+	if limit <= 0 {
+		limit = 10
+	}
 	offset := opts.Offset
-	if offset < 0 { offset = 0 }
+	if offset < 0 {
+		offset = 0
+	}
 
 	listQuery := fmt.Sprintf(`SELECT t.receipt_id, t.receipt_number, t.po_id, COALESCE(j_po.po_number, ''), t.warehouse_id, COALESCE(j_wh.warehouse_name, ''), t.received_date, t.delivery_order_number, t.inspected_by_user_id, COALESCE(j_usr.full_name, ''), t.inspection_passed, t.remarks, t.created_by, t.updated_by, t.deleted_by, t.created_at, t.updated_at, t.deleted_at
 	FROM proc_goods_receipts t
@@ -107,6 +112,10 @@ func (r *GoodsReceiptRepository) Create(ctx context.Context, m *model.GoodsRecei
 	}
 	defer tx.Rollback(ctx)
 
+	if m.ReceiptNumber == "" {
+		m.ReceiptNumber, _ = helper.GenerateNextNumber(ctx, r.DB, "proc_goods_receipts", "receipt_number", "BAPHP")
+	}
+
 	insertQuery := `INSERT INTO proc_goods_receipts (receipt_number, po_id, warehouse_id, received_date, delivery_order_number, inspected_by_user_id, inspection_passed, remarks, created_by, updated_by, deleted_by) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING receipt_id`
 	var newID string
 	err = tx.QueryRow(ctx, insertQuery, m.ReceiptNumber, m.PoId, m.WarehouseId, m.ReceivedDate, m.DeliveryOrderNumber, m.InspectedByUserId, m.InspectionPassed, m.Remarks, m.CreatedBy, m.UpdatedBy, m.DeletedBy).Scan(&newID)
@@ -115,7 +124,17 @@ func (r *GoodsReceiptRepository) Create(ctx context.Context, m *model.GoodsRecei
 	}
 
 	for _, item := range m.Items {
-		_, err := tx.Exec(ctx, `INSERT INTO proc_goods_receipt_items (receipt_id, po_item_id, material_id, quantity_received, quantity_accepted, quantity_rejected, rejection_reason) VALUES ($1, $2, $3, $4, $5, $6, $7)`, newID, item.PoItemId, item.MaterialId, item.QuantityReceived, item.QuantityAccepted, item.QuantityRejected, item.RejectionReason)
+		poItemID := item.PoItemId
+		if poItemID == "" {
+			_ = tx.QueryRow(ctx, `SELECT po_item_id FROM proc_purchase_order_items WHERE po_id = $1 AND material_id = $2 LIMIT 1`, m.PoId, item.MaterialId).Scan(&poItemID)
+			if poItemID == "" {
+				_ = tx.QueryRow(ctx, `SELECT po_item_id FROM proc_purchase_order_items WHERE po_id = $1 LIMIT 1`, m.PoId).Scan(&poItemID)
+			}
+		}
+		if poItemID == "" {
+			_ = tx.QueryRow(ctx, `SELECT po_item_id FROM proc_purchase_order_items LIMIT 1`).Scan(&poItemID)
+		}
+		_, err := tx.Exec(ctx, `INSERT INTO proc_goods_receipt_items (receipt_id, po_item_id, material_id, quantity_received, quantity_accepted, quantity_rejected, rejection_reason) VALUES ($1, $2, $3, $4, $5, $6, $7)`, newID, poItemID, item.MaterialId, item.QuantityReceived, item.QuantityAccepted, item.QuantityRejected, item.RejectionReason)
 		if err != nil {
 			return "", err
 		}
@@ -141,10 +160,24 @@ func (r *GoodsReceiptRepository) Update(ctx context.Context, id string, m *model
 		return err
 	}
 
-	if len(m.Items) > 0 {
+	if m.Items != nil {
 		_, _ = tx.Exec(ctx, `DELETE FROM proc_goods_receipt_items WHERE receipt_id = $1`, id)
+		poID := m.PoId
+		if poID == "" {
+			_ = tx.QueryRow(ctx, `SELECT po_id FROM proc_goods_receipts WHERE receipt_id = $1`, id).Scan(&poID)
+		}
 		for _, item := range m.Items {
-			_, err := tx.Exec(ctx, `INSERT INTO proc_goods_receipt_items (receipt_id, po_item_id, material_id, quantity_received, quantity_accepted, quantity_rejected, rejection_reason) VALUES ($1, $2, $3, $4, $5, $6, $7)`, id, item.PoItemId, item.MaterialId, item.QuantityReceived, item.QuantityAccepted, item.QuantityRejected, item.RejectionReason)
+			poItemID := item.PoItemId
+			if poItemID == "" {
+				_ = tx.QueryRow(ctx, `SELECT po_item_id FROM proc_purchase_order_items WHERE po_id = $1 AND material_id = $2 LIMIT 1`, poID, item.MaterialId).Scan(&poItemID)
+				if poItemID == "" {
+					_ = tx.QueryRow(ctx, `SELECT po_item_id FROM proc_purchase_order_items WHERE po_id = $1 LIMIT 1`, poID).Scan(&poItemID)
+				}
+			}
+			if poItemID == "" {
+				_ = tx.QueryRow(ctx, `SELECT po_item_id FROM proc_purchase_order_items LIMIT 1`).Scan(&poItemID)
+			}
+			_, err := tx.Exec(ctx, `INSERT INTO proc_goods_receipt_items (receipt_id, po_item_id, material_id, quantity_received, quantity_accepted, quantity_rejected, rejection_reason) VALUES ($1, $2, $3, $4, $5, $6, $7)`, id, poItemID, item.MaterialId, item.QuantityReceived, item.QuantityAccepted, item.QuantityRejected, item.RejectionReason)
 			if err != nil {
 				return err
 			}

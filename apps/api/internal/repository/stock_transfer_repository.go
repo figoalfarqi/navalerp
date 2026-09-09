@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/figoalfarqi/navalerp/internal/helper"
 	"github.com/figoalfarqi/navalerp/internal/model"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -32,12 +33,12 @@ func (r *StockTransferRepository) Get(ctx context.Context, id string) (*model.St
 	}
 
 	// Load Items
-	childRowsItems, err := r.DB.Query(ctx, `SELECT transfer_item_id, transfer_id, material_id, quantity_shipped, quantity_received, condition_on_receipt, created_by, updated_by, deleted_by, created_at, updated_at, deleted_at FROM inv_stock_transfer_items WHERE transfer_id = $1`, id)
+	childRowsItems, err := r.DB.Query(ctx, `SELECT poi.transfer_item_id, poi.transfer_id, poi.material_id, COALESCE(m.material_name, ''), COALESCE(m.material_code, ''), poi.quantity_shipped, poi.quantity_received, poi.condition_on_receipt, poi.created_by, poi.updated_by, poi.deleted_by, poi.created_at, poi.updated_at, poi.deleted_at FROM inv_stock_transfer_items poi LEFT JOIN inv_materials m ON m.material_id = poi.material_id WHERE poi.transfer_id = $1`, id)
 	if err == nil {
 		defer childRowsItems.Close()
 		for childRowsItems.Next() {
 			var item model.StockTransferItems
-			if err := childRowsItems.Scan(&item.TransferItemId, &item.TransferId, &item.MaterialId, &item.QuantityShipped, &item.QuantityReceived, &item.ConditionOnReceipt, &item.CreatedBy, &item.UpdatedBy, &item.DeletedBy, &item.CreatedAt, &item.UpdatedAt, &item.DeletedAt); err == nil {
+			if err := childRowsItems.Scan(&item.TransferItemId, &item.TransferId, &item.MaterialId, &item.MaterialName, &item.MaterialCode, &item.QuantityShipped, &item.QuantityReceived, &item.ConditionOnReceipt, &item.CreatedBy, &item.UpdatedBy, &item.DeletedBy, &item.CreatedAt, &item.UpdatedAt, &item.DeletedAt); err == nil {
 				m.Items = append(m.Items, item)
 			}
 		}
@@ -68,9 +69,13 @@ func (r *StockTransferRepository) List(ctx context.Context, opts model.ListOptio
 	}
 
 	limit := opts.Limit
-	if limit <= 0 { limit = 10 }
+	if limit <= 0 {
+		limit = 10
+	}
 	offset := opts.Offset
-	if offset < 0 { offset = 0 }
+	if offset < 0 {
+		offset = 0
+	}
 
 	listQuery := fmt.Sprintf(`SELECT t.transfer_id, t.transfer_number, t.from_warehouse_id, COALESCE(j_fwh.warehouse_name, ''), t.to_warehouse_id, COALESCE(j_twh.warehouse_name, ''), t.movement_type, t.scheduled_departure, t.actual_departure, t.scheduled_arrival, t.actual_arrival, t.transporter_unit, t.status, t.created_by, t.updated_by, t.deleted_by, t.created_at, t.updated_at, t.deleted_at
 	FROM inv_stock_transfers t
@@ -104,6 +109,10 @@ func (r *StockTransferRepository) Create(ctx context.Context, m *model.StockTran
 		return "", err
 	}
 	defer tx.Rollback(ctx)
+
+	if m.TransferNumber == "" {
+		m.TransferNumber, _ = helper.GenerateNextNumber(ctx, r.DB, "inv_stock_transfers", "transfer_number", "TRF")
+	}
 
 	insertQuery := `INSERT INTO inv_stock_transfers (transfer_number, from_warehouse_id, to_warehouse_id, movement_type, scheduled_departure, actual_departure, scheduled_arrival, actual_arrival, transporter_unit, status, created_by, updated_by, deleted_by) VALUES ($1, $2, $3, $4::stock_movement_type, $5, $6, $7, $8, $9, $10::transfer_status_type, $11, $12, $13) RETURNING transfer_id`
 	var newID string
@@ -139,7 +148,7 @@ func (r *StockTransferRepository) Update(ctx context.Context, id string, m *mode
 		return err
 	}
 
-	if len(m.Items) > 0 {
+	if m.Items != nil {
 		_, _ = tx.Exec(ctx, `DELETE FROM inv_stock_transfer_items WHERE transfer_id = $1`, id)
 		for _, item := range m.Items {
 			_, err := tx.Exec(ctx, `INSERT INTO inv_stock_transfer_items (transfer_id, material_id, quantity_shipped, quantity_received, condition_on_receipt, created_by, updated_by, deleted_by) VALUES ($1, $2, $3, $4, $5::item_condition_type, $6, $7, $8)`, id, item.MaterialId, item.QuantityShipped, item.QuantityReceived, item.ConditionOnReceipt, item.CreatedBy, item.UpdatedBy, item.DeletedBy)

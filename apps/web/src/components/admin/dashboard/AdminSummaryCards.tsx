@@ -5,7 +5,7 @@ import {
   FaRoute,
   FaScaleBalanced,
   FaTruck,
-} from "react-icons/fa6";
+} from "@/components/icons";
 import type { AdminDashboardSummary } from "@/types/adminDashboard";
 import {
   formatCurrencyIDR,

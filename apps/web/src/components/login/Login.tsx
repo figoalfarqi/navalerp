@@ -7,8 +7,8 @@ import TextField from "../form/TextField";
 import Image from "next/image";
 import { useToast } from "../ToastContext";
 import LoaderDots from "../form/LoaderDots";
-import { FiUser } from "react-icons/fi";
-import { GoLock } from "react-icons/go";
+import { FiUser } from "@/components/icons";
+import { GoLock } from "@/components/icons";
 import { useFetchAPI } from "@/hooks/useFetchAPI";
 import { useIsMobile } from "@/hooks/useIsMobile";
 
@@ -49,8 +49,8 @@ export default function Login({
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-[#0b3355] to-slate-950 px-4 sm:px-6 lg:px-8">
-      <div className="w-full max-w-sm sm:max-w-md bg-white p-6 sm:p-8 rounded-2xl shadow-[0_20px_50px_rgba(0,30,70,0.4)] border-t-4 border-[#0b8fa5]">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-950 via-[#071a33] to-slate-950 px-4 sm:px-6 lg:px-8">
+      <div className="w-full max-w-sm sm:max-w-md bg-white p-6 sm:p-8 rounded-2xl shadow-[0_20px_50px_rgba(0,30,70,0.4)] border-t-4 border-[#0a2540]">
         <div className="w-full">
           <div className="flex justify-center mb-4">
             <Image

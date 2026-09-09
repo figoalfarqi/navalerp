@@ -52,7 +52,12 @@ export const formFields = (mode: string): FormField[] => [
     name: "fuel_type",
     col: "left",
     label: "Fuel Type",
-    fieldType: "text",
+    fieldType: "select",
+    options: [
+      { label: "Hsd Milspec", value: "HSD_MILSPEC" },
+      { label: "B35 Naval", value: "B35_NAVAL" },
+      { label: "Avtur Jet A1", value: "AVTUR_JET_A1" },
+    ],
     required: true,
     disabled: mode === "view",
   },

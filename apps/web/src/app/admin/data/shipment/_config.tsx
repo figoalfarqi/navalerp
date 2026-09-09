@@ -1,7 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { formatSmartDate } from "@/utils/dateTime";
 import { ColumnField } from "@/components/table/Table";
 import { FormField } from "@/components/formCrud/FormCrud";
 import { FilterField } from "@/components/table/FilterFormTable";
+import { DetailItemsConfig } from "@/components/formCrud/DetailItemsTable";
 
 export const entityName = "shipment";
 export const entityTitle = "Pengiriman Konvoi";
@@ -14,7 +16,7 @@ export const columns: ColumnField[] = [
   { key: "transport_unit_name", label: "Unit Angkut" },
   { key: "origin_warehouse_name", label: "Gudang Asal" },
   { key: "destination_warehouse_name", label: "Gudang Tujuan" },
-  { key: "departure_date", label: "Departure Date" },
+  { key: "departure_date", label: "Departure Date", render: (item: any) => formatSmartDate(item.departure_date) },
 ];
 
 export const filterFields: FilterField[] = [
@@ -28,7 +30,10 @@ export const formFields = (mode: string): FormField[] => [
     label: "Manifest Number",
     fieldType: "text",
     required: true,
+    readOnly: true,
     disabled: mode === "view",
+    autoGenerate: true,
+    autoPrefix: "MNF",
   },
     {
     name: "route_id",
@@ -102,7 +107,12 @@ export const formFields = (mode: string): FormField[] => [
     name: "escort_security_level",
     col: "right",
     label: "Escort Security Level",
-    fieldType: "text",
+    fieldType: "select",
+    options: [
+      { label: "Unescorted", value: "UNESCORTED" },
+      { label: "Standard Convoy", value: "STANDARD_CONVOY" },
+      { label: "Warship Escort", value: "WARSHIP_ESCORT" },
+    ],
     required: false,
     disabled: mode === "view",
   },
@@ -110,7 +120,14 @@ export const formFields = (mode: string): FormField[] => [
     name: "status",
     col: "left",
     label: "Status",
-    fieldType: "text",
+    fieldType: "select",
+    options: [
+      { label: "Planned", value: "PLANNED" },
+      { label: "Loading", value: "LOADING" },
+      { label: "In Transit", value: "IN_TRANSIT" },
+      { label: "Delivered", value: "DELIVERED" },
+      { label: "Cancelled", value: "CANCELLED" },
+    ],
     required: false,
     disabled: mode === "view",
   },
@@ -137,6 +154,74 @@ export const formFields = (mode: string): FormField[] => [
   },
 ];
 
+export const detailItemsConfig: DetailItemsConfig = {
+  tableName: "items",
+  title: "Rincian Item Muatan Pengiriman",
+  itemName: "Item Muatan",
+  qtyKey: "quantity_dispatched",
+  columns: [
+    {
+      key: "material_id",
+      label: "Material / Muatan",
+      type: "select",
+      required: true,
+      placeholder: "Pilih Material...",
+      options: {
+        url: "/admin/material?limit=100",
+        labelKey: "material_name",
+        valueKey: "material_id",
+        extraLabelKey: "material_code",
+      },
+    },
+    {
+      key: "quantity_dispatched",
+      label: "Jumlah Dikirim",
+      type: "number",
+      required: true,
+      defaultValue: 1,
+      width: "140px",
+    },
+    {
+      key: "quantity_received",
+      label: "Jumlah Diterima",
+      type: "number",
+      required: false,
+      defaultValue: 0,
+      width: "140px",
+    },
+    {
+      key: "packaging_type",
+      label: "Jenis Kemasan",
+      type: "select",
+      required: true,
+      defaultValue: "CRATE",
+      options: [
+        { label: "Peti Kayu (Crate)", value: "CRATE" },
+        { label: "Palet (Pallet)", value: "PALLET" },
+        { label: "Drum", value: "DRUM" },
+        { label: "Kotak Amunisi (Ammo Box)", value: "AMMO_BOX" },
+        { label: "Kontainer (ISO Container)", value: "ISO_CONTAINER" },
+      ],
+      width: "180px",
+    },
+    {
+      key: "weight_kg",
+      label: "Berat (Kg)",
+      type: "number",
+      required: false,
+      defaultValue: 0,
+      width: "130px",
+    },
+    {
+      key: "notes",
+      label: "Catatan Muatan",
+      type: "text",
+      required: false,
+      placeholder: "Keterangan kemasan/muatan...",
+    },
+  ],
+};
+
 export const buildPayload = (data: any) => {
   const payload: any = { ...data };
   delete payload.shipment_id;
@@ -146,5 +231,22 @@ export const buildPayload = (data: any) => {
   delete payload.created_by;
   delete payload.updated_by;
   delete payload.deleted_by;
+  delete payload.route_code;
+  delete payload.transport_code;
+  delete payload.origin_warehouse_name;
+  delete payload.destination_warehouse_name;
+  delete payload.full_name;
+
+  if (Array.isArray(payload.items)) {
+    payload.items = payload.items.map((it: any) => ({
+      material_id: it.material_id,
+      quantity_dispatched: Number(it.quantity_dispatched) || 0,
+      quantity_received: Number(it.quantity_received) || 0,
+      packaging_type: it.packaging_type || "CRATE",
+      weight_kg: Number(it.weight_kg) || 0,
+      notes: it.notes || null,
+    }));
+  }
+
   return payload;
 };

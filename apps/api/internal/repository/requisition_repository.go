@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/figoalfarqi/navalerp/internal/helper"
 	"github.com/figoalfarqi/navalerp/internal/model"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -32,12 +33,12 @@ func (r *RequisitionRepository) Get(ctx context.Context, id string) (*model.Requ
 	}
 
 	// Load Items
-	childRowsItems, err := r.DB.Query(ctx, `SELECT req_item_id, requisition_id, material_id, quantity, estimated_unit_price, estimated_total_price, notes, created_by, updated_by, deleted_by, created_at, updated_at, deleted_at FROM proc_requisition_items WHERE requisition_id = $1`, id)
+	childRowsItems, err := r.DB.Query(ctx, `SELECT poi.req_item_id, poi.requisition_id, poi.material_id, COALESCE(m.material_name, ''), COALESCE(m.material_code, ''), poi.quantity, poi.estimated_unit_price, poi.estimated_total_price, poi.notes, poi.created_by, poi.updated_by, poi.deleted_by, poi.created_at, poi.updated_at, poi.deleted_at FROM proc_requisition_items poi LEFT JOIN inv_materials m ON m.material_id = poi.material_id WHERE poi.requisition_id = $1`, id)
 	if err == nil {
 		defer childRowsItems.Close()
 		for childRowsItems.Next() {
 			var item model.RequisitionItems
-			if err := childRowsItems.Scan(&item.ReqItemId, &item.RequisitionId, &item.MaterialId, &item.Quantity, &item.EstimatedUnitPrice, &item.EstimatedTotalPrice, &item.Notes, &item.CreatedBy, &item.UpdatedBy, &item.DeletedBy, &item.CreatedAt, &item.UpdatedAt, &item.DeletedAt); err == nil {
+			if err := childRowsItems.Scan(&item.ReqItemId, &item.RequisitionId, &item.MaterialId, &item.MaterialName, &item.MaterialCode, &item.Quantity, &item.EstimatedUnitPrice, &item.EstimatedTotalPrice, &item.Notes, &item.CreatedBy, &item.UpdatedBy, &item.DeletedBy, &item.CreatedAt, &item.UpdatedAt, &item.DeletedAt); err == nil {
 				m.Items = append(m.Items, item)
 			}
 		}
@@ -68,9 +69,13 @@ func (r *RequisitionRepository) List(ctx context.Context, opts model.ListOptions
 	}
 
 	limit := opts.Limit
-	if limit <= 0 { limit = 10 }
+	if limit <= 0 {
+		limit = 10
+	}
 	offset := opts.Offset
-	if offset < 0 { offset = 0 }
+	if offset < 0 {
+		offset = 0
+	}
 
 	listQuery := fmt.Sprintf(`SELECT t.requisition_id, t.requisition_number, t.origin_unit_id, COALESCE(j_unit.unit_name, ''), t.work_order_id, t.priority, t.requested_date, t.required_by_date, t.approval_status, t.approved_by_user_id, COALESCE(j_usr.full_name, ''), t.approved_at, t.total_estimated_cost, t.justification, t.created_by, t.updated_by, t.deleted_by, t.created_at, t.updated_at, t.deleted_at
 	FROM proc_requisitions t
@@ -104,6 +109,10 @@ func (r *RequisitionRepository) Create(ctx context.Context, m *model.Requisition
 		return "", err
 	}
 	defer tx.Rollback(ctx)
+
+	if m.RequisitionNumber == "" {
+		m.RequisitionNumber, _ = helper.GenerateNextNumber(ctx, r.DB, "proc_requisitions", "requisition_number", "PR")
+	}
 
 	insertQuery := `INSERT INTO proc_requisitions (requisition_number, origin_unit_id, work_order_id, priority, requested_date, required_by_date, approval_status, approved_by_user_id, approved_at, total_estimated_cost, justification, created_by, updated_by, deleted_by) VALUES ($1, $2, $3, $4::requisition_priority_type, $5, $6, $7::requisition_approval_status_type, $8, $9, $10, $11, $12, $13, $14) RETURNING requisition_id`
 	var newID string
@@ -139,7 +148,7 @@ func (r *RequisitionRepository) Update(ctx context.Context, id string, m *model.
 		return err
 	}
 
-	if len(m.Items) > 0 {
+	if m.Items != nil {
 		_, _ = tx.Exec(ctx, `DELETE FROM proc_requisition_items WHERE requisition_id = $1`, id)
 		for _, item := range m.Items {
 			_, err := tx.Exec(ctx, `INSERT INTO proc_requisition_items (requisition_id, material_id, quantity, estimated_unit_price, notes, created_by, updated_by, deleted_by) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`, id, item.MaterialId, item.Quantity, item.EstimatedUnitPrice, item.Notes, item.CreatedBy, item.UpdatedBy, item.DeletedBy)

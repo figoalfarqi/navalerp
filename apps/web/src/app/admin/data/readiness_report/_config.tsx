@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { formatSmartDate } from "@/utils/dateTime";
 import { ColumnField } from "@/components/table/Table";
 import { FormField } from "@/components/formCrud/FormCrud";
 import { FilterField } from "@/components/table/FilterFormTable";
@@ -10,7 +11,7 @@ export const primaryKey = "snapshot_id";
 
 export const columns: ColumnField[] = [
   { key: "ship_name", label: "Kapal KRI" },
-  { key: "snapshot_timestamp", label: "Snapshot Timestamp" },
+  { key: "snapshot_timestamp", label: "Snapshot Timestamp", render: (item: any) => formatSmartDate(item.snapshot_timestamp) },
   { key: "readiness_category", label: "Readiness Category" },
   { key: "mro_readiness_score", label: "Mro Readiness Score" },
   { key: "personnel_manning_score", label: "Personnel Manning Score" },
@@ -47,7 +48,13 @@ export const formFields = (mode: string): FormField[] => [
     name: "readiness_category",
     col: "left",
     label: "Readiness Category",
-    fieldType: "text",
+    fieldType: "select",
+    options: [
+      { label: "C-1", value: "C-1" },
+      { label: "C-2", value: "C-2" },
+      { label: "C-3", value: "C-3" },
+      { label: "C-4", value: "C-4" },
+    ],
     required: true,
     disabled: mode === "view",
   },

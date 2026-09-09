@@ -55,13 +55,16 @@ func (r *WarehouseRepository) List(ctx context.Context, opts model.ListOptions) 
 	whereClauses = append(whereClauses, "w.deleted_at IS NULL")
 	if opts.Search != "" {
 		searchPattern := "%" + opts.Search + "%"
-		whereClauses = append(whereClauses, fmt.Sprintf("(w.warehouse_code ILIKE $%[1]d OR w.warehouse_name ILIKE $%[1]d OR w.location_address ILIKE $%[1]d)", argPos))
+		whereClauses = append(whereClauses, fmt.Sprintf("(w.warehouse_code ILIKE $%[1]d OR w.warehouse_name ILIKE $%[1]d OR w.location_address ILIKE $%[1]d OR u_unit.unit_name ILIKE $%[1]d OR u_mgr.full_name ILIKE $%[1]d)", argPos))
 		args = append(args, searchPattern)
 		argPos++
 	}
 
 	whereSql := strings.Join(whereClauses, " AND ")
-	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM inv_warehouses w WHERE %s", whereSql)
+	countQuery := fmt.Sprintf(`SELECT COUNT(*) FROM inv_warehouses w
+	LEFT JOIN org_units u_unit ON u_unit.unit_id = w.unit_id
+	LEFT JOIN sys_users u_mgr ON u_mgr.user_id = w.manager_user_id
+	WHERE %s`, whereSql)
 	var total int
 	if err := r.DB.QueryRow(ctx, countQuery, args...).Scan(&total); err != nil {
 		return nil, 0, err

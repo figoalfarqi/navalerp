@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { formatSmartDate } from "@/utils/dateTime";
 import { ColumnField } from "@/components/table/Table";
 import { FormField } from "@/components/formCrud/FormCrud";
 import { FilterField } from "@/components/table/FilterFormTable";
@@ -14,7 +15,7 @@ export const columns: ColumnField[] = [
   { key: "pm_title", label: "Pm Title" },
   { key: "interval_hours", label: "Interval Hours" },
   { key: "interval_days", label: "Interval Days" },
-  { key: "last_performed_at", label: "Last Performed At" },
+  { key: "last_performed_at", label: "Last Performed At", render: (item: any) => formatSmartDate(item.last_performed_at) },
 ];
 
 export const filterFields: FilterField[] = [

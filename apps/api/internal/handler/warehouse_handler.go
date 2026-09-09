@@ -53,11 +53,15 @@ func (h *WarehouseHandler) Get(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	query := r.URL.Query()
+	query := queryValues(r)
 	page, _ := strconv.Atoi(query.Get("page"))
-	if page <= 0 { page = 1 }
+	if page <= 0 {
+		page = 1
+	}
 	limit, _ := strconv.Atoi(query.Get("limit"))
-	if limit <= 0 { limit = 10 }
+	if limit <= 0 {
+		limit = 10
+	}
 	offset := (page - 1) * limit
 	search := strings.TrimSpace(query.Get("search"))
 
@@ -70,7 +74,7 @@ func (h *WarehouseHandler) Get(w http.ResponseWriter, r *http.Request) {
 	response.JSON(w, http.StatusOK, "success", map[string]any{
 		"items": items,
 		"total": total,
-		"page": page,
+		"page":  page,
 		"limit": limit,
 	}, nil)
 }

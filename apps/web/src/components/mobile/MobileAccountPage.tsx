@@ -6,8 +6,8 @@ import { useAppObjectStore } from "@/hooks/useAppObjectStore";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { BsPerson } from "react-icons/bs";
-import { FiChevronRight, FiLock, FiLogOut, FiSettings, FiUser } from "react-icons/fi";
+import { BsPerson } from "@/components/icons";
+import { FiChevronRight, FiLock, FiLogOut, FiSettings, FiUser } from "@/components/icons";
 
 type MobileRole = "checker" | "driver";
 

@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { formatSmartDate } from "@/utils/dateTime";
 import { ColumnField } from "@/components/table/Table";
 import { FormField } from "@/components/formCrud/FormCrud";
 import { FilterField } from "@/components/table/FilterFormTable";
@@ -14,7 +15,7 @@ export const columns: ColumnField[] = [
   { key: "command_unit_name", label: "Komando Pengendali" },
   { key: "threat_level", label: "Threat Level" },
   { key: "description", label: "Description" },
-  { key: "created_at", label: "Created At" },
+  { key: "created_at", label: "Created At", render: (item: any) => formatSmartDate(item.created_at) },
 ];
 
 export const filterFields: FilterField[] = [
@@ -55,7 +56,14 @@ export const formFields = (mode: string): FormField[] => [
     name: "threat_level",
     col: "right",
     label: "Threat Level",
-    fieldType: "text",
+    fieldType: "select",
+    options: [
+      { label: "DEFCON 1", value: "DEFCON_1" },
+      { label: "DEFCON 2", value: "DEFCON_2" },
+      { label: "DEFCON 3", value: "DEFCON_3" },
+      { label: "DEFCON 4", value: "DEFCON_4" },
+      { label: "DEFCON 5", value: "DEFCON_5" },
+    ],
     required: false,
     disabled: mode === "view",
   },

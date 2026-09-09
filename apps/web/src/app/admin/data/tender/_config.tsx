@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { formatSmartDate } from "@/utils/dateTime";
 import { ColumnField } from "@/components/table/Table";
 import { FormField } from "@/components/formCrud/FormCrud";
 import { FilterField } from "@/components/table/FilterFormTable";
@@ -14,7 +15,7 @@ export const columns: ColumnField[] = [
   { key: "procurement_category", label: "Procurement Category" },
   { key: "estimated_budget", label: "Estimated Budget" },
   { key: "procurement_method", label: "Procurement Method" },
-  { key: "start_date", label: "Start Date" },
+  { key: "start_date", label: "Start Date", render: (item: any) => formatSmartDate(item.start_date) },
 ];
 
 export const filterFields: FilterField[] = [
@@ -28,7 +29,10 @@ export const formFields = (mode: string): FormField[] => [
     label: "Tender Number",
     fieldType: "text",
     required: true,
+    readOnly: true,
     disabled: mode === "view",
+    autoGenerate: true,
+    autoPrefix: "TND",
   },
   {
     name: "title",
@@ -42,7 +46,13 @@ export const formFields = (mode: string): FormField[] => [
     name: "procurement_category",
     col: "left",
     label: "Procurement Category",
-    fieldType: "text",
+    fieldType: "select",
+    options: [
+      { label: "Alutsista", value: "ALUTSISTA" },
+      { label: "Spare Parts", value: "SPARE_PARTS" },
+      { label: "MRO Service", value: "MRO_SERVICE" },
+      { label: "Facility", value: "FACILITY" },
+    ],
     required: true,
     disabled: mode === "view",
   },
@@ -58,7 +68,13 @@ export const formFields = (mode: string): FormField[] => [
     name: "procurement_method",
     col: "left",
     label: "Procurement Method",
-    fieldType: "text",
+    fieldType: "select",
+    options: [
+      { label: "Direct Appointment", value: "DIRECT_APPOINTMENT" },
+      { label: "Limited Tender", value: "LIMITED_TENDER" },
+      { label: "Open Tender", value: "OPEN_TENDER" },
+      { label: "G2G", value: "G2G" },
+    ],
     required: true,
     disabled: mode === "view",
   },
@@ -82,7 +98,14 @@ export const formFields = (mode: string): FormField[] => [
     name: "status",
     col: "right",
     label: "Status",
-    fieldType: "text",
+    fieldType: "select",
+    options: [
+      { label: "Draft", value: "DRAFT" },
+      { label: "Published", value: "PUBLISHED" },
+      { label: "Evaluating", value: "EVALUATING" },
+      { label: "Awarded", value: "AWARDED" },
+      { label: "Cancelled", value: "CANCELLED" },
+    ],
     required: false,
     disabled: mode === "view",
   },

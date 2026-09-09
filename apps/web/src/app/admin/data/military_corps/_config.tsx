@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { formatSmartDate } from "@/utils/dateTime";
 import { ColumnField } from "@/components/table/Table";
 import { FormField } from "@/components/formCrud/FormCrud";
 import { FilterField } from "@/components/table/FilterFormTable";
@@ -12,7 +13,7 @@ export const columns: ColumnField[] = [
   { key: "corps_code", label: "Corps Code" },
   { key: "corps_name", label: "Corps Name" },
   { key: "description", label: "Description" },
-  { key: "created_at", label: "Created At" },
+  { key: "created_at", label: "Created At", render: (item: any) => formatSmartDate(item.created_at) },
 ];
 
 export const filterFields: FilterField[] = [
@@ -24,7 +25,17 @@ export const formFields = (mode: string): FormField[] => [
     name: "corps_code",
     col: "left",
     label: "Corps Code",
-    fieldType: "text",
+    fieldType: "select",
+    options: [
+      { label: "P", value: "P" },
+      { label: "T", value: "T" },
+      { label: "E", value: "E" },
+      { label: "S", value: "S" },
+      { label: "M", value: "M" },
+      { label: "K", value: "K" },
+      { label: "KH", value: "KH" },
+      { label: "PM", value: "PM" },
+    ],
     required: true,
     disabled: mode === "view",
   },

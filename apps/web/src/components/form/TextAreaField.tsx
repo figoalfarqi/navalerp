@@ -38,10 +38,10 @@ export default function TextAreaField({
 }: TextAreaFieldProps) {
   const [isFocused, setIsFocused] = useState(false);
 
-  const baseWrapperClass = "flex flex-col mb-4";
+  const baseWrapperClass = "flex flex-col w-full mb-4";
   const baseLabelClass = "mb-1 font-medium text-gray-700";
   const baseTextareaClass =
-    "app-scrollbar px-3 py-2 border rounded-sm focus:outline-none focus:border-blue-500 focus:shadow-[0_0_6px_rgba(59,130,246,0.3)] disabled:bg-gray-100 disabled:text-gray-400 resize-none transition-all duration-300 ease-in-out";
+    "w-full app-scrollbar px-3 py-2 border rounded-sm focus:outline-none focus:border-blue-500 focus:shadow-[0_0_6px_rgba(59,130,246,0.3)] disabled:bg-gray-100 disabled:text-gray-400 resize-none transition-all duration-300 ease-in-out";
 
   return (
     <div className={`${baseWrapperClass} ${wrapperClassName}`}>

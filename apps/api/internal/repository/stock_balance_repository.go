@@ -41,17 +41,30 @@ func (r *StockBalanceRepository) List(ctx context.Context, opts model.ListOption
 	argPos := 1
 
 	whereClauses = append(whereClauses, "t.deleted_at IS NULL")
+	if opts.Search != "" {
+		searchPattern := "%" + opts.Search + "%"
+		whereClauses = append(whereClauses, fmt.Sprintf("(j_wh.warehouse_name ILIKE $%[1]d OR j_mat.material_name ILIKE $%[1]d)", argPos))
+		args = append(args, searchPattern)
+		argPos++
+	}
 	whereSql := strings.Join(whereClauses, " AND ")
-	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM inv_stock_balances t WHERE %s", whereSql)
+	countQuery := fmt.Sprintf(`SELECT COUNT(*) FROM inv_stock_balances t
+	LEFT JOIN inv_warehouses j_wh ON j_wh.warehouse_id = t.warehouse_id
+	LEFT JOIN inv_materials j_mat ON j_mat.material_id = t.material_id
+	WHERE %s`, whereSql)
 	var total int
 	if err := r.DB.QueryRow(ctx, countQuery, args...).Scan(&total); err != nil {
 		return nil, 0, err
 	}
 
 	limit := opts.Limit
-	if limit <= 0 { limit = 10 }
+	if limit <= 0 {
+		limit = 10
+	}
 	offset := opts.Offset
-	if offset < 0 { offset = 0 }
+	if offset < 0 {
+		offset = 0
+	}
 
 	listQuery := fmt.Sprintf(`SELECT t.balance_id, t.warehouse_id, COALESCE(j_wh.warehouse_name, ''), t.location_id, t.material_id, COALESCE(j_mat.material_name, ''), t.quantity_on_hand, t.quantity_reserved, t.quantity_in_transit, t.quantity_available, t.last_count_date, t.created_by, t.updated_by, t.deleted_by, t.created_at, t.updated_at, t.deleted_at
 	FROM inv_stock_balances t

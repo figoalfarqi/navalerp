@@ -12,7 +12,7 @@ import {
   toLocalISOString,
 } from "@/utils/dateTime";
 import { usePopoverPosition } from "@/hooks/usePopoverPosition";
-import { FaX } from "react-icons/fa6";
+import { FaX } from "@/components/icons";
 import DurationPicker from "./picker/DurationPicker";
 import { useCloseOnScrollDistance } from "@/hooks/useCloseOnScrollDistance";
 

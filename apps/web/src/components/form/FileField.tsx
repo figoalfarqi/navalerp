@@ -2,11 +2,11 @@
 
 import { useState, useRef, DragEvent, ChangeEvent } from "react";
 import { FileType, useUploadFile } from "@/hooks/useUploadFile";
-import { IoCloudUploadOutline } from "react-icons/io5";
+import { IoCloudUploadOutline } from "@/components/icons";
 import Image from "next/image";
 import { authTokenType } from "@/hooks/useFetchAPI";
 import ImageViewer from "../ImageViewer";
-import { LuX } from "react-icons/lu";
+import { LuX } from "@/components/icons";
 
 interface UploadFileFieldProps {
   id: string;

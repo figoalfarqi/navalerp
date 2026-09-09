@@ -18,7 +18,10 @@ import {
   FaTruckFast,
   FaFileContract,
   FaArrowRotateRight,
-} from "react-icons/fa6";
+  FaFilePdf,
+} from "@/components/icons";
+import { ADMIN_ROLE_NAMES } from "@/components/admin/adminNavigation";
+import Button from "@/components/form/Button";
 
 interface MetricState {
   ships: number;
@@ -41,6 +44,7 @@ export default function AdminDashboardPage() {
     readinessReports: 0,
   });
   const [loading, setLoading] = useState(true);
+  const [exportingPdf, setExportingPdf] = useState(false);
 
   const fetchDashboardData = async () => {
     setLoading(true);
@@ -216,36 +220,97 @@ export default function AdminDashboardPage() {
     },
   ];
 
+  const exportOverviewPdf = async () => {
+    if (exportingPdf || loading) return;
+    try {
+      setExportingPdf(true);
+      const now = new Date();
+      const dateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+      const timeStr = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")} WIB`;
+      const userName = adminPayload?.username
+        ? adminPayload.username.replace(/[._]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
+        : "Administrator Sistem";
+      const userRole = ADMIN_ROLE_NAMES[adminPayload?.app_role_id ?? 5] ?? "Super Admin";
+
+      const { pdf } = await import("@react-pdf/renderer");
+      const OverviewPdfDocument = (await import("@/components/admin/overview/OverviewPdfDocument")).default;
+
+      const blob = await pdf(
+        <OverviewPdfDocument
+          metrics={metrics}
+          modules={modules}
+          userName={userName}
+          userRole={userRole}
+          date={dateStr}
+          time={timeStr}
+        />,
+      ).toBlob();
+
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `laporan-overview-navalerp-${dateStr}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("Gagal mengekspor PDF Overview:", err);
+    } finally {
+      setExportingPdf(false);
+    }
+  };
+
   return (
     <div className="space-y-6 p-4 sm:p-6 lg:p-8">
       {/* Header Banner */}
-      <section className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#062444] via-[#09426f] to-[#0b8fa5] p-6 text-white shadow-xl sm:p-8">
+      <section className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#061830] via-[#092244] to-[#0d2f5a] p-6 text-white shadow-xl sm:p-8">
         <div className="relative z-10 flex flex-col justify-between gap-4 md:flex-row md:items-center">
           <div>
-            <div className="inline-flex items-center gap-2 rounded-full bg-cyan-950/60 px-3 py-1 text-xs font-semibold tracking-wider text-cyan-300 uppercase backdrop-blur border border-cyan-400/20">
+            <div className="inline-flex items-center gap-2 rounded-full bg-blue-950/70 px-3 py-1 text-xs font-semibold tracking-wider text-blue-200 uppercase backdrop-blur border border-blue-400/25">
               <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
               SISTEM KOMANDO NAVAL ERP AKTIF
             </div>
             <h1 className="mt-3 text-2xl font-extrabold sm:text-3xl lg:text-4xl tracking-tight">
               Pusat Komando & Operasional Alutsista
             </h1>
-            <p className="mt-2 max-w-2xl text-sm text-cyan-100/90 leading-relaxed">
+            <p className="mt-2 max-w-2xl text-sm text-blue-100/90 leading-relaxed">
               Monitoring kesiapan tempur armada KRI, integrasi logistik perbekalan, pemeliharaan alpalhankam,
               dan manajemen personel pertahanan maritim TNI AL.
             </p>
           </div>
 
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-            <button
+            <Button
+              id="dashboard-refresh-btn"
+              type="button"
+              variant="gray-outline"
+              size="sm"
               onClick={fetchDashboardData}
-              className="inline-flex items-center gap-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 px-4 py-2.5 text-xs sm:text-sm font-medium backdrop-blur transition"
+              className="rounded-xl !border-white/20 !bg-white/10 px-4 py-2 text-xs sm:text-sm font-medium !text-white hover:!bg-white/20 backdrop-blur cursor-pointer"
             >
               <FaArrowRotateRight className={loading ? "animate-spin" : ""} />
               Refresh Data
-            </button>
+            </Button>
+            <Button
+              id="dashboard-download-pdf-btn"
+              type="button"
+              variant="blue-solid"
+              size="sm"
+              onClick={exportOverviewPdf}
+              disabled={exportingPdf || loading}
+              className="rounded-xl !bg-blue-900/60 hover:!bg-blue-800/80 !text-white !border !border-blue-400/30 px-4 py-2 text-xs sm:text-sm font-semibold shadow-lg shadow-blue-950/50 backdrop-blur cursor-pointer disabled:opacity-50"
+            >
+              <FaFilePdf size={14} />
+              {exportingPdf ? "Membuat PDF..." : "Download PDF Overview"}
+            </Button>
             <div className="rounded-xl bg-black/20 border border-white/10 px-4 py-2 text-xs backdrop-blur">
-              <span className="block text-cyan-200 font-semibold">User: {adminPayload?.app_user_name || "Super Admin"}</span>
-              <span className="text-white/70">Role: {adminPayload?.username || "admin"}</span>
+              <span className="block text-cyan-200 font-semibold">
+                User: {adminPayload?.username ? adminPayload.username.replace(/[._]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()) : "Admin"}
+              </span>
+              <span className="text-white/70">
+                Role: {ADMIN_ROLE_NAMES[adminPayload?.app_role_id ?? 5] ?? "Super Admin"}
+              </span>
             </div>
           </div>
         </div>
@@ -257,7 +322,21 @@ export default function AdminDashboardPage() {
           <h2 className="text-lg font-bold text-slate-800 tracking-tight">
             Ringkasan Alutsista & Operasi
           </h2>
-          <span className="text-xs text-slate-500 font-medium">Data Terintegrasi Database Real-time</span>
+          <div className="flex items-center gap-3">
+            <Button
+              id="dashboard-kpi-download-pdf-btn"
+              type="button"
+              variant="blue-outline"
+              size="xs"
+              onClick={exportOverviewPdf}
+              disabled={exportingPdf || loading}
+              className="!px-3 !py-1.5 rounded-lg text-xs font-semibold !bg-cyan-50 hover:!bg-cyan-100 !text-cyan-800 !border-cyan-200 cursor-pointer disabled:opacity-50"
+            >
+              <FaFilePdf size={13} />
+              {exportingPdf ? "Memproses PDF..." : "Unduh PDF Laporan"}
+            </Button>
+            <span className="text-xs text-slate-500 font-medium hidden sm:inline">Data Terintegrasi Database Real-time</span>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

@@ -46,6 +46,27 @@
   *::-webkit-scrollbar-corner {
     background: transparent;
   }
+
+  button,
+  [role="button"],
+  [type="button"],
+  [type="submit"],
+  [type="reset"] {
+    cursor: pointer;
+  }
+
+  button:disabled,
+  [role="button"]:disabled,
+  [type="button"]:disabled,
+  [type="submit"]:disabled,
+  [type="reset"]:disabled {
+    cursor: not-allowed;
+  }
+
+  aside button,
+  aside button * {
+    cursor: pointer;
+  }
 }
 
 @keyframes bounce-custom {

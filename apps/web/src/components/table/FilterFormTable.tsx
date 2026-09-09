@@ -11,7 +11,7 @@ import DateTimeField from "@/components/form/DateTimeField";
 import SelectButtonField from "../form/SelectButtonField";
 import TextFieldSkeleton from "../form/TextFieldSkeleton";
 import DateField from "../form/DateField";
-import { LuChevronDown } from "react-icons/lu";
+import { LuChevronDown } from "@/components/icons";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { useQueryParams } from "@/hooks/useQueryParams";
 import DateAfterBeforeField from "../form/DateAfterBeforeField";
@@ -122,9 +122,17 @@ export default function FilterFormTable({
     return nextState;
   };
 
-  const handleApplyFilter = (data = filterFormTableData) => {
-    const activeFilters = Object.fromEntries(
-      Object.entries(data).filter(
+  const handleApplyFilter = (data?: any) => {
+    const sourceData =
+      data &&
+      typeof data === "object" &&
+      !("nativeEvent" in data) &&
+      !("isTrusted" in data)
+        ? data
+        : filterFormTableData;
+
+    const activeFilters: Record<string, any> = Object.fromEntries(
+      Object.entries(sourceData).filter(
         ([_, v]) => v !== "" && v !== undefined && v !== null,
       ),
     );
@@ -132,7 +140,11 @@ export default function FilterFormTable({
     onApplyFilter(activeFilters);
 
     if (tableFor !== "select" && tableFor !== "detail") {
-      setParams(activeFilters);
+      const stringParams: Record<string, string> = {};
+      Object.entries(activeFilters).forEach(([k, v]) => {
+        stringParams[k] = String(v);
+      });
+      setParams(stringParams);
     }
   };
 
@@ -556,7 +568,7 @@ export default function FilterFormTable({
             <Button
               id="apply-filters"
               variant="blue-solid"
-              onClick={handleApplyFilter}
+              onClick={() => handleApplyFilter()}
               className="text-sm"
             >
               Apply

@@ -1,7 +1,7 @@
 "use client";
 
 import BackButton from "@/components/mobile/BackButton";
-import { FiCheckCircle, FiShield } from "react-icons/fi";
+import { FiCheckCircle, FiShield } from "@/components/icons";
 
 type MobileRole = "checker" | "driver";
 

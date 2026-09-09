@@ -1,6 +1,6 @@
 import { useRouter } from "next/navigation";
 import { ReactNode } from "react";
-import { BiChevronLeft } from "react-icons/bi";
+import { BiChevronLeft } from "@/components/icons";
 
 export default function BackButton({
   url,

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/figoalfarqi/navalerp/internal/helper"
 	"github.com/figoalfarqi/navalerp/internal/model"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -32,12 +33,12 @@ func (r *ShipmentRepository) Get(ctx context.Context, id string) (*model.Shipmen
 	}
 
 	// Load Items
-	childRowsItems, err := r.DB.Query(ctx, `SELECT shipment_item_id, shipment_id, material_id, quantity_dispatched, quantity_received, packaging_type, weight_kg, notes, created_at FROM log_shipment_items WHERE shipment_id = $1`, id)
+	childRowsItems, err := r.DB.Query(ctx, `SELECT poi.shipment_item_id, poi.shipment_id, poi.material_id, COALESCE(m.material_name, ''), COALESCE(m.material_code, ''), poi.quantity_dispatched, poi.quantity_received, poi.packaging_type, poi.weight_kg, poi.notes, poi.created_at FROM log_shipment_items poi LEFT JOIN inv_materials m ON m.material_id = poi.material_id WHERE poi.shipment_id = $1`, id)
 	if err == nil {
 		defer childRowsItems.Close()
 		for childRowsItems.Next() {
 			var item model.ShipmentItems
-			if err := childRowsItems.Scan(&item.ShipmentItemId, &item.ShipmentId, &item.MaterialId, &item.QuantityDispatched, &item.QuantityReceived, &item.PackagingType, &item.WeightKg, &item.Notes, &item.CreatedAt); err == nil {
+			if err := childRowsItems.Scan(&item.ShipmentItemId, &item.ShipmentId, &item.MaterialId, &item.MaterialName, &item.MaterialCode, &item.QuantityDispatched, &item.QuantityReceived, &item.PackagingType, &item.WeightKg, &item.Notes, &item.CreatedAt); err == nil {
 				m.Items = append(m.Items, item)
 			}
 		}
@@ -68,9 +69,13 @@ func (r *ShipmentRepository) List(ctx context.Context, opts model.ListOptions) (
 	}
 
 	limit := opts.Limit
-	if limit <= 0 { limit = 10 }
+	if limit <= 0 {
+		limit = 10
+	}
 	offset := opts.Offset
-	if offset < 0 { offset = 0 }
+	if offset < 0 {
+		offset = 0
+	}
 
 	listQuery := fmt.Sprintf(`SELECT t.shipment_id, t.manifest_number, t.route_id, t.transport_unit_id, t.origin_warehouse_id, COALESCE(j_owh.warehouse_name, ''), t.destination_warehouse_id, COALESCE(j_dwh.warehouse_name, ''), t.departure_date, t.arrival_date, t.escort_security_level, t.status, t.authorized_by_user_id, t.remarks, t.created_by, t.updated_by, t.deleted_by, t.created_at, t.updated_at, t.deleted_at
 	FROM log_shipments t
@@ -105,6 +110,10 @@ func (r *ShipmentRepository) Create(ctx context.Context, m *model.Shipment) (str
 	}
 	defer tx.Rollback(ctx)
 
+	if m.ManifestNumber == "" {
+		m.ManifestNumber, _ = helper.GenerateNextNumber(ctx, r.DB, "log_shipments", "manifest_number", "MNF")
+	}
+
 	insertQuery := `INSERT INTO log_shipments (manifest_number, route_id, transport_unit_id, origin_warehouse_id, destination_warehouse_id, departure_date, arrival_date, escort_security_level, status, authorized_by_user_id, remarks, created_by, updated_by, deleted_by) VALUES ($1, $2, $3, $4, $5, $6, $7, $8::escort_security_level_type, $9::shipment_status_type, $10, $11, $12, $13, $14) RETURNING shipment_id`
 	var newID string
 	err = tx.QueryRow(ctx, insertQuery, m.ManifestNumber, m.RouteId, m.TransportUnitId, m.OriginWarehouseId, m.DestinationWarehouseId, m.DepartureDate, m.ArrivalDate, m.EscortSecurityLevel, m.Status, m.AuthorizedByUserId, m.Remarks, m.CreatedBy, m.UpdatedBy, m.DeletedBy).Scan(&newID)
@@ -112,8 +121,13 @@ func (r *ShipmentRepository) Create(ctx context.Context, m *model.Shipment) (str
 		return "", err
 	}
 
+	validPkg := map[string]bool{"CRATE": true, "PALLET": true, "DRUM": true, "AMMO_BOX": true, "ISO_CONTAINER": true}
 	for _, item := range m.Items {
-		_, err := tx.Exec(ctx, `INSERT INTO log_shipment_items (shipment_id, material_id, quantity_dispatched, quantity_received, packaging_type, weight_kg, notes) VALUES ($1, $2, $3, $4, $5::shipment_packaging_type, $6, $7)`, newID, item.MaterialId, item.QuantityDispatched, item.QuantityReceived, item.PackagingType, item.WeightKg, item.Notes)
+		pkg := strings.ToUpper(strings.TrimSpace(item.PackagingType))
+		if !validPkg[pkg] {
+			pkg = "CRATE"
+		}
+		_, err := tx.Exec(ctx, `INSERT INTO log_shipment_items (shipment_id, material_id, quantity_dispatched, quantity_received, packaging_type, weight_kg, notes) VALUES ($1, $2, $3, $4, $5::shipment_packaging_type, $6, $7)`, newID, item.MaterialId, item.QuantityDispatched, item.QuantityReceived, pkg, item.WeightKg, item.Notes)
 		if err != nil {
 			return "", err
 		}
@@ -139,10 +153,15 @@ func (r *ShipmentRepository) Update(ctx context.Context, id string, m *model.Shi
 		return err
 	}
 
-	if len(m.Items) > 0 {
+	if m.Items != nil {
 		_, _ = tx.Exec(ctx, `DELETE FROM log_shipment_items WHERE shipment_id = $1`, id)
+		validPkg := map[string]bool{"CRATE": true, "PALLET": true, "DRUM": true, "AMMO_BOX": true, "ISO_CONTAINER": true}
 		for _, item := range m.Items {
-			_, err := tx.Exec(ctx, `INSERT INTO log_shipment_items (shipment_id, material_id, quantity_dispatched, quantity_received, packaging_type, weight_kg, notes) VALUES ($1, $2, $3, $4, $5::shipment_packaging_type, $6, $7)`, id, item.MaterialId, item.QuantityDispatched, item.QuantityReceived, item.PackagingType, item.WeightKg, item.Notes)
+			pkg := strings.ToUpper(strings.TrimSpace(item.PackagingType))
+			if !validPkg[pkg] {
+				pkg = "CRATE"
+			}
+			_, err := tx.Exec(ctx, `INSERT INTO log_shipment_items (shipment_id, material_id, quantity_dispatched, quantity_received, packaging_type, weight_kg, notes) VALUES ($1, $2, $3, $4, $5::shipment_packaging_type, $6, $7)`, id, item.MaterialId, item.QuantityDispatched, item.QuantityReceived, pkg, item.WeightKg, item.Notes)
 			if err != nil {
 				return err
 			}

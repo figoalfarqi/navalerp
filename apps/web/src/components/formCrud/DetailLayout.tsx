@@ -101,7 +101,7 @@ export default function DetailLayout({
   errorForm,
 }: DetailLayoutProps) {
   return (
-    <div className="col-span-2 space-y-4">
+    <div className="col-span-1 md:col-span-2 space-y-4">
       {detailForms.map((detailForm) => (
         <DetailFormSection
           key={detailForm.table_name}

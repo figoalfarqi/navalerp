@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { formatSmartDate } from "@/utils/dateTime";
 import { ColumnField } from "@/components/table/Table";
 import { FormField } from "@/components/formCrud/FormCrud";
 import { FilterField } from "@/components/table/FilterFormTable";
@@ -12,7 +13,7 @@ export const columns: ColumnField[] = [
   { key: "equipment_name", label: "Peralatan" },
   { key: "reporter_name", label: "Pelapor" },
   { key: "report_number", label: "Report Number" },
-  { key: "incident_date", label: "Incident Date" },
+  { key: "incident_date", label: "Incident Date", render: (item: any) => formatSmartDate(item.incident_date) },
   { key: "severity", label: "Severity" },
   { key: "failure_mode", label: "Failure Mode" },
 ];
@@ -54,7 +55,10 @@ export const formFields = (mode: string): FormField[] => [
     label: "Report Number",
     fieldType: "text",
     required: true,
+    readOnly: true,
     disabled: mode === "view",
+    autoGenerate: true,
+    autoPrefix: "REP",
   },
   {
     name: "incident_date",
@@ -68,7 +72,13 @@ export const formFields = (mode: string): FormField[] => [
     name: "severity",
     col: "left",
     label: "Severity",
-    fieldType: "text",
+    fieldType: "select",
+    options: [
+      { label: "Cat1", value: "CAT1" },
+      { label: "Cat2", value: "CAT2" },
+      { label: "Cat3", value: "CAT3" },
+      { label: "Cat4", value: "CAT4" },
+    ],
     required: true,
     disabled: mode === "view",
   },
@@ -108,7 +118,13 @@ export const formFields = (mode: string): FormField[] => [
     name: "status",
     col: "right",
     label: "Status",
-    fieldType: "text",
+    fieldType: "select",
+    options: [
+      { label: "Pending", value: "PENDING" },
+      { label: "Assessed", value: "ASSESSED" },
+      { label: "Work Order Created", value: "WORK_ORDER_CREATED" },
+      { label: "Closed", value: "CLOSED" },
+    ],
     required: false,
     disabled: mode === "view",
   },

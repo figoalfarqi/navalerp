@@ -6,13 +6,15 @@ import {
   FaArrowRotateRight,
   FaFilePdf,
   FaPrint,
-} from "react-icons/fa6";
+} from "@/components/icons";
 import AdminSummaryCards from "@/components/admin/dashboard/AdminSummaryCards";
 import { normalizeReportRows } from "@/components/admin/dashboard/dashboardAdapter";
 import { extractAdminProjectOptions } from "@/components/admin/projectOptions";
 import SelectField, {
   type SelectOption,
 } from "@/components/form/SelectField";
+import Button from "@/components/form/Button";
+import DateField from "@/components/form/DateField";
 import { useFetchAPI } from "@/hooks/useFetchAPI";
 import type {
   AdminDashboardSummary,
@@ -23,6 +25,7 @@ import {
   formatCurrencyIDR,
   formatNumberID,
 } from "@/utils/currencyFormater";
+import { formatDate } from "@/utils/dateTime";
 
 const emptySummary: AdminDashboardSummary = {
   project_count: 0,
@@ -186,22 +189,26 @@ export default function AdminReportPage() {
               bulanan, lalu cetak langsung atau simpan sebagai PDF.
             </p>
           </div>
-          <div className="flex flex-wrap gap-2 print:hidden">
-            <button
+          <div className="flex flex-wrap items-center gap-2 print:hidden">
+            <Button
+              id="report-print-btn"
               type="button"
+              variant="gray-outline"
+              size="md"
               onClick={() => window.print()}
-              className="inline-flex h-10 items-center gap-2 rounded-xl border border-slate-200 px-4 text-sm font-medium text-slate-700 hover:bg-slate-50"
             >
               <FaPrint /> Cetak
-            </button>
-            <button
+            </Button>
+            <Button
+              id="report-export-pdf-btn"
               type="button"
+              variant="red-solid"
+              size="md"
               onClick={exportPdf}
               disabled={rows.length === 0 || exportingPdf}
-              className="inline-flex h-10 items-center gap-2 rounded-xl bg-red-600 px-4 text-sm font-medium text-white hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
             >
               <FaFilePdf /> {exportingPdf ? "Mengekspor..." : "Export PDF"}
-            </button>
+            </Button>
           </div>
         </div>
       </section>
@@ -216,8 +223,6 @@ export default function AdminReportPage() {
             setProjectId(value === "all" || value === null ? null : Number(value))
           }
           uncloseable
-          labelClassName="!mb-1.5 text-xs font-semibold uppercase tracking-wide !text-slate-500"
-          className="h-11 w-full rounded-xl !border-slate-200 bg-white text-sm"
         />
         <SelectField
           id="report-period"
@@ -228,28 +233,35 @@ export default function AdminReportPage() {
             setPeriod(value === "weekly" ? "weekly" : "monthly")
           }
           uncloseable
-          labelClassName="!mb-1.5 text-xs font-semibold uppercase tracking-wide !text-slate-500"
-          className="h-11 w-full rounded-xl !border-slate-200 bg-white text-sm"
         />
-        <label className="flex flex-col gap-1.5">
-          <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-            Tanggal acuan
-          </span>
-          <input
-            type="date"
-            value={date}
-            onChange={(event) => setDate(event.target.value)}
-            className="h-11 rounded-xl border border-slate-200 px-3 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
-          />
-        </label>
-        <button
-          type="button"
-          onClick={() => setReloadKey((key) => key + 1)}
-          className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 text-sm font-medium text-white hover:bg-blue-700"
-        >
-          <FaArrowRotateRight className={loading ? "animate-spin" : ""} />
-          Terapkan
-        </button>
+        <DateField
+          id="report-date"
+          label="Tanggal acuan"
+          value={date}
+          uncloseable
+          onChange={(val) => {
+            if (!val) return;
+            const d = new Date(val);
+            if (!isNaN(d.getTime())) {
+              const yyyy = d.getFullYear();
+              const mm = String(d.getMonth() + 1).padStart(2, "0");
+              const dd = String(d.getDate()).padStart(2, "0");
+              setDate(`${yyyy}-${mm}-${dd}`);
+            }
+          }}
+        />
+        <div className="flex items-end pb-0.5">
+          <Button
+            id="report-apply-btn"
+            type="button"
+            variant="blue-solid"
+            size="md"
+            onClick={() => setReloadKey((key) => key + 1)}
+          >
+            <FaArrowRotateRight className={loading ? "animate-spin" : ""} />
+            Terapkan
+          </Button>
+        </div>
       </section>
 
       {error && (
@@ -269,7 +281,7 @@ export default function AdminReportPage() {
           </h2>
           <p className="text-xs text-slate-500">
             {period === "weekly" ? "Laporan mingguan" : "Laporan bulanan"} —
-            tanggal acuan {date}
+            tanggal acuan {formatDate(date)}
           </p>
         </div>
         <div className="overflow-x-auto">

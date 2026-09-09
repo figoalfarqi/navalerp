@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { formatSmartDate } from "@/utils/dateTime";
 import { ColumnField } from "@/components/table/Table";
 import { FormField } from "@/components/formCrud/FormCrud";
 import { FilterField } from "@/components/table/FilterFormTable";
@@ -10,7 +11,7 @@ export const primaryKey = "log_id";
 
 export const columns: ColumnField[] = [
   { key: "ship_name", label: "Kapal KRI" },
-  { key: "log_date", label: "Log Date" },
+  { key: "log_date", label: "Log Date", render: (item: any) => formatSmartDate(item.log_date) },
   { key: "latitude", label: "Latitude" },
   { key: "longitude", label: "Longitude" },
   { key: "heading_degrees", label: "Heading Degrees" },

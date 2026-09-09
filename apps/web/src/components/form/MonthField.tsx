@@ -8,7 +8,7 @@ import {
   FaChevronLeft,
   FaChevronRight,
   FaXmark,
-} from "react-icons/fa6";
+} from "@/components/icons";
 import { useCloseOnScrollDistance } from "@/hooks/useCloseOnScrollDistance";
 import { usePopoverPosition } from "@/hooks/usePopoverPosition";
 
@@ -216,7 +216,7 @@ export default function MonthField({
               onChange(null);
               setShowPopover(false);
             }}
-            className="absolute right-8 top-1/2 -translate-y-1/2 rounded-md p-1 text-slate-400 transition hover:bg-red-50 hover:text-red-500 focus:outline-none focus:ring-2 focus:ring-red-100"
+            className="absolute right-8 top-1/2 -translate-y-1/2 rounded-md p-1 text-slate-400 transition hover:bg-red-50 hover:text-red-500 focus:outline-none focus:ring-2 focus:ring-red-100 cursor-pointer"
           >
             <FaXmark />
           </button>
@@ -235,13 +235,13 @@ export default function MonthField({
               left: position.left,
             }}
           >
-            <div className="mb-3 flex items-center justify-between">
+            <div className="mb-3 flex items-center justify-between border-b border-slate-100 pb-2">
               <button
                 type="button"
                 aria-label="Tahun sebelumnya"
                 disabled={!yearHasAvailableMonth(viewYear - 1)}
                 onClick={() => setViewYear((year) => year - 1)}
-                className="inline-flex h-9 w-9 items-center justify-center rounded-xl text-slate-500 transition hover:bg-blue-50 hover:text-blue-600 disabled:cursor-not-allowed disabled:opacity-30"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-xl text-slate-500 transition hover:bg-blue-50 hover:text-blue-600 disabled:cursor-not-allowed disabled:opacity-30 cursor-pointer"
               >
                 <FaChevronLeft />
               </button>
@@ -256,7 +256,7 @@ export default function MonthField({
                 aria-label="Tahun berikutnya"
                 disabled={!yearHasAvailableMonth(viewYear + 1)}
                 onClick={() => setViewYear((year) => year + 1)}
-                className="inline-flex h-9 w-9 items-center justify-center rounded-xl text-slate-500 transition hover:bg-blue-50 hover:text-blue-600 disabled:cursor-not-allowed disabled:opacity-30"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-xl text-slate-500 transition hover:bg-blue-50 hover:text-blue-600 disabled:cursor-not-allowed disabled:opacity-30 cursor-pointer"
               >
                 <FaChevronRight />
               </button>
@@ -277,7 +277,7 @@ export default function MonthField({
                     type="button"
                     disabled={isDisabled}
                     onClick={() => selectMonth(month)}
-                    className={`rounded-xl px-2 py-2.5 text-sm font-medium transition ${
+                    className={`rounded-xl px-2 py-2.5 text-sm font-medium transition cursor-pointer ${
                       isSelected
                         ? "bg-blue-600 text-white shadow-md shadow-blue-200"
                         : isCurrent
@@ -296,7 +296,7 @@ export default function MonthField({
                 type="button"
                 disabled={isMonthDisabled(now.getFullYear(), now.getMonth())}
                 onClick={selectCurrentMonth}
-                className="w-full rounded-xl bg-slate-50 px-3 py-2 text-sm font-semibold text-blue-600 transition hover:bg-blue-50 disabled:cursor-not-allowed disabled:text-slate-300"
+                className="w-full rounded-xl bg-slate-50 px-3 py-2 text-sm font-semibold text-blue-600 transition hover:bg-blue-50 disabled:cursor-not-allowed disabled:text-slate-300 cursor-pointer"
               >
                 Bulan ini
               </button>

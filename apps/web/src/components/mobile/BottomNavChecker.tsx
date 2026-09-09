@@ -3,8 +3,8 @@
 import MobileBottomNav, {
   MobileNavItem,
 } from "@/components/mobile/MobileBottomNav";
-import { BiSolidTruck, BiUser } from "react-icons/bi";
-import { FiActivity, FiGrid } from "react-icons/fi";
+import { BiSolidTruck, BiUser } from "@/components/icons";
+import { FiActivity, FiGrid } from "@/components/icons";
 
 const checkerNavigation: MobileNavItem[] = [
   {

@@ -3,7 +3,7 @@
 import MobileBottomNav, {
   MobileNavItem,
 } from "@/components/mobile/MobileBottomNav";
-import { BiSolidTruck, BiUser } from "react-icons/bi";
+import { BiSolidTruck, BiUser } from "@/components/icons";
 
 const driverNavigation: MobileNavItem[] = [
   {

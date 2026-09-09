@@ -2,6 +2,7 @@
 import { ColumnField } from "@/components/table/Table";
 import { FormField } from "@/components/formCrud/FormCrud";
 import { FilterField } from "@/components/table/FilterFormTable";
+import { DetailItemsConfig } from "@/components/formCrud/DetailItemsTable";
 
 export const entityName = "stock_transfer";
 export const entityTitle = "Transfer Bebekal";
@@ -28,7 +29,10 @@ export const formFields = (mode: string): FormField[] => [
     label: "Transfer Number",
     fieldType: "text",
     required: true,
+    readOnly: true,
     disabled: mode === "view",
+    autoGenerate: true,
+    autoPrefix: "TRF",
   },
     {
     name: "from_warehouse_id",
@@ -60,7 +64,13 @@ export const formFields = (mode: string): FormField[] => [
     name: "movement_type",
     col: "right",
     label: "Movement Type",
-    fieldType: "text",
+    fieldType: "select",
+    options: [
+      { label: "Fleet Resupply", value: "FLEET_RESUPPLY" },
+      { label: "Base Transfer", value: "BASE_TRANSFER" },
+      { label: "Depot Dispatch", value: "DEPOT_DISPATCH" },
+      { label: "Emergency Airdrop", value: "EMERGENCY_AIRDROP" },
+    ],
     required: true,
     disabled: mode === "view",
   },
@@ -108,11 +118,68 @@ export const formFields = (mode: string): FormField[] => [
     name: "status",
     col: "right",
     label: "Status",
-    fieldType: "text",
+    fieldType: "select",
+    options: [
+      { label: "Planned", value: "PLANNED" },
+      { label: "In Transit", value: "IN_TRANSIT" },
+      { label: "Received", value: "RECEIVED" },
+      { label: "Rejected", value: "REJECTED" },
+    ],
     required: false,
     disabled: mode === "view",
   },
 ];
+
+export const detailItemsConfig: DetailItemsConfig = {
+  tableName: "items",
+  title: "Rincian Item Mutasi / Transfer",
+  itemName: "Item Bebekal",
+  qtyKey: "quantity_shipped",
+  columns: [
+    {
+      key: "material_id",
+      label: "Material / Suku Cadang",
+      type: "select",
+      required: true,
+      placeholder: "Pilih Material...",
+      options: {
+        url: "/admin/material?limit=100",
+        labelKey: "material_name",
+        valueKey: "material_id",
+        extraLabelKey: "material_code",
+      },
+    },
+    {
+      key: "quantity_shipped",
+      label: "Jumlah Dikirim",
+      type: "number",
+      required: true,
+      defaultValue: 1,
+      width: "150px",
+    },
+    {
+      key: "quantity_received",
+      label: "Jumlah Diterima",
+      type: "number",
+      required: false,
+      defaultValue: 0,
+      width: "150px",
+    },
+    {
+      key: "condition_on_receipt",
+      label: "Kondisi",
+      type: "select",
+      required: false,
+      defaultValue: "SERVICEABLE",
+      options: [
+        { label: "Siap Pakai (Serviceable)", value: "SERVICEABLE" },
+        { label: "Rusak Ringan (Repairable)", value: "REPAIRABLE" },
+        { label: "Tidak Layak Pakai (Unserviceable)", value: "UNSERVICEABLE" },
+      ],
+      width: "200px",
+    },
+  ],
+};
 
 export const buildPayload = (data: any) => {
   const payload: any = { ...data };
@@ -123,5 +190,17 @@ export const buildPayload = (data: any) => {
   delete payload.created_by;
   delete payload.updated_by;
   delete payload.deleted_by;
+  delete payload.from_warehouse_name;
+  delete payload.to_warehouse_name;
+
+  if (Array.isArray(payload.items)) {
+    payload.items = payload.items.map((it: any) => ({
+      material_id: it.material_id,
+      quantity_shipped: Number(it.quantity_shipped) || 0,
+      quantity_received: Number(it.quantity_received) || 0,
+      condition_on_receipt: it.condition_on_receipt || "SERVICEABLE",
+    }));
+  }
+
   return payload;
 };

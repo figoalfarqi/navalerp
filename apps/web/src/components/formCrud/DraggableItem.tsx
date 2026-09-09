@@ -1,5 +1,5 @@
 import { Reorder, useDragControls } from "framer-motion";
-import { LuEllipsis } from "react-icons/lu";
+import { LuEllipsis } from "@/components/icons";
 import Button from "../form/Button";
 
 interface DraggableItemProps {

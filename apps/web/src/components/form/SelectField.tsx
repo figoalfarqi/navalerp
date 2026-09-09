@@ -2,14 +2,15 @@
 "use client";
 
 import { useState, useEffect, useRef, useMemo } from "react";
-import { FaChevronDown, FaSearch } from "react-icons/fa";
-import { FaX } from "react-icons/fa6";
+import { FaChevronDown, FaSearch } from "@/components/icons";
+import { FaX } from "@/components/icons";
 import Table, { TableProps } from "../table/Table";
 import Modal from "../Modal";
-import { PiTableFill } from "react-icons/pi";
+import { PiTableFill } from "@/components/icons";
 import { usePopoverPosition } from "@/hooks/usePopoverPosition";
 import { createPortal } from "react-dom";
 import { useCloseOnScrollDistance } from "@/hooks/useCloseOnScrollDistance";
+import { formatEnumLabel } from "@/utils/string";
 
 export interface SelectOption {
   label: string;
@@ -214,12 +215,12 @@ export default function SelectField({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [showPopover, activeIndex, filteredOptions, onChange]);
 
-  const baseWrapperClass = "flex flex-col";
+  const baseWrapperClass = "flex flex-col w-full";
   const baseLabelClass = "mb-1 font-medium text-gray-700";
   const baseButtonClass =
-    "flex items-center justify-between px-3 py-2 border rounded-sm focus:outline-none focus:border-blue-500 focus:shadow-[0_0_6px_rgba(59,130,246,0.3)] cursor-pointer bg-white disabled:bg-gray-100 disabled:text-gray-400";
+    "w-full flex items-center justify-between px-3 py-2 border rounded-sm focus:outline-none focus:border-blue-500 focus:shadow-[0_0_6px_rgba(59,130,246,0.3)] cursor-pointer bg-white disabled:bg-gray-100 disabled:text-gray-400";
   const baseDropdownClass =
-    "app-scrollbar absolute z-50 bg-white border rounded-sm shadow-lg min-w-60 h-60 overflow-auto";
+    "app-scrollbar absolute z-[70] bg-white border rounded-sm shadow-lg min-w-60 h-60 overflow-auto";
   const baseSearchClass =
     "flex items-center gap-2 px-2 py-2 border-b bg-gray-50 sticky top-0 z-10";
 
@@ -232,7 +233,7 @@ export default function SelectField({
           {label} {required && <span className="text-red-500">*</span>}
         </label>
       )}
-      <div className="relative" style={{ width: columnLength }}>
+      <div className="relative w-full" style={{ width: columnLength }}>
         <button
           type="button"
           onClick={() => !disabled && setShowPopover(true)}
@@ -252,7 +253,7 @@ export default function SelectField({
           disabled={disabled}
           ref={inputRef}
         >
-          <div className="flex gap-1 items-center justify-center">
+          <div className="flex gap-2 items-center min-w-0 flex-1 overflow-hidden">
             {value && !uncloseable && (
               <div
                 onMouseDown={(e) => {
@@ -266,21 +267,24 @@ export default function SelectField({
                 className={`${
                   disabled
                     ? "text-red-300"
-                    : "text-red-500 hover:bg-red-100 hover:text-red-600 "
-                } rounded-xs p-0.5`}
+                    : "text-red-500 hover:bg-red-100 hover:text-red-600 cursor-pointer "
+                } rounded-xs p-0.5 shrink-0`}
               >
                 <FaX size={10} />
               </div>
             )}
-            {value ? (
-              options.find((opt) => String(opt.value) === String(value))?.label || (
-                <div className="text-gray-400">{placeholder}</div>
-              )
-            ) : (
-              <div className="text-gray-400">{placeholder}</div>
-            )}
+            <div className="truncate min-w-0 text-left">
+              {value ? (
+                options.find((opt) => String(opt.value) === String(value))?.label ||
+                (typeof value === "string" ? formatEnumLabel(value) : (
+                  <span className="text-gray-400">{placeholder}</span>
+                ))
+              ) : (
+                <span className="text-gray-400">{placeholder}</span>
+              )}
+            </div>
           </div>
-          <div className="flex gap-2 items-center">
+          <div className="flex gap-2 items-center shrink-0 ml-2">
             {valueKey && tableProps && (
               <PiTableFill
                 strokeWidth={3}
@@ -293,7 +297,7 @@ export default function SelectField({
                   setIsOpenModal(true);
                   setShowPopover(false);
                 }}
-                className="hover:h-6 hover:w-6 hover:mr-0 text-xl h-5.5 w-5.5 mr-px transition-all duration-300"
+                className="hover:h-6 hover:w-6 hover:mr-0 text-xl h-5.5 w-5.5 mr-px transition-all duration-300 cursor-pointer"
               />
             )}
             <FaChevronDown
@@ -311,6 +315,7 @@ export default function SelectField({
                 position: "absolute",
                 top: position.top,
                 left: position.left,
+                width: inputRef.current ? `${inputRef.current.offsetWidth}px` : undefined,
               }}
               ref={popoverRef}
               tabIndex={-1}

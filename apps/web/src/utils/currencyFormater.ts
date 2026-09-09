@@ -37,6 +37,6 @@ export function formatNumberID(value: number): string {
 
     return new Intl.NumberFormat("id-ID", {
         minimumFractionDigits: num % 1 === 0 ? 0 : 1,
-        maximumFractionDigits: 20,
+        maximumFractionDigits: 4,
     }).format(num);
 }

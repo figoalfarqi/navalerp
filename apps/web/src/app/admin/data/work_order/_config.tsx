@@ -2,6 +2,7 @@
 import { ColumnField } from "@/components/table/Table";
 import { FormField } from "@/components/formCrud/FormCrud";
 import { FilterField } from "@/components/table/FilterFormTable";
+import { DetailItemsConfig } from "@/components/formCrud/DetailItemsTable";
 
 export const entityName = "work_order";
 export const entityTitle = "Perintah Kerja MRO";
@@ -67,13 +68,23 @@ export const formFields = (mode: string): FormField[] => [
     label: "Work Order Number",
     fieldType: "text",
     required: true,
+    readOnly: true,
     disabled: mode === "view",
+    autoGenerate: true,
+    autoPrefix: "WO",
   },
   {
     name: "work_order_type",
     col: "left",
     label: "Work Order Type",
-    fieldType: "text",
+    fieldType: "select",
+    options: [
+      { label: "Corrective", value: "CORRECTIVE" },
+      { label: "Preventive", value: "PREVENTIVE" },
+      { label: "Docking", value: "DOCKING" },
+      { label: "Depot Level", value: "DEPOT_LEVEL" },
+      { label: "Emergency", value: "EMERGENCY" },
+    ],
     required: true,
     disabled: mode === "view",
   },
@@ -81,7 +92,12 @@ export const formFields = (mode: string): FormField[] => [
     name: "priority",
     col: "right",
     label: "Priority",
-    fieldType: "text",
+    fieldType: "select",
+    options: [
+      { label: "Emergency", value: "EMERGENCY" },
+      { label: "Urgent", value: "URGENT" },
+      { label: "Routine", value: "ROUTINE" },
+    ],
     required: true,
     disabled: mode === "view",
   },
@@ -142,7 +158,16 @@ export const formFields = (mode: string): FormField[] => [
     name: "status",
     col: "left",
     label: "Status",
-    fieldType: "text",
+    fieldType: "select",
+    options: [
+      { label: "Draft", value: "DRAFT" },
+      { label: "Approved", value: "APPROVED" },
+      { label: "In Progress", value: "IN_PROGRESS" },
+      { label: "Waiting Parts", value: "WAITING_PARTS" },
+      { label: "Completed", value: "COMPLETED" },
+      { label: "Inspected", value: "INSPECTED" },
+      { label: "Cancelled", value: "CANCELLED" },
+    ],
     required: false,
     disabled: mode === "view",
   },
@@ -180,6 +205,67 @@ export const formFields = (mode: string): FormField[] => [
   },
 ];
 
+export const detailItemsConfig: DetailItemsConfig = {
+  tableName: "items",
+  title: "Rincian Suku Cadang & Material Pemeliharaan",
+  itemName: "Suku Cadang",
+  qtyKey: "quantity_required",
+  priceKey: "unit_cost",
+  totalKey: "total_cost",
+  columns: [
+    {
+      key: "material_id",
+      label: "Material / Suku Cadang",
+      type: "select",
+      required: true,
+      placeholder: "Pilih Material...",
+      options: {
+        url: "/admin/material?limit=100",
+        labelKey: "material_name",
+        valueKey: "material_id",
+        extraLabelKey: "material_code",
+        priceKey: "standard_cost",
+      },
+    },
+    {
+      key: "quantity_required",
+      label: "Kuantitas Dibutuhkan",
+      type: "number",
+      required: true,
+      defaultValue: 1,
+      width: "150px",
+    },
+    {
+      key: "quantity_issued",
+      label: "Kuantitas Dikeluarkan",
+      type: "number",
+      required: false,
+      defaultValue: 0,
+      width: "150px",
+    },
+    {
+      key: "unit_cost",
+      label: "Biaya Satuan",
+      type: "currency",
+      required: false,
+      defaultValue: 0,
+      width: "160px",
+    },
+    {
+      key: "is_critical_spare",
+      label: "Suku Cadang Kritis?",
+      type: "select",
+      required: false,
+      defaultValue: false,
+      options: [
+        { label: "Ya (Critical Spare)", value: true },
+        { label: "Tidak (Standard Spare)", value: false },
+      ],
+      width: "170px",
+    },
+  ],
+};
+
 export const buildPayload = (data: any) => {
   const payload: any = { ...data };
   delete payload.work_order_id;
@@ -189,5 +275,21 @@ export const buildPayload = (data: any) => {
   delete payload.created_by;
   delete payload.updated_by;
   delete payload.deleted_by;
+  delete payload.failure_report_number;
+  delete payload.pm_title;
+  delete payload.equipment_name;
+  delete payload.full_name;
+
+  if (Array.isArray(payload.items)) {
+    payload.items = payload.items.map((it: any) => ({
+      material_id: it.material_id,
+      quantity_required: Number(it.quantity_required) || 0,
+      quantity_issued: Number(it.quantity_issued) || 0,
+      unit_cost: Number(it.unit_cost) || 0,
+      total_cost: (Number(it.quantity_required) || 0) * (Number(it.unit_cost) || 0),
+      is_critical_spare: Boolean(it.is_critical_spare),
+    }));
+  }
+
   return payload;
 };

@@ -8,10 +8,10 @@ import {
   FaTrashAlt,
   FaTrashRestore,
   FaTrashRestoreAlt,
-} from "react-icons/fa";
+} from "@/components/icons";
 import Button from "../form/Button";
-import { FaMapLocation } from "react-icons/fa6";
-import { MdAssignmentInd, MdAttachMoney } from "react-icons/md";
+import { FaMapLocation } from "@/components/icons";
+import { MdAssignmentInd, MdAttachMoney } from "@/components/icons";
 
 interface TableToolbarProps {
   selectedCount: number;

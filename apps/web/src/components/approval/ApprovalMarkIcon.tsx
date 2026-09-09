@@ -1,5 +1,5 @@
-// import { FaRegUser } from "react-icons/fa";
-// import { MdCheck, MdClose, MdComputer } from "react-icons/md";
+// import { FaRegUser } from "@/components/icons";
+// import { MdCheck, MdClose, MdComputer } from "@/components/icons";
 // const ApprovalMarkIcon = ({
 //   approvalData,
 //   onClick,
@@ -73,14 +73,14 @@
 // ketika isMultiStep false
 // ketika approvalData index terakhir approval_step_id == 1 dan approval_status_id == 1 maka <MdCheck size={sizeMap[size]} bg-green-500/50 />
 
-import { FaRegUser } from "react-icons/fa";
+import { FaRegUser } from "@/components/icons";
 import {
   MdCheck,
   MdClose,
   MdComputer,
   MdOutlineAssignmentLate,
-} from "react-icons/md";
-import { LuClock2 } from "react-icons/lu";
+} from "@/components/icons";
+import { LuClock2 } from "@/components/icons";
 
 
 const wrap = (

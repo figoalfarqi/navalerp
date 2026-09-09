@@ -1,159 +1,34 @@
-﻿-- =============================================================================
--- SEED DATA: MODUL 9 - MANAJEMEN DOKUMEN ELEKTRONIK & DIGITAL THREAD (EDRMS)
--- FILE: 09_edrms_documents/insert.sql
+-- =============================================================================
+-- SEED DATA: MODUL 9 - MANAJEMEN DOKUMEN MILITER & EDRMS
 -- =============================================================================
 
--- 1. Kategori Dokumen Pertahanan
-INSERT INTO doc_categories (
-    category_id, category_code, category_name, retention_years,
-    confidentiality_level, description
-) VALUES
-(
-    '89000000-0000-0000-0000-000000000001',
-    'TECH_MANUAL',
-    'Buku Petunjuk Teknis & Operasional (OEM Technical Manual)',
-    25,
-    'TERBATAS',
-    'Buku panduan pengoperasian, perbaikan, dan spesifikasi komponen alutsista'
-),
-(
-    '89000000-0000-0000-0000-000000000002',
-    'CERT_KELAIKAN',
-    'Sertifikat Kelaikan Militer (Seaworthiness & Readiness)',
-    10,
-    'RAHASIA',
-    'Sertifikat kelaikan operasi kapal perang yang diterbitkan Dislaikmatal'
-),
-(
-    '89000000-0000-0000-0000-000000000003',
-    'BLUEPRINT_CAD',
-    'Gambar Rancang Bangun & Skema Kelistrikan Kapal',
-    30,
-    'RAHASIA',
-    'Gambar teknik galangan kapal, piping diagram, dan single line wiring'
-),
-(
-    '89000000-0000-0000-0000-000000000004',
-    'CONTRACT_LEGAL',
-    'Dokumen Kontrak Pengadaan & Klausul ToT Rahasia Negara',
-    20,
-    'RAHASIA_NEGARA',
-    'Perjanjian hukum pengadaan alutsista dengan klausul pertahanan strategis'
-)
-ON CONFLICT (category_id) DO UPDATE SET
-    category_name = EXCLUDED.category_name,
-    description = EXCLUDED.description;
+INSERT INTO doc_categories (category_id, category_code, category_name, retention_years, confidentiality_level, description) VALUES
+    ('b0000000-0000-0000-0000-000000000001', 'DOC-OPORD', 'Perintah Operasi & Rencana Taktis Tempur', 30, 'SANGAT_RAHASIA', 'Dokumen instruksi pergerakan dan rencana taktis peperangan laut'),
+    ('b0000000-0000-0000-0000-000000000002', 'DOC-TECH-MAN', 'Buku Petunjuk Teknis & Manual Pemeliharaan OEM', 25, 'TERBATAS', 'Manual book pemeliharaan mesin, radar, senjata dan lambung kapal'),
+    ('b0000000-0000-0000-0000-000000000003', 'DOC-KELAIKAN', 'Sertifikat Kelaikan Militer & Surat Ukur Kapal', 15, 'BIASA', 'Sertifikasi kelaikan laut material diterbitkan Dislaikmatal'),
+    ('b0000000-0000-0000-0000-000000000004', 'DOC-KONTRAK', 'Berkas Kontrak Pengadaan & Perjanjian Garansi TOT', 20, 'RAHASIA', 'Dokumen legal pengadaan alutsista, BAPHP, dan surat jaminan bank'),
+    ('b0000000-0000-0000-0000-000000000005', 'DOC-INTEL-MAR', 'Laporan Intelijen Maritim & Pemantauan ALKI', 10, 'SANGAT_RAHASIA', 'Laporan pergerakan kapal asing, data sensor SIGINT dan citra satelit'),
+    ('b0000000-0000-0000-0000-000000000006', 'DOC-SPRINT', 'Surat Perintah Tugas & Mutasi Personel TNI AL', 10, 'BIASA', 'Surat perintah penempatan jabatan, mutasi awak, dan penugasan operasi'),
+    ('b0000000-0000-0000-0000-000000000007', 'DOC-LOG-REQ', 'Surat Permintaan & Bukti Penyerahan Bekal (SPB/SBB)', 7, 'BIASA', 'Dokumen administrasi penerimaan dan pengeluaran materiil bekal'),
+    ('b0000000-0000-0000-0000-000000000008', 'DOC-DOCK-SURV', 'Laporan Hasil Survei Docking & Ketebalan Plat Lambung', 15, 'TERBATAS', 'Hasil ultrasonic test ketebalan plat baja lambung kapal di galangan'),
+    ('b0000000-0000-0000-0000-000000000009', 'DOC-SOP-PANGKALAN', 'SOP Keamanan Pangkalan & Standar Fasilitas Labuh', 10, 'TERBATAS', 'Prosedur operasi standar operasional dermaga dan fasilitas pangkalan'),
+    ('b0000000-0000-0000-0000-000000000010', 'DOC-AUDIT-WAS', 'Laporan Hasil Pengawasan & Pemeriksaan Inspektorat', 10, 'RAHASIA', 'Laporan kepatuhan administrasi keuangan, logistik dan material Itjenal')
+ON CONFLICT (category_id) DO UPDATE SET category_name = EXCLUDED.category_name;
 
--- 2. Master Dokumen
-INSERT INTO doc_documents (
-    document_id, document_number, title, category_id,
-    originating_unit_id, classification_level, effective_date, expiry_date,
-    status, approved_by_user_id
-) VALUES
-(
-    '90000000-0000-0000-0000-000000000001',
-    'MNL-MTU-20V4000-M53B',
-    'Technical & Maintenance Manual MTU 20V 4000 M53B Marine Diesel Engine',
-    '89000000-0000-0000-0000-000000000001', -- TECH_MANUAL
-    '10000000-0000-0000-0000-000000000009', -- Fasharkan Sby
-    'TERBATAS',
-    '2024-01-01',
-    '2034-12-31',
-    'APPROVED',
-    '20000000-0000-0000-0000-000000000004'  -- Perwira Logistik
-),
-(
-    '90000000-0000-0000-0000-000000000002',
-    'CERT-LAIK-REM331-2026',
-    'Sertifikat Kelaikan Operasi Laut KRI Raden Eddy Martadinata-331 TA 2026',
-    '89000000-0000-0000-0000-000000000002', -- CERT_KELAIKAN
-    '10000000-0000-0000-0000-000000000001', -- Mabesal (Dislaikmatal)
-    'RAHASIA',
-    '2026-01-10',
-    '2027-01-10',
-    'APPROVED',
-    '20000000-0000-0000-0000-000000000002'  -- Panglima
-),
-(
-    '90000000-0000-0000-0000-000000000003',
-    'DWG-SIGMA-CMS-004',
-    'Interconnection Wiring Schematic TACTICOS CMS to SMART-S Mk2 Radar',
-    '89000000-0000-0000-0000-000000000003', -- BLUEPRINT_CAD
-    '10000000-0000-0000-0000-000000000007', -- Satkor Koarmada II
-    'RAHASIA',
-    '2023-05-15',
-    NULL,
-    'APPROVED',
-    '20000000-0000-0000-0000-000000000003'  -- Dan KRI
-)
-ON CONFLICT (document_id) DO NOTHING;
-
--- 3. Versi & Berkas Dokumen
-INSERT INTO doc_document_versions (
-    version_id, document_id, version_number, file_name, file_path,
-    file_size_bytes, file_hash_sha256, mime_type, change_summary, uploaded_by_user_id
-) VALUES
-(
-    '90500000-0000-0000-0000-000000000001',
-    '90000000-0000-0000-0000-000000000001',
-    'v1.0',
-    'mtu_20v4000_m53b_maintenance_manual.pdf',
-    '/secure_storage/naval_edrms/tech_manuals/mtu_20v4000_m53b.pdf',
-    18450200,
-    'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
-    'application/pdf',
-    'Dokumen asli pabrikan OEM Rolls-Royce Solutions edisi bahasa Inggris',
-    '20000000-0000-0000-0000-000000000005'
-),
-(
-    '90500000-0000-0000-0000-000000000002',
-    '90000000-0000-0000-0000-000000000002',
-    'v1.0',
-    'sertifikat_laik_laut_kri_rem_331_2026.pdf',
-    '/secure_storage/naval_edrms/certificates/laik_rem_331_2026.pdf',
-    2150000,
-    'dca148408a287964b4458f4679720478051ec7495029e2f4705cbab29a6745ef',
-    'application/pdf',
-    'Sertifikat Kelaikan Penuh Hasil Uji Petik & Uji Laut Dislaikmatal',
-    '20000000-0000-0000-0000-000000000004'
-),
-(
-    '90500000-0000-0000-0000-000000000003',
-    '90000000-0000-0000-0000-000000000003',
-    'v2.1',
-    'sigma_tacticos_smarts_wiring_rev2.dwg',
-    '/secure_storage/naval_edrms/blueprints/sigma_tacticos_smarts_wiring.dwg',
-    45600000,
-    '9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08',
-    'application/acad',
-    'Revisi integrasi protokol data bus mil-std-1553B',
-    '20000000-0000-0000-0000-000000000003'
-)
-ON CONFLICT (version_id) DO NOTHING;
-
--- 4. Benang Merah Digital (Digital Thread Links)
-INSERT INTO doc_document_links (
-    link_id, document_id, entity_type, entity_id, link_purpose
-) VALUES
-(
-    '90800000-0000-0000-0000-000000000001',
-    '90000000-0000-0000-0000-000000000001',
-    'MRO_EQUIPMENT',
-    '43000000-0000-0000-0000-000000000001', -- Mesin Pokok MTU KRI REM-331
-    'OPERATING_MANUAL'
-),
-(
-    '90800000-0000-0000-0000-000000000002',
-    '90000000-0000-0000-0000-000000000002',
-    'MRO_SHIP',
-    '41000000-0000-0000-0000-000000000001', -- Kapal KRI REM-331
-    'CERT_KELAIKAN'
-),
-(
-    '90800000-0000-0000-0000-000000000003',
-    '90000000-0000-0000-0000-000000000003',
-    'MRO_SHIP',
-    '41000000-0000-0000-0000-000000000001',
-    'WIRING_DIAGRAM'
-)
-ON CONFLICT (link_id) DO NOTHING;
+INSERT INTO doc_documents (document_id, document_number, title, category_id, originating_unit_id, classification_level, effective_date, status, approved_by_user_id) VALUES
+    ('b1000000-0000-0000-0000-000000000001', 'OPORD/01/RO-NATUNA/2026', 'Perintah Operasi Siaga Tempur Laut Natuna Utara TA 2026', 'b0000000-0000-0000-0000-000000000001', '10000000-0000-0000-0000-000000000001', 'SANGAT_RAHASIA', '2026-01-01', 'ACTIVE', '20000000-0000-0000-0000-000000000001'),
+    ('b1000000-0000-0000-0000-000000000002', 'MAN-OEM-MTU-20V4000', 'Manual Workshop Overhaul Diesel Engine MTU 20V 4000 M53B', 'b0000000-0000-0000-0000-000000000002', '10000000-0000-0000-0000-000000000009', 'TERBATAS', '2026-01-01', 'ACTIVE', '20000000-0000-0000-0000-000000000001'),
+    ('b1000000-0000-0000-0000-000000000003', 'LAIK-KRI-REM-331-2025', 'Sertifikat Kelaikan Tempur Laut Penuh KRI Raden Eddy Martadinata-331', 'b0000000-0000-0000-0000-000000000003', '10000000-0000-0000-0000-000000000015', 'TERBATAS', '2026-01-01', 'ACTIVE', '20000000-0000-0000-0000-000000000001'),
+    ('b1000000-0000-0000-0000-000000000004', 'KTR-PENG-PKR-2024-001', 'Salinan Perjanjian Kontrak MRO Sistem Sensor Senjata Terpadu FFG', 'b0000000-0000-0000-0000-000000000004', '10000000-0000-0000-0000-000000000001', 'RAHASIA', '2026-01-01', 'ACTIVE', '20000000-0000-0000-0000-000000000001'),
+    ('b1000000-0000-0000-0000-000000000005', 'INTEL-ALKI-II-02-2026', 'Analisis Situasi Taktis Lalu Lintas Kapal Militer Asing di ALKI II', 'b0000000-0000-0000-0000-000000000005', '10000000-0000-0000-0000-000000000001', 'SANGAT_RAHASIA', '2026-01-01', 'ACTIVE', '20000000-0000-0000-0000-000000000001'),
+    ('b1000000-0000-0000-0000-000000000006', 'SPRINT/120/V/2025/KASAL', 'Surat Perintah Mutasi Penugasan Komandan Satuan Kapal Eskorta Koarmada II', 'b0000000-0000-0000-0000-000000000006', '10000000-0000-0000-0000-000000000001', 'BIASA', '2026-01-01', 'ACTIVE', '20000000-0000-0000-0000-000000000001'),
+    ('b1000000-0000-0000-0000-000000000007', 'SPB-BEK-SBY-2026-089', 'Surat Penyerahan Bekal BBM 120 KL dan Ransum Tempur KRI REM-331', 'b0000000-0000-0000-0000-000000000007', '10000000-0000-0000-0000-000000000008', 'BIASA', '2026-01-01', 'ACTIVE', '20000000-0000-0000-0000-000000000001'),
+    ('b1000000-0000-0000-0000-000000000008', 'SURV-DOCK-331-2025', 'Laporan Pengukuran Ultratest Pelat Lambung Bawah Air KRI REM-331 di PT PAL', 'b0000000-0000-0000-0000-000000000008', '10000000-0000-0000-0000-000000000009', 'TERBATAS', '2026-01-01', 'ACTIVE', '20000000-0000-0000-0000-000000000001'),
+    ('b1000000-0000-0000-0000-000000000009', 'SOP-SEC-PORT-04-2024', 'Standar Operasional Pengamanan Dermaga Militer Koarmada II Surabaya', 'b0000000-0000-0000-0000-000000000009', '10000000-0000-0000-0000-000000000006', 'TERBATAS', '2026-01-01', 'ACTIVE', '20000000-0000-0000-0000-000000000001'),
+    ('b1000000-0000-0000-0000-000000000010', 'LHP-ITJENAL-K2-2025', 'Laporan Hasil Evaluasi Tata Kelola Materiil & Anggaran MRO Koarmada II', 'b0000000-0000-0000-0000-000000000010', '10000000-0000-0000-0000-000000000001', 'RAHASIA', '2026-01-01', 'ACTIVE', '20000000-0000-0000-0000-000000000001'),
+    ('b1000000-0000-0000-0000-000000000011', 'MAN-CMS-TACTICOS-MK2', 'Panduan Operator Combat Management System TACTICOS KRI Kelas PKR', 'b0000000-0000-0000-0000-000000000002', '10000000-0000-0000-0000-000000000007', 'TERBATAS', '2026-01-01', 'ACTIVE', '20000000-0000-0000-0000-000000000001'),
+    ('b1000000-0000-0000-0000-000000000012', 'LAIK-KRI-GNR-332-2025', 'Sertifikat Kelaikan Tempur Laut Penuh KRI I Gusti Ngurah Rai-332', 'b0000000-0000-0000-0000-000000000003', '10000000-0000-0000-0000-000000000015', 'TERBATAS', '2026-01-01', 'ACTIVE', '20000000-0000-0000-0000-000000000001'),
+    ('b1000000-0000-0000-0000-000000000013', 'OPORD/02/GUL-BAJAK/2026', 'Rencana Operasi Khusus Penanggulangan Perompakan di Selat Malaka', 'b0000000-0000-0000-0000-000000000001', '10000000-0000-0000-0000-000000000002', 'SANGAT_RAHASIA', '2026-01-01', 'ACTIVE', '20000000-0000-0000-0000-000000000001'),
+    ('b1000000-0000-0000-0000-000000000014', 'KTR-BBM-PERT-2026', 'Kontrak Payung Suplai Bahan Bakar Cair Minyak HSD Armada TNI AL 2026', 'b0000000-0000-0000-0000-000000000004', '10000000-0000-0000-0000-000000000016', 'RAHASIA', '2026-01-01', 'ACTIVE', '20000000-0000-0000-0000-000000000001'),
+    ('b1000000-0000-0000-0000-000000000015', 'SURV-DOCK-403-2025', 'Laporan Pengujian Kedap dan Uji Tekan Lambung Kapal Selam KRI Nagapasa-403', 'b0000000-0000-0000-0000-000000000008', '10000000-0000-0000-0000-000000000012', 'RAHASIA', '2026-01-01', 'ACTIVE', '20000000-0000-0000-0000-000000000001')
+ON CONFLICT (document_id) DO UPDATE SET title = EXCLUDED.title;

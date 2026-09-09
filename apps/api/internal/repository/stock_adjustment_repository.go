@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/figoalfarqi/navalerp/internal/helper"
 	"github.com/figoalfarqi/navalerp/internal/model"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -32,12 +33,12 @@ func (r *StockAdjustmentRepository) Get(ctx context.Context, id string) (*model.
 	}
 
 	// Load Items
-	childRowsItems, err := r.DB.Query(ctx, `SELECT adj_item_id, adjustment_id, material_id, book_quantity, physical_quantity, difference_quantity, unit_cost, total_adjustment_value, created_by, updated_by, deleted_by, created_at, updated_at, deleted_at FROM inv_stock_adjustment_items WHERE adjustment_id = $1`, id)
+	childRowsItems, err := r.DB.Query(ctx, `SELECT poi.adj_item_id, poi.adjustment_id, poi.material_id, COALESCE(m.material_name, ''), COALESCE(m.material_code, ''), poi.book_quantity, poi.physical_quantity, poi.difference_quantity, poi.unit_cost, poi.total_adjustment_value, poi.created_by, poi.updated_by, poi.deleted_by, poi.created_at, poi.updated_at, poi.deleted_at FROM inv_stock_adjustment_items poi LEFT JOIN inv_materials m ON m.material_id = poi.material_id WHERE poi.adjustment_id = $1`, id)
 	if err == nil {
 		defer childRowsItems.Close()
 		for childRowsItems.Next() {
 			var item model.StockAdjustmentItems
-			if err := childRowsItems.Scan(&item.AdjItemId, &item.AdjustmentId, &item.MaterialId, &item.BookQuantity, &item.PhysicalQuantity, &item.DifferenceQuantity, &item.UnitCost, &item.TotalAdjustmentValue, &item.CreatedBy, &item.UpdatedBy, &item.DeletedBy, &item.CreatedAt, &item.UpdatedAt, &item.DeletedAt); err == nil {
+			if err := childRowsItems.Scan(&item.AdjItemId, &item.AdjustmentId, &item.MaterialId, &item.MaterialName, &item.MaterialCode, &item.BookQuantity, &item.PhysicalQuantity, &item.DifferenceQuantity, &item.UnitCost, &item.TotalAdjustmentValue, &item.CreatedBy, &item.UpdatedBy, &item.DeletedBy, &item.CreatedAt, &item.UpdatedAt, &item.DeletedAt); err == nil {
 				m.Items = append(m.Items, item)
 			}
 		}
@@ -68,9 +69,13 @@ func (r *StockAdjustmentRepository) List(ctx context.Context, opts model.ListOpt
 	}
 
 	limit := opts.Limit
-	if limit <= 0 { limit = 10 }
+	if limit <= 0 {
+		limit = 10
+	}
 	offset := opts.Offset
-	if offset < 0 { offset = 0 }
+	if offset < 0 {
+		offset = 0
+	}
 
 	listQuery := fmt.Sprintf(`SELECT t.adjustment_id, t.warehouse_id, COALESCE(j_wh.warehouse_name, ''), t.adjustment_number, t.adjustment_date, t.conducted_by_user_id, COALESCE(j_usr.full_name, ''), t.reason, t.status, t.remarks, t.created_by, t.updated_by, t.deleted_by, t.created_at, t.updated_at, t.deleted_at
 	FROM inv_stock_adjustments t
@@ -104,6 +109,10 @@ func (r *StockAdjustmentRepository) Create(ctx context.Context, m *model.StockAd
 		return "", err
 	}
 	defer tx.Rollback(ctx)
+
+	if m.AdjustmentNumber == "" {
+		m.AdjustmentNumber, _ = helper.GenerateNextNumber(ctx, r.DB, "inv_stock_adjustments", "adjustment_number", "ADJ")
+	}
 
 	insertQuery := `INSERT INTO inv_stock_adjustments (warehouse_id, adjustment_number, adjustment_date, conducted_by_user_id, reason, status, remarks, created_by, updated_by, deleted_by) VALUES ($1, $2, $3, $4, $5::adjustment_reason_type, $6::adjustment_status_type, $7, $8, $9, $10) RETURNING adjustment_id`
 	var newID string
@@ -139,7 +148,7 @@ func (r *StockAdjustmentRepository) Update(ctx context.Context, id string, m *mo
 		return err
 	}
 
-	if len(m.Items) > 0 {
+	if m.Items != nil {
 		_, _ = tx.Exec(ctx, `DELETE FROM inv_stock_adjustment_items WHERE adjustment_id = $1`, id)
 		for _, item := range m.Items {
 			_, err := tx.Exec(ctx, `INSERT INTO inv_stock_adjustment_items (adjustment_id, material_id, book_quantity, physical_quantity, unit_cost, total_adjustment_value, created_by, updated_by, deleted_by) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`, id, item.MaterialId, item.BookQuantity, item.PhysicalQuantity, item.UnitCost, item.TotalAdjustmentValue, item.CreatedBy, item.UpdatedBy, item.DeletedBy)

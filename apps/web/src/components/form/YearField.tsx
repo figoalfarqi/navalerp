@@ -8,7 +8,7 @@ import {
   FaChevronLeft,
   FaChevronRight,
   FaXmark,
-} from "react-icons/fa6";
+} from "@/components/icons";
 import { useCloseOnScrollDistance } from "@/hooks/useCloseOnScrollDistance";
 import { usePopoverPosition } from "@/hooks/usePopoverPosition";
 
@@ -187,7 +187,7 @@ export default function YearField({
               onChange(null);
               setShowPopover(false);
             }}
-            className="absolute right-8 top-1/2 -translate-y-1/2 rounded-md p-1 text-slate-400 transition hover:bg-red-50 hover:text-red-500 focus:outline-none focus:ring-2 focus:ring-red-100"
+            className="absolute right-8 top-1/2 -translate-y-1/2 rounded-md p-1 text-slate-400 transition hover:bg-red-50 hover:text-red-500 focus:outline-none focus:ring-2 focus:ring-red-100 cursor-pointer"
           >
             <FaXmark />
           </button>
@@ -212,7 +212,7 @@ export default function YearField({
                 aria-label="Rentang tahun sebelumnya"
                 disabled={!pageHasAvailableYear(pageStart - yearsPerPage)}
                 onClick={() => setPageStart((year) => year - yearsPerPage)}
-                className="inline-flex h-9 w-9 items-center justify-center rounded-xl text-slate-500 transition hover:bg-blue-50 hover:text-blue-600 disabled:cursor-not-allowed disabled:opacity-30"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-xl text-slate-500 transition hover:bg-blue-50 hover:text-blue-600 disabled:cursor-not-allowed disabled:opacity-30 cursor-pointer"
               >
                 <FaChevronLeft />
               </button>
@@ -229,7 +229,7 @@ export default function YearField({
                 aria-label="Rentang tahun berikutnya"
                 disabled={!pageHasAvailableYear(pageStart + yearsPerPage)}
                 onClick={() => setPageStart((year) => year + yearsPerPage)}
-                className="inline-flex h-9 w-9 items-center justify-center rounded-xl text-slate-500 transition hover:bg-blue-50 hover:text-blue-600 disabled:cursor-not-allowed disabled:opacity-30"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-xl text-slate-500 transition hover:bg-blue-50 hover:text-blue-600 disabled:cursor-not-allowed disabled:opacity-30 cursor-pointer"
               >
                 <FaChevronRight />
               </button>
@@ -246,7 +246,7 @@ export default function YearField({
                     type="button"
                     disabled={isYearDisabled(year)}
                     onClick={() => selectYear(year)}
-                    className={`rounded-xl px-2 py-2.5 text-sm font-medium transition ${
+                    className={`rounded-xl px-2 py-2.5 text-sm font-medium transition cursor-pointer ${
                       isSelected
                         ? "bg-blue-600 text-white shadow-md shadow-blue-200"
                         : isCurrent
@@ -265,7 +265,7 @@ export default function YearField({
                 type="button"
                 disabled={isYearDisabled(currentYear)}
                 onClick={selectCurrentYear}
-                className="w-full rounded-xl bg-slate-50 px-3 py-2 text-sm font-semibold text-blue-600 transition hover:bg-blue-50 disabled:cursor-not-allowed disabled:text-slate-300"
+                className="w-full rounded-xl bg-slate-50 px-3 py-2 text-sm font-semibold text-blue-600 transition hover:bg-blue-50 disabled:cursor-not-allowed disabled:text-slate-300 cursor-pointer"
               >
                 Tahun ini
               </button>

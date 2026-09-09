@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { formatSmartDate } from "@/utils/dateTime";
 import { ColumnField } from "@/components/table/Table";
 import { FormField } from "@/components/formCrud/FormCrud";
 import { FilterField } from "@/components/table/FilterFormTable";
@@ -13,8 +14,8 @@ export const columns: ColumnField[] = [
   { key: "vendor_name", label: "Vendor" },
   { key: "contract_number", label: "No. Kontrak" },
   { key: "po_number", label: "No. PO" },
-  { key: "invoice_date", label: "Invoice Date" },
-  { key: "due_date", label: "Due Date" },
+  { key: "invoice_date", label: "Invoice Date", render: (item: any) => formatSmartDate(item.invoice_date) },
+  { key: "due_date", label: "Due Date", render: (item: any) => formatSmartDate(item.due_date) },
 ];
 
 export const filterFields: FilterField[] = [
@@ -28,7 +29,10 @@ export const formFields = (mode: string): FormField[] => [
     label: "Invoice Number",
     fieldType: "text",
     required: true,
+    readOnly: true,
     disabled: mode === "view",
+    autoGenerate: true,
+    autoPrefix: "INV",
   },
     {
     name: "vendor_id",
@@ -113,7 +117,12 @@ export const formFields = (mode: string): FormField[] => [
     name: "verification_status",
     col: "right",
     label: "Verification Status",
-    fieldType: "text",
+    fieldType: "select",
+    options: [
+      { label: "Pending Verif", value: "PENDING_VERIF" },
+      { label: "Verified", value: "VERIFIED" },
+      { label: "Rejected", value: "REJECTED" },
+    ],
     required: false,
     disabled: mode === "view",
   },
@@ -134,7 +143,12 @@ export const formFields = (mode: string): FormField[] => [
     name: "payment_status",
     col: "right",
     label: "Payment Status",
-    fieldType: "text",
+    fieldType: "select",
+    options: [
+      { label: "Unpaid", value: "UNPAID" },
+      { label: "Partial", value: "PARTIAL" },
+      { label: "Paid", value: "PAID" },
+    ],
     required: false,
     disabled: mode === "view",
   },

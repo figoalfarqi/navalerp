@@ -14,7 +14,7 @@ import {
   FaBell,
   FaBellSlash,
   FaTimesCircle,
-} from "react-icons/fa";
+} from "@/components/icons";
 import LoaderDots from "@/components/form/LoaderDots";
 import { authTokenType } from "@/hooks/useFetchAPI";
 

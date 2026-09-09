@@ -1,6 +1,6 @@
 "use client";
 import { ReactNode } from "react";
-import { AiOutlineClose } from "react-icons/ai";
+import { AiOutlineClose } from "@/components/icons";
 import LoaderDots from "./form/LoaderDots";
 import Button from "./form/Button";
 import { createPortal } from "react-dom";

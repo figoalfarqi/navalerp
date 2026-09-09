@@ -20,6 +20,7 @@ navalerp.exe
 .DS_Store
 Thumbs.db
 *.tsbuildinfo
+.vercel/
 
 # Local backup retained while the monorepo migration is verified
 .monorepo-migration-backup/

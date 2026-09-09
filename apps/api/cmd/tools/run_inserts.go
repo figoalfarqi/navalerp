@@ -1,4 +1,4 @@
-﻿package main
+package main
 
 import (
 	"bytes"
@@ -38,6 +38,27 @@ func main() {
 	}
 
 	baseDir := "d:\\stm\\VirutalGate\\navalerp"
+
+	fmt.Println(">>> Membersihkan data lama dengan TRUNCATE CASCADE...")
+	truncateSQL := `
+		TRUNCATE TABLE 
+			ops_readiness_alerts, ops_ship_readiness_snapshots, ops_daily_logs, ops_mission_ship_assignments, ops_missions, ops_theaters,
+			doc_documents, doc_document_links, doc_document_versions, doc_categories,
+			log_shipment_items, log_shipments, log_routes, log_transport_units,
+			infra_facility_maintenances, infra_fuel_bunker_records, infra_berth_bookings, infra_facilities,
+			hcm_sea_duty_allowances, hcm_crew_assignments, hcm_medical_readiness, hcm_personnel_qualifications, hcm_qualifications, hcm_service_records, hcm_personnel, hcm_corps, hcm_ranks,
+			fin_platform_tco_summaries, fin_journal_entries, fin_payments, fin_invoices, fin_budget_commitments, fin_budget_allocations, fin_budget_programs, fin_chart_of_accounts,
+			proc_goods_receipt_items, proc_goods_receipts, proc_purchase_order_items, proc_purchase_orders, proc_contract_amendments, proc_contracts, proc_tender_bids, proc_tenders, proc_requisition_items, proc_requisitions, proc_vendors,
+			inv_stock_adjustments, inv_stock_transfers, inv_item_instances, inv_stock_balances, inv_materials, inv_storage_locations, inv_warehouses,
+			mro_docking_records, mro_work_order_items, mro_work_order_tasks, mro_work_orders, mro_pm_schedules, mro_failure_reports, mro_equipment_parameters, mro_equipments, mro_systems, mro_ships, mro_ship_classes,
+			sys_audit_logs, sys_users, org_units
+		CASCADE;
+	`
+	if _, err := pool.Exec(ctx, truncateSQL); err != nil {
+		fmt.Fprintf(os.Stderr, "  [WARNING] Truncate error (melanjutkan): %v\n", err)
+	} else {
+		fmt.Println("  [SUKSES] Seluruh tabel berhasil dibersihkan untuk re-seed.")
+	}
 
 	for i, relPath := range files {
 		fullPath := filepath.Join(baseDir, relPath)
