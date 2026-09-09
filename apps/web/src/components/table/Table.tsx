@@ -362,6 +362,20 @@ export default function Table({
   const [activateData, setActivateData] = useState(false);
   const [loadingAction, setLoadingAction] = useState(false);
 
+  const [approvalModalItem, setApprovalModalItem] = useState<any | null>(null);
+  const [approvalAction, setApprovalAction] = useState<"APPROVE" | "REJECT">("APPROVE");
+  const [approvalNotes, setApprovalNotes] = useState<string>("");
+  const [isSubmittingApproval, setIsSubmittingApproval] = useState<boolean>(false);
+
+  const isApprovalEligible = [
+    "requisition",
+    "purchase_order",
+    "work_order",
+    "goods_receipt",
+    "payment",
+    "cui_alert",
+  ].includes(table_web_url);
+
   // const [errorTA, setErrorTA] = useState<string | null>(null);
   // const [driverObjectTA, setDriverObjectTA] = useState<Record<string, any>>({});
 
@@ -984,6 +998,39 @@ export default function Table({
     [],
   );
 
+  const handleExecuteApproval = useCallback(async () => {
+    if (!approvalModalItem) return;
+    setIsSubmittingApproval(true);
+    try {
+      const res = await postAPI<any>(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "/api/v1"}/admin/approval`,
+        { authToken: "admin" },
+        {
+          entity_type: table_web_url,
+          entity_id: approvalModalItem[key_table],
+          action: approvalAction,
+          notes: approvalNotes || `Approval diproses untuk ${table_web_url}`,
+        },
+      );
+      if (res && [200, 201].includes(res.code)) {
+        showToast(
+          3000,
+          "success",
+          `Otorisasi ${approvalAction === "APPROVE" ? "disetujui" : "ditolak"} berhasil!`,
+        );
+        setApprovalModalItem(null);
+        setApprovalNotes("");
+        await fetchData(currentPageRef.current);
+      } else {
+        showToast(4000, "error", res?.message || "Gagal memproses otorisasi");
+      }
+    } catch (err: any) {
+      showToast(4000, "error", err?.message || "Kesalahan jaringan");
+    } finally {
+      setIsSubmittingApproval(false);
+    }
+  }, [approvalModalItem, approvalAction, approvalNotes, table_web_url, key_table, postAPI, showToast, fetchData]);
+
   const handleApprovePhoto = useCallback(
     async ({
       approvalBaseTableName,
@@ -1357,6 +1404,11 @@ export default function Table({
                       onApproveTA: () => setModalApproveTAOpen("approveTA"),
                     }
                   : {})}
+                {...(isApprovalEligible && selectedRows.length === 1 && !readOnly
+                  ? {
+                      onApproval: () => setApprovalModalItem(selectedRows[0]),
+                    }
+                  : {})}
                 {...(assignTable
                   ? {
                       onAssign: () => {
@@ -1588,6 +1640,20 @@ export default function Table({
                           >
                             <EditIcon size={13} className="mr-1" />
                             <span>Ubah</span>
+                          </Button>
+                        )}
+
+                        {isApprovalEligible && !readOnly && (
+                          <Button
+                            id={`card-approve-${index}`}
+                            size="2xs"
+                            variant="amber-solid"
+                            onClick={() => setApprovalModalItem(item)}
+                            className="flex-1 justify-center !py-2 text-xs font-semibold cursor-pointer shadow-xs"
+                            title="Otorisasi & Approval"
+                          >
+                            <CheckIcon size={13} className="mr-1" />
+                            <span>Otorisasi</span>
                           </Button>
                         )}
 
@@ -2183,6 +2249,91 @@ export default function Table({
                 setAssignData(row);
               }}
             />
+          </div>
+        </Modal>
+      )}
+
+      {/* NavalERP Digital Approval Modal */}
+      {approvalModalItem && (
+        <Modal
+          size="md"
+          isOpen={!!approvalModalItem}
+          title="Persetujuan & Otorisasi Digital"
+          cancelText="Batal"
+          confirmText={approvalAction === "APPROVE" ? "Setujui Dokumen" : "Tolak Dokumen"}
+          confirmVariant={approvalAction === "APPROVE" ? "green-solid" : "red-solid"}
+          loading={isSubmittingApproval}
+          onCancel={() => setApprovalModalItem(null)}
+          onConfirm={handleExecuteApproval}
+        >
+          <div className="space-y-4 text-slate-800 p-1">
+            <div className="bg-slate-50 p-3 rounded-lg border border-slate-200 text-xs space-y-1 font-mono">
+              <div>
+                <span className="text-slate-500">MODUL:</span>{" "}
+                <span className="font-bold text-[#081d38] uppercase">{table_web_url}</span>
+              </div>
+              <div>
+                <span className="text-slate-500">ID DOKUMEN:</span>{" "}
+                <span className="font-semibold text-slate-900">{approvalModalItem[key_table]}</span>
+              </div>
+              <div>
+                <span className="text-slate-500">STATUS SAAT INI:</span>{" "}
+                <span className="font-bold text-blue-800">
+                  {approvalModalItem.status || approvalModalItem.approval_status || "-"}
+                </span>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                Keputusan Otorisasi *
+              </label>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setApprovalAction("APPROVE")}
+                  className={`py-2 px-3 rounded-lg text-xs font-bold border transition ${
+                    approvalAction === "APPROVE"
+                      ? "bg-emerald-600 text-white border-emerald-700 shadow-sm"
+                      : "bg-white text-slate-700 border-slate-300 hover:bg-slate-50"
+                  }`}
+                >
+                  ✓ SETUJUI (APPROVE)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setApprovalAction("REJECT")}
+                  className={`py-2 px-3 rounded-lg text-xs font-bold border transition ${
+                    approvalAction === "REJECT"
+                      ? "bg-rose-600 text-white border-rose-700 shadow-sm"
+                      : "bg-white text-slate-700 border-slate-300 hover:bg-slate-50"
+                  }`}
+                >
+                  ✕ TOLAK (REJECT)
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">
+                Catatan & Dasar Pertimbangan Komando
+              </label>
+              <textarea
+                rows={3}
+                value={approvalNotes}
+                onChange={(e) => setApprovalNotes(e.target.value)}
+                placeholder="Ketik pertimbangan operasional, kesiapan armada, atau instruksi tindak lanjut..."
+                className="w-full text-xs p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              />
+            </div>
+
+            <div className="bg-blue-50/70 p-3 rounded-lg border border-blue-200 text-[11px] text-blue-900 font-mono">
+              <div className="font-bold mb-0.5">STEMPEL VERIFIKASI DIGITAL TNI AL:</div>
+              <div>TNI-AL-SIG-AUTOGEN-SECURE</div>
+              <div className="text-[10px] text-blue-700 mt-1">
+                Setiap aksi otorisasi secara otomatis dicatat ke dalam audit trail (sys_audit_logs) beserta waktu presisi.
+              </div>
+            </div>
           </div>
         </Modal>
       )}

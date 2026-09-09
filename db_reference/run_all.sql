@@ -48,10 +48,15 @@
 \i 09_edrms_documents/tables.sql
 \i 09_edrms_documents/insert.sql
 
-\echo '>>> [10/10] Modul 10: Kesiapan Tempur Alutsista & Komando Operasi Armada (C2)...'
+\echo '>>> [10/11] Modul 10: Kesiapan Tempur Alutsista & Komando Operasi Armada (C2)...'
 \i 10_readiness_operations_command/tables.sql
 \i 10_readiness_operations_command/insert.sql
 
+\echo '>>> [11/11] Modul 11: Infrastruktur Bawah Laut Kritis (Critical Underwater Infrastructure - CUI)...'
+\i 11_cui_underwater_infrastructure/tables.sql
+\i 11_cui_underwater_infrastructure/insert.sql
+
 \echo '============================================================================='
-\echo '>>> SELURUH STRUKTUR DATABASE (60+ TABEL) DAN SEEDER NAVALERP BERHASIL DILAKSANAKAN!'
+\echo '>>> SELURUH STRUKTUR DATABASE (65+ TABEL) DAN SEEDER NAVALERP BERHASIL DILAKSANAKAN!'
 \echo '============================================================================='
+

@@ -74,6 +74,13 @@ import {
   DailyLogIcon,
   ReadinessReportIcon,
   ReadinessAlertIcon,
+  // 11. Infrastruktur Bawah Laut (CUI)
+  CuiGroupIcon,
+  CuiCommandCenterIcon,
+  CuiAssetIcon,
+  CuiMonitoringLogIcon,
+  CuiAlertIcon,
+  CuiInspectionIcon,
 } from "@/components/icons";
 
 export type AdminRoleId = 3 | 4 | 5 | 6;
@@ -577,6 +584,53 @@ export const ADMIN_NAVIGATION: AdminNavigationGroup[] = [
         href: "/admin/data/readiness_alert",
         url: "/admin/data/readiness_alert",
         icon: ReadinessAlertIcon,
+        roles: allAdminRoles,
+      },
+    ],
+  },
+  {
+    label: "11. Bawah Laut (CUI)",
+    title: "11. Infrastruktur Bawah Laut (CUI)",
+    icon: CuiGroupIcon,
+    items: [
+      {
+        label: "Pusat Komando CUI",
+        name: "Pusat Komando CUI",
+        href: "/admin/cui",
+        url: "/admin/cui",
+        icon: CuiCommandCenterIcon,
+        roles: allAdminRoles,
+      },
+      {
+        label: "Aset Bawah Laut",
+        name: "Aset Bawah Laut",
+        href: "/admin/data/cui_asset",
+        url: "/admin/data/cui_asset",
+        icon: CuiAssetIcon,
+        roles: allAdminRoles,
+      },
+      {
+        label: "Log Sensor CUI",
+        name: "Log Sensor CUI",
+        href: "/admin/data/cui_monitoring_log",
+        url: "/admin/data/cui_monitoring_log",
+        icon: CuiMonitoringLogIcon,
+        roles: allAdminRoles,
+      },
+      {
+        label: "Peringatan Anomali",
+        name: "Peringatan Anomali",
+        href: "/admin/data/cui_alert",
+        url: "/admin/data/cui_alert",
+        icon: CuiAlertIcon,
+        roles: allAdminRoles,
+      },
+      {
+        label: "Inspeksi Bawah Laut",
+        name: "Inspeksi Bawah Laut",
+        href: "/admin/data/cui_inspection",
+        url: "/admin/data/cui_inspection",
+        icon: CuiInspectionIcon,
         roles: allAdminRoles,
       },
     ],

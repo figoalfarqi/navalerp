@@ -23,6 +23,7 @@ interface TableToolbarProps {
   onActivate?: () => void;
   onDeactivate?: () => void;
   onApproveTA?: () => void;
+  onApproval?: () => void;
   onOpen?: () => void;
   onAssign?: () => void;
   assignIcon?: React.ReactNode;
@@ -40,6 +41,7 @@ export default function TableToolbar({
   onDeactivate,
   onOpen,
   onApproveTA,
+  onApproval,
   onAssign,
   assignIcon,
   isOnOpenDisabled,
@@ -121,6 +123,18 @@ export default function TableToolbar({
             <div className="h-4 w-4">
               <MdAttachMoney className="h-5 w-5 -m-0.5"/>
             </div>
+          </Button>
+        )}
+        {onApproval && (
+          <Button
+            id="approval-button"
+            disabled={selectedCount > 1}
+            onClick={onApproval}
+            variant="amber-solid"
+            className="flex items-center gap-1 px-3 py-1 font-semibold text-xs"
+            title="Persetujuan & Otorisasi Digital"
+          >
+            <span className="font-bold text-xs">✓ Otorisasi</span>
           </Button>
         )}
         {onActivate && (

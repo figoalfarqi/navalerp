@@ -98,3 +98,15 @@
 {"timestamp":"2026-09-06T08:44:25+07:00","method":"PUT","path":"/api/v1/admin/stock_adjustment/79dcea97-03f7-4795-b2ea-e1379e011476","status":500,"duration_ms":146,"ip":"[::1]:59818"}
 {"timestamp":"2026-09-06T09:09:07+07:00","method":"GET","path":"/api/v1/admin/item_instance","status":200,"duration_ms":1020,"ip":"[::1]:62045"}
 {"timestamp":"2026-09-06T09:09:18+07:00","method":"GET","path":"/api/v1/admin/material","status":200,"duration_ms":1661,"ip":"[::1]:62045"}
+{"timestamp":"2026-09-09T22:33:40+07:00","method":"POST","path":"/api/v1/admin/login","status":400,"duration_ms":9,"ip":"[::1]:56738"}
+{"timestamp":"2026-09-09T22:33:44+07:00","method":"POST","path":"/api/v1/admin/login","status":400,"duration_ms":3,"ip":"[::1]:60124"}
+{"timestamp":"2026-09-09T22:33:48+07:00","method":"POST","path":"/api/v1/admin/login","status":401,"duration_ms":174,"ip":"[::1]:55482"}
+{"timestamp":"2026-09-09T22:34:21+07:00","method":"POST","path":"/api/v1/admin/login","status":401,"duration_ms":265,"ip":"[::1]:49846"}
+{"timestamp":"2026-09-09T22:35:21+07:00","method":"POST","path":"/api/v1/admin/login","status":400,"duration_ms":0,"ip":"[::1]:52503"}
+{"timestamp":"2026-09-09T22:35:25+07:00","method":"POST","path":"/api/v1/admin/login","status":400,"duration_ms":0,"ip":"[::1]:57623"}
+{"timestamp":"2026-09-09T22:37:25+07:00","method":"GET","path":"/api/v1/admin/cui/overview","status":401,"duration_ms":0,"ip":"[::1]:51882"}
+{"timestamp":"2026-09-09T22:37:34+07:00","method":"GET","path":"/api/v1/admin/cui_alert","status":401,"duration_ms":0,"ip":"[::1]:53178"}
+{"timestamp":"2026-09-09T22:37:35+07:00","method":"GET","path":"/api/v1/admin/cui_inspection","status":401,"duration_ms":0,"ip":"[::1]:53178"}
+{"timestamp":"2026-09-09T22:38:33+07:00","method":"POST","path":"/api/v1/admin/approval","status":400,"duration_ms":20,"ip":"[::1]:65293"}
+{"timestamp":"2026-09-09T22:38:57+07:00","method":"POST","path":"/api/v1/admin/approval","status":400,"duration_ms":139,"ip":"[::1]:49673"}
+{"timestamp":"2026-09-09T22:39:26+07:00","method":"POST","path":"/api/v1/admin/approval","status":400,"duration_ms":216,"ip":"[::1]:64007"}

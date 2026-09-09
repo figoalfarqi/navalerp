@@ -104,4 +104,15 @@ func registerApplicationRoutes(mux *http.ServeMux, cfg *config.Config, h *routeH
 	registerCRUD(mux, cfg, "/api/v1/admin/daily_log", allRoles, h.dailyLog)
 	registerCRUD(mux, cfg, "/api/v1/admin/readiness_report", allRoles, h.readinessReport)
 	registerCRUD(mux, cfg, "/api/v1/admin/readiness_alert", allRoles, h.readinessAlert)
+
+	// Critical Underwater Infrastructure (CUI) Module
+	registerCRUD(mux, cfg, "/api/v1/admin/cui_asset", allRoles, h.cuiAsset)
+	registerCRUD(mux, cfg, "/api/v1/admin/cui_monitoring_log", allRoles, h.cuiMonitoringLog)
+	registerCRUD(mux, cfg, "/api/v1/admin/cui_alert", allRoles, h.cuiAlert)
+	registerCRUD(mux, cfg, "/api/v1/admin/cui_inspection", allRoles, h.cuiInspection)
+	mux.Handle("GET /api/v1/admin/cui/overview", authenticated(cfg, allRoles, h.cuiOverview.Get))
+
+	// Digital Approval Workflow
+	mux.Handle("POST /api/v1/admin/approval", authenticated(cfg, allRoles, h.approval.Process))
+	mux.Handle("GET /api/v1/admin/approval/pending", authenticated(cfg, allRoles, h.approval.ListPending))
 }

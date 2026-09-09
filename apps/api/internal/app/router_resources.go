@@ -61,6 +61,12 @@ type routeHandlers struct {
 	dailyLog         *handler.DailyLogHandler
 	readinessReport  *handler.ReadinessReportHandler
 	readinessAlert   *handler.ReadinessAlertHandler
+	cuiAsset         *handler.CuiAssetHandler
+	cuiMonitoringLog *handler.CuiMonitoringLogHandler
+	cuiAlert         *handler.CuiAlertHandler
+	cuiInspection    *handler.CuiInspectionHandler
+	cuiOverview      *handler.CuiOverviewHandler
+	approval         *handler.ApprovalHandler
 	generator        *handler.GeneratorHandler
 }
 
@@ -169,6 +175,17 @@ func buildRouteHandlers(cfg *config.Config) *routeHandlers {
 	readinessAlertRepo := repository.NewReadinessAlertRepository(db)
 	readinessAlertService := service.NewReadinessAlertService(readinessAlertRepo)
 
+	cuiAssetRepo := repository.NewCuiAssetRepository(db)
+	cuiAssetService := service.NewCuiAssetService(cuiAssetRepo)
+	cuiMonitoringLogRepo := repository.NewCuiMonitoringLogRepository(db)
+	cuiMonitoringLogService := service.NewCuiMonitoringLogService(cuiMonitoringLogRepo)
+	cuiAlertRepo := repository.NewCuiAlertRepository(db)
+	cuiAlertService := service.NewCuiAlertService(cuiAlertRepo)
+	cuiInspectionRepo := repository.NewCuiInspectionRepository(db)
+	cuiInspectionService := service.NewCuiInspectionService(cuiInspectionRepo)
+	cuiOverviewService := service.NewCuiOverviewService(db)
+	approvalService := service.NewApprovalService(db)
+
 	return &routeHandlers{
 		fileUpload:       handler.NewFileUploadHandler(fileService, cfg),
 		dashboard:        handler.NewDashboardHandler(dashboardService, cfg),
@@ -222,6 +239,12 @@ func buildRouteHandlers(cfg *config.Config) *routeHandlers {
 		dailyLog:         handler.NewDailyLogHandler(dailyLogService, cfg),
 		readinessReport:  handler.NewReadinessReportHandler(readinessReportService, cfg),
 		readinessAlert:   handler.NewReadinessAlertHandler(readinessAlertService, cfg),
+		cuiAsset:         handler.NewCuiAssetHandler(cuiAssetService, cfg),
+		cuiMonitoringLog: handler.NewCuiMonitoringLogHandler(cuiMonitoringLogService, cfg),
+		cuiAlert:         handler.NewCuiAlertHandler(cuiAlertService, cfg),
+		cuiInspection:    handler.NewCuiInspectionHandler(cuiInspectionService, cfg),
+		cuiOverview:      handler.NewCuiOverviewHandler(cuiOverviewService, cfg),
+		approval:         handler.NewApprovalHandler(approvalService, cfg),
 		generator:        handler.NewGeneratorHandler(db),
 	}
 }

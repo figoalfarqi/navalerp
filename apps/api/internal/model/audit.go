@@ -23,6 +23,8 @@ type ListOptions struct {
 	Offset          int
 	CursorKey       *int
 	Sort            string
+	SortBy          string
+	Order           string
 	Search          string
 	ProjectID       *int
 	TransportID     *int

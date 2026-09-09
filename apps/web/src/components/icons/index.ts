@@ -12,5 +12,6 @@ export * from "./baseIcons";
 export * from "./transportIcons";
 export * from "./edrmsIcons";
 export * from "./commandIcons";
+export * from "./cuiIcons";
 export * from "./commonIcons";
 
