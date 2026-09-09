@@ -18,12 +18,20 @@ func NewCuiMonitoringLogRepository(db *pgxpool.Pool) *CuiMonitoringLogRepository
 }
 
 // Get retrieves a single cui_monitoring_log by ID
+// Get retrieves a single cui_monitoring_log by ID
 func (r *CuiMonitoringLogRepository) Get(ctx context.Context, id string) (*model.CuiMonitoringLog, error) {
-	query := `SELECT log_id, cui_asset_id, sensor_code, sensor_type, log_time, metric_value, metric_unit, status, vessel_proximity_mmsi, anomaly_score, description, created_by, updated_by, deleted_by, created_at, updated_at, deleted_at FROM cui_monitoring_logs WHERE log_id = $1 AND deleted_at IS NULL`
+	query := `SELECT 
+		l.log_id, l.cui_asset_id, l.sensor_code, l.sensor_type, l.log_time, 
+		l.metric_value, l.metric_unit, l.status, l.vessel_proximity_mmsi, l.anomaly_score, 
+		l.description, l.created_by, l.updated_by, l.deleted_by, l.created_at, l.updated_at, l.deleted_at,
+		a.asset_name, a.asset_code
+	FROM cui_monitoring_logs l
+	LEFT JOIN cui_assets a ON a.cui_asset_id = l.cui_asset_id
+	WHERE l.log_id = $1 AND l.deleted_at IS NULL`
 
 	row := r.DB.QueryRow(ctx, query, id)
 	var m model.CuiMonitoringLog
-	err := row.Scan(&m.LogId, &m.CuiAssetId, &m.SensorCode, &m.SensorType, &m.LogTime, &m.MetricValue, &m.MetricUnit, &m.Status, &m.VesselProximityMmsi, &m.AnomalyScore, &m.Description, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt)
+	err := row.Scan(&m.LogId, &m.CuiAssetId, &m.SensorCode, &m.SensorType, &m.LogTime, &m.MetricValue, &m.MetricUnit, &m.Status, &m.VesselProximityMmsi, &m.AnomalyScore, &m.Description, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt, &m.AssetName, &m.AssetCode)
 	if err != nil {
 		return nil, err
 	}
@@ -33,21 +41,38 @@ func (r *CuiMonitoringLogRepository) Get(ctx context.Context, id string) (*model
 
 // List retrieves cui_monitoring_log records with search, filter, and pagination
 func (r *CuiMonitoringLogRepository) List(ctx context.Context, opts model.ListOptions) ([]model.CuiMonitoringLog, int, error) {
-	baseQuery := `FROM cui_monitoring_logs WHERE 1=1`
-	baseQuery += ` AND deleted_at IS NULL`
+	whereQuery := `FROM cui_monitoring_logs l
+	LEFT JOIN cui_assets a ON a.cui_asset_id = l.cui_asset_id
+	WHERE 1=1 AND l.deleted_at IS NULL`
 	var args []interface{}
 	argIndex := 1
 
 	if opts.Search != "" {
-		baseQuery += fmt.Sprintf(" AND (sensor_code ILIKE $%d OR sensor_type ILIKE $%d OR metric_unit ILIKE $%d OR status ILIKE $%d OR vessel_proximity_mmsi ILIKE $%d OR description ILIKE $%d)", argIndex, argIndex, argIndex, argIndex, argIndex, argIndex)
+		whereQuery += fmt.Sprintf(" AND (l.sensor_code ILIKE $%d OR l.sensor_type ILIKE $%d OR l.metric_unit ILIKE $%d OR l.status ILIKE $%d OR l.vessel_proximity_mmsi ILIKE $%d OR l.description ILIKE $%d OR a.asset_name ILIKE $%d OR a.asset_code ILIKE $%d)", argIndex, argIndex, argIndex, argIndex, argIndex, argIndex, argIndex, argIndex)
 		args = append(args, "%"+opts.Search+"%")
 		argIndex++
 	}
 
-	// Generic filter support
+	allowedCols := map[string]bool{
+		"log_id":                true,
+		"cui_asset_id":          true,
+		"sensor_code":           true,
+		"sensor_type":           true,
+		"log_time":              true,
+		"metric_value":          true,
+		"metric_unit":           true,
+		"status":                true,
+		"vessel_proximity_mmsi": true,
+		"anomaly_score":         true,
+		"description":           true,
+		"created_at":            true,
+		"updated_at":            true,
+	}
+
+	// Generic filter support with column whitelisting
 	for k, v := range opts.Filters {
-		if v != "" {
-			baseQuery += fmt.Sprintf(" AND %s = $%d", k, argIndex)
+		if v != "" && allowedCols[k] {
+			whereQuery += fmt.Sprintf(" AND l.%s = $%d", k, argIndex)
 			args = append(args, v)
 			argIndex++
 		}
@@ -55,29 +80,33 @@ func (r *CuiMonitoringLogRepository) List(ctx context.Context, opts model.ListOp
 
 	// Count total
 	var total int
-	countQuery := "SELECT COUNT(*) " + baseQuery
+	countQuery := "SELECT COUNT(*) " + whereQuery
 	err := r.DB.QueryRow(ctx, countQuery, args...).Scan(&total)
 	if err != nil {
 		return nil, 0, err
 	}
 
 	// Sorting and Pagination
-	sortCol := "log_id"
-	if opts.SortBy != "" {
+	sortCol := "created_at"
+	if opts.SortBy != "" && allowedCols[opts.SortBy] {
 		sortCol = opts.SortBy
 	}
 	order := "DESC"
 	if strings.ToUpper(opts.Order) == "ASC" {
 		order = "ASC"
 	}
-	baseQuery += fmt.Sprintf(" ORDER BY %s %s", sortCol, order)
+	whereQuery += fmt.Sprintf(" ORDER BY l.%s %s", sortCol, order)
 
 	if opts.Limit > 0 {
-		baseQuery += fmt.Sprintf(" LIMIT $%d OFFSET $%d", argIndex, argIndex+1)
+		whereQuery += fmt.Sprintf(" LIMIT $%d OFFSET $%d", argIndex, argIndex+1)
 		args = append(args, opts.Limit, opts.Offset)
 	}
 
-	selectQuery := "SELECT log_id, cui_asset_id, sensor_code, sensor_type, log_time, metric_value, metric_unit, status, vessel_proximity_mmsi, anomaly_score, description, created_by, updated_by, deleted_by, created_at, updated_at, deleted_at " + baseQuery
+	selectQuery := `SELECT 
+		l.log_id, l.cui_asset_id, l.sensor_code, l.sensor_type, l.log_time, 
+		l.metric_value, l.metric_unit, l.status, l.vessel_proximity_mmsi, l.anomaly_score, 
+		l.description, l.created_by, l.updated_by, l.deleted_by, l.created_at, l.updated_at, l.deleted_at,
+		a.asset_name, a.asset_code ` + whereQuery
 	rows, err := r.DB.Query(ctx, selectQuery, args...)
 	if err != nil {
 		return nil, 0, err
@@ -87,7 +116,7 @@ func (r *CuiMonitoringLogRepository) List(ctx context.Context, opts model.ListOp
 	var items []model.CuiMonitoringLog
 	for rows.Next() {
 		var m model.CuiMonitoringLog
-		if err := rows.Scan(&m.LogId, &m.CuiAssetId, &m.SensorCode, &m.SensorType, &m.LogTime, &m.MetricValue, &m.MetricUnit, &m.Status, &m.VesselProximityMmsi, &m.AnomalyScore, &m.Description, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt); err != nil {
+		if err := rows.Scan(&m.LogId, &m.CuiAssetId, &m.SensorCode, &m.SensorType, &m.LogTime, &m.MetricValue, &m.MetricUnit, &m.Status, &m.VesselProximityMmsi, &m.AnomalyScore, &m.Description, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt, &m.AssetName, &m.AssetCode); err != nil {
 			return nil, 0, err
 		}
 		items = append(items, m)

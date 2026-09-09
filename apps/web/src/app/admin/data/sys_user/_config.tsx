@@ -14,7 +14,7 @@ export const columns: ColumnField[] = [
   { key: "full_name", label: "Full Name" },
   { key: "email", label: "Email" },
   { key: "phone", label: "Phone" },
-  { key: "military_id", label: "Military Id" },
+  { key: "military_id", label: "NRP / Identitas Militer" },
 ];
 
 export const filterFields: FilterField[] = [

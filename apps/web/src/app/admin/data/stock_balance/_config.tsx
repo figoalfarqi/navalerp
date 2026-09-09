@@ -10,7 +10,6 @@ export const primaryKey = "balance_id";
 
 export const columns: ColumnField[] = [
   { key: "warehouse_name", label: "Nama Gudang" },
-  { key: "location_id", label: "Location Id" },
   { key: "material_name", label: "Material" },
   { key: "quantity_on_hand", label: "Quantity On Hand" },
   { key: "quantity_reserved", label: "Quantity Reserved" },

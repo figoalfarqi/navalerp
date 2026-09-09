@@ -12,7 +12,6 @@ export const columns: ColumnField[] = [
   { key: "full_name", label: "Pengguna" },
   { key: "action", label: "Action" },
   { key: "entity_table", label: "Entity Table" },
-  { key: "entity_id", label: "Entity Id" },
   { key: "old_values", label: "Old Values" },
   { key: "new_values", label: "New Values" },
 ];

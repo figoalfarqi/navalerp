@@ -15,7 +15,6 @@ export const columns: ColumnField[] = [
   { key: "entry_date", label: "Entry Date", render: (item: any) => formatSmartDate(item.entry_date) },
   { key: "description", label: "Description" },
   { key: "source_module", label: "Source Module" },
-  { key: "source_reference_id", label: "Source Reference Id" },
   { key: "is_posted", label: "Is Posted" },
 ];
 

@@ -35,6 +35,7 @@ func main() {
 		"db_reference/08_logistics_transportation/insert.sql",
 		"db_reference/09_edrms_documents/insert.sql",
 		"db_reference/10_readiness_operations_command/insert.sql",
+		"db_reference/11_cui_underwater_infrastructure/insert.sql",
 	}
 
 	baseDir := "d:\\stm\\VirutalGate\\navalerp"
@@ -42,6 +43,7 @@ func main() {
 	fmt.Println(">>> Membersihkan data lama dengan TRUNCATE CASCADE...")
 	truncateSQL := `
 		TRUNCATE TABLE 
+			cui_inspections, cui_alerts, cui_monitoring_logs, cui_assets,
 			ops_readiness_alerts, ops_ship_readiness_snapshots, ops_daily_logs, ops_mission_ship_assignments, ops_missions, ops_theaters,
 			doc_documents, doc_document_links, doc_document_versions, doc_categories,
 			log_shipment_items, log_shipments, log_routes, log_transport_units,
@@ -62,7 +64,7 @@ func main() {
 
 	for i, relPath := range files {
 		fullPath := filepath.Join(baseDir, relPath)
-		fmt.Printf("[%d/10] Menjalankan %s...\n", i+1, relPath)
+		fmt.Printf("[%d/%d] Menjalankan %s...\n", i+1, len(files), relPath)
 
 		content, err := os.ReadFile(fullPath)
 		if err != nil {

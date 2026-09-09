@@ -21,20 +21,41 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!tokenLoaded) return;
 
+    if (isLoginPage) {
+      if (typeof window !== "undefined") {
+        sessionStorage.setItem("last_admin_route", "/admin/login");
+      }
+      if (adminToken && isAdminRoleId(roleId)) {
+        if (typeof window !== "undefined") {
+          sessionStorage.removeItem("last_admin_route");
+        }
+        router.replace("/admin");
+      }
+      return;
+    }
+
     if (!adminToken) {
-      if (!isLoginPage) router.replace("/admin/login");
+      // Check if user came back from /admin/login (e.g. by pressing browser Back button)
+      if (
+        typeof window !== "undefined" &&
+        sessionStorage.getItem("last_admin_route") === "/admin/login"
+      ) {
+        sessionStorage.removeItem("last_admin_route");
+        router.replace("/#security");
+        return;
+      }
+      router.replace("/admin/login");
       return;
     }
 
     if (!isAdminRoleId(roleId)) {
       void clearAdminToken();
-      router.replace("/admin/login");
+      if (!isLoginPage) router.replace("/admin/login");
       return;
     }
 
-    if (isLoginPage) {
-      router.replace("/admin");
-      return;
+    if (typeof window !== "undefined") {
+      sessionStorage.removeItem("last_admin_route");
     }
 
     if (!canAccessAdminPath(roleId, pathname)) {

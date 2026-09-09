@@ -2,6 +2,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import Button from "../form/Button";
 import TextField from "../form/TextField";
 import Image from "next/image";
@@ -52,6 +53,18 @@ export default function Login({
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-950 via-[#071a33] to-slate-950 px-4 sm:px-6 lg:px-8">
       <div className="w-full max-w-sm sm:max-w-md bg-white p-6 sm:p-8 rounded-2xl shadow-[0_20px_50px_rgba(0,30,70,0.4)] border-t-4 border-[#0a2540]">
         <div className="w-full">
+          <div className="flex items-center justify-between mb-4">
+            <Link
+              href="/#security"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-blue-700 transition cursor-pointer"
+            >
+              ← Kembali ke Beranda
+            </Link>
+            <span className="text-[10px] font-mono text-cyan-800 bg-cyan-50 px-2 py-0.5 rounded border border-cyan-200">
+              TNI AL SECURE
+            </span>
+          </div>
+
           <div className="flex justify-center mb-4">
             <Image
               src="/logo.png"
@@ -94,7 +107,7 @@ export default function Login({
                 }
                 type="password"
                 isPasswordShowable
-                placeholder="Password (e.g. admin123)"
+                placeholder="Password (e.g. Password123!)"
                 border="border-gray-300"
                 value={formData["password"] || ""}
                 onChange={(val) =>
@@ -111,12 +124,21 @@ export default function Login({
                 variant="blue-dkl"
                 size="xl"
                 wrapperClassName="!block"
-                className="w-full h-11 text-base font-semibold bg-[#0b8fa5] hover:bg-[#097587]"
+                className="w-full h-11 text-base font-semibold bg-[#0a2540] hover:bg-[#081d38] text-white shadow-md transition"
               >
                 {loadingSubmit ? <LoaderDots /> : "Masuk Sistem"}
               </Button>
             </div>
           </form>
+
+          <div className="mt-6 text-center border-t border-slate-100 pt-4">
+            <Link
+              href="/#security"
+              className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-500 hover:text-blue-700 transition"
+            >
+              ← Kembali ke Halaman Utama
+            </Link>
+          </div>
         </div>
       </div>
     </div>

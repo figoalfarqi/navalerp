@@ -1,15 +1,20 @@
 -- =============================================================================
--- MODUL 11: SEED DATA INFRASTRUKTUR BAWAH LAUT KRITIS (CUI)
+-- MODUL 11: SEED DATA INFRASTRUKTUR BAWAH LAUT KRITIS (CRITICAL UNDERWATER INFRASTRUCTURE - CUI)
 -- FILE: 11_cui_underwater_infrastructure/insert.sql
 -- =============================================================================
 
--- Seed Assets
+TRUNCATE TABLE cui_inspections, cui_alerts, cui_monitoring_logs, cui_assets CASCADE;
+
+-- -----------------------------------------------------------------------------
+-- 1. ASET BAWAH LAUT KRITIS NASIONAL (cui_assets) - 20 Aset Strategis
+-- -----------------------------------------------------------------------------
 INSERT INTO cui_assets (
     cui_asset_id, asset_code, asset_name, asset_type, operator_name,
     theater_id, depth_meters, length_km, latitude, longitude,
     start_coordinates, end_coordinates, status, health_score, protection_priority,
     last_inspected_at, next_inspection_due, notes, created_by
 ) VALUES
+-- 1. SKKL Natuna
 (
     '9c000000-0000-0000-0000-000000000001',
     'CUI-CBL-001',
@@ -21,16 +26,17 @@ INSERT INTO cui_assets (
     345.50,
     3.916700,
     108.383300,
-    '3.9167, 108.3833 (Ranai)',
-    '1.1304, 104.0530 (Batam)',
+    '3.9167, 108.3833 (Ranai Natuna)',
+    '1.1304, 104.0530 (Batam Centre)',
     'ACTIVE_MONITORED',
     96,
     'CRITICAL_TIER_1',
     NOW() - INTERVAL '20 days',
     NOW() + INTERVAL '70 days',
-    'Tulang punggung telekomunikasi perbatasan utara NKRI dan pangkalan KRI Ranai',
+    'Tulang punggung telekomunikasi pertahanan perbatasan utara NKRI dan pangkalan KRI Ranai.',
     'SYSTEM'
 ),
+-- 2. Pipa Gas WNAT
 (
     '9c000000-0000-0000-0000-000000000002',
     'CUI-PIP-001',
@@ -49,9 +55,10 @@ INSERT INTO cui_assets (
     'CRITICAL_TIER_1',
     NOW() - INTERVAL '45 days',
     NOW() + INTERVAL '45 days',
-    'Jalur pasokan energi gas strategis lintas batas dan industri domestik Batam-Singapura',
+    'Jalur pasokan energi gas strategis lintas batas dan industri domestik Batam-Singapura.',
     'SYSTEM'
 ),
+-- 3. CLS Batam Centre
 (
     '9c000000-0000-0000-0000-000000000003',
     'CUI-LND-001',
@@ -70,9 +77,10 @@ INSERT INTO cui_assets (
     'CRITICAL_TIER_1',
     NOW() - INTERVAL '15 days',
     NOW() + INTERVAL '75 days',
-    'Stasiun pendaratan kabel internasional SEA-ME-WE-5 dan Palapa Ring',
+    'Stasiun pendaratan kabel internasional SEA-ME-WE-5, Indigo, dan Palapa Ring Barat.',
     'SYSTEM'
 ),
+-- 4. FSO Gagak Rimang Laut Jawa
 (
     '9c000000-0000-0000-0000-000000000004',
     'CUI-OFF-001',
@@ -91,13 +99,14 @@ INSERT INTO cui_assets (
     'CRITICAL_TIER_1',
     NOW() - INTERVAL '30 days',
     NOW() + INTERVAL '60 days',
-    'Floating Storage and Offloading lifting minyak mentah nasional Laut Jawa',
+    'Floating Storage and Offloading lifting minyak mentah nasional 200.000 BOPD Laut Jawa.',
     'SYSTEM'
 ),
+-- 5. Kabel Selat Sunda
 (
     '9c000000-0000-0000-0000-000000000005',
     'CUI-CBL-002',
-    'Kabel Interkoneksi Listrik Bawah Laut Selat Sunda',
+    'Kabel Interkoneksi Listrik & Komunikasi Selat Sunda',
     'SUBMARINE_CABLE',
     'PT PLN (Persero)',
     'c0000000-0000-0000-0000-000000000002',
@@ -105,16 +114,17 @@ INSERT INTO cui_assets (
     38.00,
     -5.900000,
     105.850000,
-    '-5.8500, 105.7500 (Bakauheni)',
-    '-5.9500, 105.9500 (Merak)',
+    '-5.8500, 105.7500 (Bakauheni Lampung)',
+    '-5.9500, 105.9500 (Merak Banten)',
     'ALERT_ANOMALY',
     78,
     'CRITICAL_TIER_1',
     NOW() - INTERVAL '10 days',
     NOW() + INTERVAL '10 days',
-    'Peringatan getaran dan proximity kapal kargo terdeteksi di koordinat km 14 Selat Sunda',
+    'Peringatan getaran dan proximity kapal kargo terdeteksi di koordinat km 14 Selat Sunda.',
     'SYSTEM'
 ),
+-- 6. Sensor Sonar ALKI II Lombok
 (
     '9c000000-0000-0000-0000-000000000006',
     'CUI-MON-001',
@@ -133,9 +143,10 @@ INSERT INTO cui_assets (
     'CRITICAL_TIER_1',
     NOW() - INTERVAL '5 days',
     NOW() + INTERVAL '85 days',
-    'Sistem deteksi akustik bawah air perlintasan kapal selam asing ALKI II',
+    'Sistem deteksi akustik bawah air perlintasan kapal selam asing jalur ALKI II Selat Lombok.',
     'SYSTEM'
 ),
+-- 7. Kabel Morowali Kendari
 (
     '9c000000-0000-0000-0000-000000000007',
     'CUI-CBL-003',
@@ -154,15 +165,299 @@ INSERT INTO cui_assets (
     'HIGH_TIER_2',
     NOW() - INTERVAL '120 days',
     NOW() - INTERVAL '5 days',
-    'Jadwal inspeksi ROV jatuh tempo untuk survei ketebalan sedimen pelindung',
+    'Jadwal inspeksi ROV jatuh tempo untuk survei ketebalan sedimen pelindung zona industri nikel.',
     'SYSTEM'
-)
-ON CONFLICT (cui_asset_id) DO UPDATE SET
-    asset_name = EXCLUDED.asset_name,
-    status = EXCLUDED.status,
-    health_score = EXCLUDED.health_score;
+),
+-- 8. Kabel B2JS
+(
+    '9c000000-0000-0000-0000-000000000008',
+    'CUI-CBL-004',
+    'Kabel SKKL B2JS (Bangka - Batam - Jakarta - Singapore)',
+    'SUBMARINE_CABLE',
+    'PT XL Axiata Tbk / Mora Telematika',
+    'c0000000-0000-0000-0000-000000000002',
+    60.00,
+    1100.00,
+    -1.500000,
+    106.000000,
+    '-6.1000, 106.8000 (Ancol Jakarta)',
+    '1.1500, 104.0500 (Batam)',
+    'ACTIVE_MONITORED',
+    95,
+    'CRITICAL_TIER_1',
+    NOW() - INTERVAL '40 days',
+    NOW() + INTERVAL '50 days',
+    'Jalur transmisi data utama lalu lintas internet nasional ke gateway internasional Singapura.',
+    'SYSTEM'
+),
+-- 9. Kabel Java-Kalimantan Link
+(
+    '9c000000-0000-0000-0000-000000000009',
+    'CUI-CBL-005',
+    'Kabel Laut SKKL Java-Kalimantan Link (Surabaya - Banjarmasin)',
+    'SUBMARINE_CABLE',
+    'PT Telkom Indonesia Tbk',
+    'c0000000-0000-0000-0000-000000000002',
+    68.00,
+    420.00,
+    -5.100000,
+    113.800000,
+    '-7.2000, 112.7500 (Tanjung Perak)',
+    '-3.3200, 114.5900 (Banjarmasin)',
+    'ACTIVE_MONITORED',
+    91,
+    'HIGH_TIER_2',
+    NOW() - INTERVAL '35 days',
+    NOW() + INTERVAL '55 days',
+    'Koneksi telekomunikasi pulau Jawa menuju IKN Nusantara Kalimantan Timur.',
+    'SYSTEM'
+),
+-- 10. Kabel Laut Selat Bali
+(
+    '9c000000-0000-0000-0000-000000000010',
+    'CUI-CBL-006',
+    'Kabel Daya Bawah Laut Selat Bali 150 kV',
+    'SUBMARINE_CABLE',
+    'PT PLN (Persero)',
+    'c0000000-0000-0000-0000-000000000003',
+    55.00,
+    6.50,
+    -8.150000,
+    114.430000,
+    '-8.1400, 114.4200 (Ketapang)',
+    '-8.1600, 114.4400 (Gilimanuk)',
+    'ACTIVE_MONITORED',
+    98,
+    'CRITICAL_TIER_1',
+    NOW() - INTERVAL '15 days',
+    NOW() + INTERVAL '75 days',
+    'Pasokan 40% energi listrik vital pulau Bali dari sistem interkoneksi Jawa-Bali.',
+    'SYSTEM'
+),
+-- 11. Palapa Ring Timur Sorong-Jayapura
+(
+    '9c000000-0000-0000-0000-000000000011',
+    'CUI-CBL-007',
+    'Kabel Laut Palapa Ring Timur - Segmen Sorong - Jayapura',
+    'SUBMARINE_CABLE',
+    'Palapa Timur Telematika (PTT)',
+    'c0000000-0000-0000-0000-000000000006',
+    1800.00,
+    980.00,
+    -1.200000,
+    136.000000,
+    '-0.8700, 131.2500 (Sorong)',
+    '-2.5300, 140.7100 (Jayapura)',
+    'ACTIVE_MONITORED',
+    89,
+    'CRITICAL_TIER_1',
+    NOW() - INTERVAL '60 days',
+    NOW() + INTERVAL '30 days',
+    'Kabel laut laut dalam Samudera Pasifik utara Papua untuk konektivitas militer & publik Koarmada III.',
+    'SYSTEM'
+),
+-- 12. Kabel Indigo West
+(
+    '9c000000-0000-0000-0000-000000000012',
+    'CUI-CBL-008',
+    'Kabel Internasional Indigo West (Perth - Jakarta - Singapore)',
+    'SUBMARINE_CABLE',
+    'Konsorsium Indigo / Telstra / Singtel',
+    'c0000000-0000-0000-0000-000000000008',
+    2400.00,
+    4600.00,
+    -7.800000,
+    106.200000,
+    '-6.1000, 106.7000 (Jakarta)',
+    '-31.9500, 115.8600 (Perth)',
+    'ACTIVE_MONITORED',
+    94,
+    'HIGH_TIER_2',
+    NOW() - INTERVAL '50 days',
+    NOW() + INTERVAL '40 days',
+    'Kabel serat optik lintas samudera penghubung benua Australia dan Asia Tenggara.',
+    'SYSTEM'
+),
+-- 13. Pipa SPM Balongan
+(
+    '9c000000-0000-0000-0000-000000000013',
+    'CUI-PIP-002',
+    'Pipa Minyak Mentah Bawah Laut SPM Balongan - Kilang RU VI',
+    'SUBSEA_PIPELINE',
+    'PT Pertamina Kilang Internasional',
+    'c0000000-0000-0000-0000-000000000002',
+    32.00,
+    14.50,
+    -6.300000,
+    108.380000,
+    '-6.2500, 108.4200 (Single Point Mooring SPM)',
+    '-6.3500, 108.3500 (Shore Terminal Indramayu)',
+    'ACTIVE_MONITORED',
+    97,
+    'CRITICAL_TIER_1',
+    NOW() - INTERVAL '10 days',
+    NOW() + INTERVAL '80 days',
+    'Pipa suplai minyak mentah kapal tanker VLCC ke kilang BBM ketahanan energi DKI Jakarta & Jabar.',
+    'SYSTEM'
+),
+-- 14. Pipa Tangguh LNG Teluk Bintuni
+(
+    '9c000000-0000-0000-0000-000000000014',
+    'CUI-PIP-003',
+    'Pipa Gas Lepas Pantai Tangguh LNG - Teluk Bintuni',
+    'SUBSEA_PIPELINE',
+    'BP Berau Ltd / SKK Migas',
+    'c0000000-0000-0000-0000-000000000006',
+    48.00,
+    85.00,
+    -2.300000,
+    133.150000,
+    '-2.1500, 133.0000 (Offshore Platform Tangguh)',
+    '-2.4500, 133.3000 (LNG Terminal Tanah Merah)',
+    'ACTIVE_MONITORED',
+    95,
+    'CRITICAL_TIER_1',
+    NOW() - INTERVAL '25 days',
+    NOW() + INTERVAL '65 days',
+    'Infrastruktur gas alam cair terbesar di Indonesia Timur untuk komitmen ekspor dan kelistrikan Papua.',
+    'SYSTEM'
+),
+-- 15. Pipa Mahakam Senipah
+(
+    '9c000000-0000-0000-0000-000000000015',
+    'CUI-PIP-004',
+    'Pipa Subsea Gas Mahakam - Senipah Balikpapan',
+    'SUBSEA_PIPELINE',
+    'PT Pertamina Hulu Mahakam (PHM)',
+    'c0000000-0000-0000-0000-000000000003',
+    45.00,
+    65.00,
+    -1.050000,
+    117.150000,
+    '-0.9000, 117.3000 (Offshore Delta Mahakam)',
+    '-1.2000, 117.0000 (Senipah Terminal)',
+    'UNDER_MAINTENANCE',
+    81,
+    'HIGH_TIER_2',
+    NOW() - INTERVAL '5 days',
+    NOW() + INTERVAL '25 days',
+    'Pemeliharaan anoda korban (sacrificial anode) dan katodik proteksi pipa korosi laut Selat Makassar.',
+    'SYSTEM'
+),
+-- 16. CLS Ancol Jakarta
+(
+    '9c000000-0000-0000-0000-000000000016',
+    'CUI-LND-002',
+    'Cable Landing Station (CLS) Ancol Jakarta',
+    'LANDING_STATION',
+    'PT Telkom Indonesia Tbk',
+    'c0000000-0000-0000-0000-000000000002',
+    0.00,
+    0.00,
+    -6.115000,
+    106.845000,
+    '-6.1150, 106.8450',
+    '-6.1150, 106.8450',
+    'ACTIVE_MONITORED',
+    99,
+    'CRITICAL_TIER_1',
+    NOW() - INTERVAL '5 days',
+    NOW() + INTERVAL '85 days',
+    'Pusat terminasi kabel komunikasi bawah laut terbesar gerbang ibukota dan Markas Besar TNI.',
+    'SYSTEM'
+),
+-- 17. CLS Pengambengan Bali
+(
+    '9c000000-0000-0000-0000-000000000017',
+    'CUI-LND-003',
+    'Cable Landing Station (CLS) Pantai Pengambengan Bali',
+    'LANDING_STATION',
+    'PT XL Axiata Tbk / PLN',
+    'c0000000-0000-0000-0000-000000000003',
+    0.00,
+    0.00,
+    -8.390000,
+    114.610000,
+    '-8.3900, 114.6100',
+    '-8.3900, 114.6100',
+    'ACTIVE_MONITORED',
+    93,
+    'HIGH_TIER_2',
+    NOW() - INTERVAL '30 days',
+    NOW() + INTERVAL '60 days',
+    'Pendaratan transmisi kabel optik Jawa-Bali dan pengawasan laut selatan Selat Bali.',
+    'SYSTEM'
+),
+-- 18. FPSO Karapan Armada Sterling III
+(
+    '9c000000-0000-0000-0000-000000000018',
+    'CUI-OFF-002',
+    'FPSO Karapan Armada Sterling III - Blok Madura BD',
+    'OFFSHORE_ENERGY',
+    'Husky-CNOOC Madura Limited (HCML)',
+    'c0000000-0000-0000-0000-000000000003',
+    55.00,
+    18.00,
+    -7.450000,
+    113.900000,
+    '-7.4800, 113.8500',
+    '-7.4200, 113.9500',
+    'ACTIVE_MONITORED',
+    96,
+    'CRITICAL_TIER_1',
+    NOW() - INTERVAL '12 days',
+    NOW() + INTERVAL '78 days',
+    'Fasilitas pengolahan minyak dan sulfur lepas pantai Selat Madura dekat pangkalan Koarmada II.',
+    'SYSTEM'
+),
+-- 19. Sonar Barrier Selat Sunda
+(
+    '9c000000-0000-0000-0000-000000000019',
+    'CUI-MON-002',
+    'Sonar Seabed Acoustic Barrier ALKI I - Selat Sunda',
+    'MONITORING_SYSTEM',
+    'Dinas Hidro-Oseanografi AL (Pushidrosal)',
+    'c0000000-0000-0000-0000-000000000002',
+    110.00,
+    22.00,
+    -5.950000,
+    105.880000,
+    '-5.9000, 105.8200',
+    '-6.0000, 105.9400',
+    'ALERT_ANOMALY',
+    82,
+    'CRITICAL_TIER_1',
+    NOW() - INTERVAL '8 days',
+    NOW() + INTERVAL '12 days',
+    'Jaringan sensor hidrofon dasar laut pengawas choke point Selat Sunda dan gunung Anak Krakatau.',
+    'SYSTEM'
+),
+-- 20. Magnetic Detector Selat Ombai
+(
+    '9c000000-0000-0000-0000-000000000020',
+    'CUI-MON-003',
+    'Underwater Surveillance Magnetic Anomaly Detector ALKI III - Selat Ombai',
+    'MONITORING_SYSTEM',
+    'Koarmada III / Lantamal VII Kupang',
+    'c0000000-0000-0000-0000-000000000004',
+    1200.00,
+    30.00,
+    -8.600000,
+    125.100000,
+    '-8.5000, 125.0000',
+    '-8.7000, 125.2000',
+    'ACTIVE_MONITORED',
+    93,
+    'CRITICAL_TIER_1',
+    NOW() - INTERVAL '18 days',
+    NOW() + INTERVAL '72 days',
+    'Pemantau celah laut dalam Selat Ombai-Wetar alur perlintasan kapal selam nuklir samudra Hindia-Pasifik.',
+    'SYSTEM'
+);
 
--- Seed Monitoring Logs
+-- -----------------------------------------------------------------------------
+-- 2. LOG SENSOR PEMANTAUAN TELEMETRI CUI (cui_monitoring_logs) - 10 Telemetri
+-- -----------------------------------------------------------------------------
 INSERT INTO cui_monitoring_logs (
     log_id, cui_asset_id, sensor_code, sensor_type, log_time,
     metric_value, metric_unit, status, vessel_proximity_mmsi, anomaly_score, description, created_by
@@ -178,7 +473,7 @@ INSERT INTO cui_monitoring_logs (
     'WARNING',
     '525119822',
     0.785,
-    'Tekanan hidrostatik berfluktuasi disertai kapal kargo curah menurunkan jangkar di koridor kabel',
+    'Tekanan hidrostatik berfluktuasi disertai kapal kargo curah menurunkan jangkar di koridor kabel Selat Sunda.',
     'SYSTEM'
 ),
 (
@@ -192,7 +487,7 @@ INSERT INTO cui_monitoring_logs (
     'NORMAL',
     NULL,
     0.045,
-    'Pola frekuensi akustik normal, tidak ada indikasi aktivitas pukat harimau atau trawl ilegal',
+    'Pola frekuensi akustik normal di perairan Ranai Natuna, tidak ada indikasi trawl atau kapal asing.',
     'SYSTEM'
 ),
 (
@@ -206,12 +501,111 @@ INSERT INTO cui_monitoring_logs (
     'NORMAL',
     '525001234',
     0.120,
-    'Kontak sonar terverifikasi: kapal kontainer komersial melintas jalur TSS ALKI II dengan kecepatan 14 knot',
+    'Kontak sonar terverifikasi: kapal kontainer komersial melintas jalur TSS ALKI II dengan kecepatan 14 knot.',
     'SYSTEM'
-)
-ON CONFLICT (log_id) DO NOTHING;
+),
+(
+    '9c100000-0000-0000-0000-000000000004',
+    '9c000000-0000-0000-0000-000000000002',
+    'PRESS-NAT-02',
+    'HYDROSTATIC_PRESSURE',
+    NOW() - INTERVAL '30 minutes',
+    82.40,
+    'bar',
+    'WARNING',
+    NULL,
+    0.650,
+    'Penurunan tekanan bertahap terdeteksi pada katup subsea WNAT km 120, SCADA merekomendasikan verifikasi.',
+    'SYSTEM'
+),
+(
+    '9c100000-0000-0000-0000-000000000005',
+    '9c000000-0000-0000-0000-000000000019',
+    'MAG-SND-01',
+    'MAGNETOMETER',
+    NOW() - INTERVAL '10 minutes',
+    54200.00,
+    'nT',
+    'WARNING',
+    NULL,
+    0.720,
+    'Anomali fluktuasi medan magnet bumi dasar laut di kedalaman 110 meter Selat Sunda.',
+    'SYSTEM'
+),
+(
+    '9c100000-0000-0000-0000-000000000006',
+    '9c000000-0000-0000-0000-000000000013',
+    'AIS-BAL-01',
+    'AIS_PROXIMITY',
+    NOW() - INTERVAL '5 minutes',
+    180.00,
+    'meters',
+    'NORMAL',
+    '525998112',
+    0.080,
+    'Kapal tanker Pertamina Pride melintas dalam batas aman koordinat Single Point Mooring Balongan.',
+    'SYSTEM'
+),
+(
+    '9c100000-0000-0000-0000-000000000007',
+    '9c000000-0000-0000-0000-000000000004',
+    'OFF-GAGAK-01',
+    'ACCELEROMETER',
+    NOW() - INTERVAL '25 minutes',
+    0.02,
+    'g',
+    'NORMAL',
+    NULL,
+    0.015,
+    'Tingkat vibrasi struktur riser tambat FSO Gagak Rimang stabil, ketinggian ombak laut Jawa 1.2 meter.',
+    'SYSTEM'
+),
+(
+    '9c100000-0000-0000-0000-000000000008',
+    '9c000000-0000-0000-0000-000000000010',
+    'TEMP-BALI-01',
+    'TEMPERATURE_SENSOR',
+    NOW() - INTERVAL '1 hour',
+    27.80,
+    'Celsius',
+    'NORMAL',
+    NULL,
+    0.030,
+    'Suhu konduktor kabel laut 150 kV Selat Bali berada dalam batas normal operasi beban puncak.',
+    'SYSTEM'
+),
+(
+    '9c100000-0000-0000-0000-000000000009',
+    '9c000000-0000-0000-0000-000000000020',
+    'HYDRO-OMBAI-01',
+    'ACOUSTIC_SONAR',
+    NOW() - INTERVAL '40 minutes',
+    42.00,
+    'dB',
+    'NORMAL',
+    NULL,
+    0.095,
+    'Deteksi spektrum frekuensi rendah oseanografi arus lintas Indonesia (ARLINDO) Selat Ombai.',
+    'SYSTEM'
+),
+(
+    '9c100000-0000-0000-0000-000000000010',
+    '9c000000-0000-0000-0000-000000000011',
+    'DTS-PAPUA-01',
+    'FIBER_OPTIC_DTS',
+    NOW() - INTERVAL '3 hours',
+    18.50,
+    'dB',
+    'NORMAL',
+    NULL,
+    0.050,
+    'Redaman optik segmen laut dalam Sorong-Jayapura berada pada toleransi 0.22 dB/km.',
+    'SYSTEM'
+);
 
--- Seed CUI Alerts
+-- -----------------------------------------------------------------------------
+-- 3. PERINGATAN ANOMALI KEAMANAN CUI (cui_alerts) - 6 Alerts (Sesuai Plan Goal)
+-- -----------------------------------------------------------------------------
 INSERT INTO cui_alerts (
     alert_id, alert_code, cui_asset_id, alert_type, severity, detected_at,
     assigned_ship_id, status, ai_confidence, recommended_action, resolution_notes, created_by
@@ -243,10 +637,67 @@ INSERT INTO cui_alerts (
     'Verifikasi telemetri SCADA PGN dan jadwalkan inspeksi visual drone bawah air (ROV) pada pipa gas Natuna.',
     NULL,
     'AI_ENGINE'
-)
-ON CONFLICT (alert_id) DO NOTHING;
+),
+(
+    '9c200000-0000-0000-0000-000000000003',
+    'ALT-CUI-2026-003',
+    '9c000000-0000-0000-0000-000000000019',
+    'ACOUSTIC_ANOMALY',
+    'HIGH',
+    NOW() - INTERVAL '1 hour',
+    '31000000-0000-0000-0000-000000000003',
+    'ACTIVE',
+    0.910,
+    'Sensor array mencatat profil akustik mesin diesel tidak dikenal di perairan Selat Sunda; KRI Alugoro-405 diperintahkan sweep sonar pasif.',
+    NULL,
+    'AI_ENGINE'
+),
+(
+    '9c200000-0000-0000-0000-000000000004',
+    'ALT-CUI-2026-004',
+    '9c000000-0000-0000-0000-000000000007',
+    'SEISMIC_DISTURBANCE',
+    'MEDIUM',
+    NOW() - INTERVAL '6 hours',
+    NULL,
+    'RESOLVED',
+    0.860,
+    'Peringatan gempa tektonik dangkal 4.3 SR Teluk Tolo Morowali; kabel laut telah diverifikasi integritas serat optiknya tidak mengalami pergeseran.',
+    'Integritas data kabel SKKL Morowali-Kendari terverifikasi aman oleh tim teknis Telkom.',
+    'AI_ENGINE'
+),
+(
+    '9c200000-0000-0000-0000-000000000005',
+    'ALT-CUI-2026-005',
+    '9c000000-0000-0000-0000-000000000015',
+    'VESSEL_ANCHOR_DRAG_RISK',
+    'MEDIUM',
+    NOW() - INTERVAL '12 hours',
+    '31000000-0000-0000-0000-000000000002',
+    'RESOLVED',
+    0.820,
+    'Kapal tunda tongkang batu bara hanyut mendekati koordinat pipa gas Mahakam Senipah; telah diperingatkan stasiun VTS Balikpapan.',
+    'Kapal telah mengubah haluan menjauhi restricted area pipa gas.',
+    'AI_ENGINE'
+),
+(
+    '9c200000-0000-0000-0000-000000000006',
+    'ALT-CUI-2026-006',
+    '9c000000-0000-0000-0000-000000000020',
+    'UNAUTHORIZED_SUBMERSIBLE',
+    'CRITICAL',
+    NOW() - INTERVAL '18 hours',
+    '31000000-0000-0000-0000-000000000003',
+    'INVESTIGATING',
+    0.935,
+    'Kontak anomali magnetik MAD di koridor Selat Ombai berpotensi unmanned underwater vehicle (UUV) riset asing tak berizin.',
+    'Disposisi Asops Pangkoarmada III untuk pengerahan aset patroli intai maritim.',
+    'AI_ENGINE'
+);
 
--- Seed CUI Inspections
+-- -----------------------------------------------------------------------------
+-- 4. INSPEKSI BAWAH LAUT CUI (cui_inspections) - 5 Inspeksi
+-- -----------------------------------------------------------------------------
 INSERT INTO cui_inspections (
     inspection_id, inspection_number, cui_asset_id, ship_id, inspection_date,
     inspector_officer_id, method, condition_rating, findings, remedial_action_required,
@@ -265,6 +716,60 @@ INSERT INTO cui_inspections (
     FALSE,
     CURRENT_DATE + INTERVAL '70 days',
     'SYSTEM'
-)
-ON CONFLICT (inspection_id) DO NOTHING;
-
+),
+(
+    '9c300000-0000-0000-0000-000000000002',
+    'INSP-CUI-2026-002',
+    '9c000000-0000-0000-0000-000000000005',
+    '31000000-0000-0000-0000-000000000001',
+    CURRENT_DATE - INTERVAL '10 days',
+    '81000000-0000-0000-0000-000000000003',
+    'SIDE_SCAN_SONAR',
+    'FAIR',
+    'Ditemukan jejak goresan rantai jangkar kapal niaga sedalam 30 cm dekat pelindung pipa kabel interkoneksi.',
+    TRUE,
+    CURRENT_DATE + INTERVAL '10 days',
+    'SYSTEM'
+),
+(
+    '9c300000-0000-0000-0000-000000000003',
+    'INSP-CUI-2026-003',
+    '9c000000-0000-0000-0000-000000000002',
+    '31000000-0000-0000-0000-000000000002',
+    CURRENT_DATE - INTERVAL '45 days',
+    '81000000-0000-0000-0000-000000000005',
+    'ROV_SUBMERSIBLE',
+    'GOOD',
+    'Survei visual ROV pipa gas WNAT Natuna bebas benturan karang dan katodik proteksi terpasang baik.',
+    FALSE,
+    CURRENT_DATE + INTERVAL '45 days',
+    'SYSTEM'
+),
+(
+    '9c300000-0000-0000-0000-000000000004',
+    'INSP-CUI-2026-004',
+    '9c000000-0000-0000-0000-000000000013',
+    '31000000-0000-0000-0000-000000000004',
+    CURRENT_DATE - INTERVAL '15 days',
+    '81000000-0000-0000-0000-000000000003',
+    'DIVER_TEAM',
+    'EXCELLENT',
+    'Inspeksi penyelam Dislambair Koarmada I pada selang bawah air SPM Balongan dalam kondisi prima.',
+    FALSE,
+    CURRENT_DATE + INTERVAL '75 days',
+    'SYSTEM'
+),
+(
+    '9c300000-0000-0000-0000-000000000005',
+    'INSP-CUI-2026-005',
+    '9c000000-0000-0000-0000-000000000006',
+    '31000000-0000-0000-0000-000000000003',
+    CURRENT_DATE - INTERVAL '5 days',
+    '81000000-0000-0000-0000-000000000005',
+    'ROV_SUBMERSIBLE',
+    'EXCELLENT',
+    'Verifikasi tambatan sensor sonar array di jurang laut Selat Lombok 350 meter, transmisi akustik optimal.',
+    FALSE,
+    CURRENT_DATE + INTERVAL '85 days',
+    'SYSTEM'
+);

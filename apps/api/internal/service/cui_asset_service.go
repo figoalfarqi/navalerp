@@ -29,20 +29,42 @@ func (s *CuiAssetService) List(ctx context.Context, opts model.ListOptions) ([]m
 
 func (s *CuiAssetService) Create(ctx context.Context, loginID string, req *model.CuiAssetRequest) (*model.CuiAsset, error, map[string]string) {
 	m := &model.CuiAsset{}
-	if req.AssetCode != nil { m.AssetCode = *req.AssetCode }
-	if req.AssetName != nil { m.AssetName = *req.AssetName }
-	if req.AssetType != nil { m.AssetType = *req.AssetType }
-	if req.OperatorName != nil { m.OperatorName = *req.OperatorName }
-	m.TheaterId = req.TheaterId
+	if req.AssetCode != nil {
+		m.AssetCode = *req.AssetCode
+	}
+	if req.AssetName != nil {
+		m.AssetName = *req.AssetName
+	}
+	if req.AssetType != nil {
+		m.AssetType = *req.AssetType
+	}
+	if req.OperatorName != nil {
+		m.OperatorName = *req.OperatorName
+	}
+	if req.TheaterId != nil && *req.TheaterId != "" {
+		m.TheaterId = req.TheaterId
+	} else {
+		m.TheaterId = nil
+	}
 	m.DepthMeters = req.DepthMeters
 	m.LengthKm = req.LengthKm
-	if req.Latitude != nil { m.Latitude = *req.Latitude }
-	if req.Longitude != nil { m.Longitude = *req.Longitude }
+	if req.Latitude != nil {
+		m.Latitude = *req.Latitude
+	}
+	if req.Longitude != nil {
+		m.Longitude = *req.Longitude
+	}
 	m.StartCoordinates = req.StartCoordinates
 	m.EndCoordinates = req.EndCoordinates
-	if req.Status != nil { m.Status = *req.Status }
-	if req.HealthScore != nil { m.HealthScore = *req.HealthScore }
-	if req.ProtectionPriority != nil { m.ProtectionPriority = *req.ProtectionPriority }
+	if req.Status != nil {
+		m.Status = *req.Status
+	}
+	if req.HealthScore != nil {
+		m.HealthScore = *req.HealthScore
+	}
+	if req.ProtectionPriority != nil {
+		m.ProtectionPriority = *req.ProtectionPriority
+	}
 	m.LastInspectedAt = req.LastInspectedAt
 	m.NextInspectionDue = req.NextInspectionDue
 	m.Notes = req.Notes
@@ -59,20 +81,42 @@ func (s *CuiAssetService) Create(ctx context.Context, loginID string, req *model
 
 func (s *CuiAssetService) Update(ctx context.Context, loginID string, id string, req *model.CuiAssetRequest) (*model.CuiAsset, error, map[string]string) {
 	m := &model.CuiAsset{}
-	if req.AssetCode != nil { m.AssetCode = *req.AssetCode }
-	if req.AssetName != nil { m.AssetName = *req.AssetName }
-	if req.AssetType != nil { m.AssetType = *req.AssetType }
-	if req.OperatorName != nil { m.OperatorName = *req.OperatorName }
-	m.TheaterId = req.TheaterId
+	if req.AssetCode != nil {
+		m.AssetCode = *req.AssetCode
+	}
+	if req.AssetName != nil {
+		m.AssetName = *req.AssetName
+	}
+	if req.AssetType != nil {
+		m.AssetType = *req.AssetType
+	}
+	if req.OperatorName != nil {
+		m.OperatorName = *req.OperatorName
+	}
+	if req.TheaterId != nil && *req.TheaterId != "" {
+		m.TheaterId = req.TheaterId
+	} else {
+		m.TheaterId = nil
+	}
 	m.DepthMeters = req.DepthMeters
 	m.LengthKm = req.LengthKm
-	if req.Latitude != nil { m.Latitude = *req.Latitude }
-	if req.Longitude != nil { m.Longitude = *req.Longitude }
+	if req.Latitude != nil {
+		m.Latitude = *req.Latitude
+	}
+	if req.Longitude != nil {
+		m.Longitude = *req.Longitude
+	}
 	m.StartCoordinates = req.StartCoordinates
 	m.EndCoordinates = req.EndCoordinates
-	if req.Status != nil { m.Status = *req.Status }
-	if req.HealthScore != nil { m.HealthScore = *req.HealthScore }
-	if req.ProtectionPriority != nil { m.ProtectionPriority = *req.ProtectionPriority }
+	if req.Status != nil {
+		m.Status = *req.Status
+	}
+	if req.HealthScore != nil {
+		m.HealthScore = *req.HealthScore
+	}
+	if req.ProtectionPriority != nil {
+		m.ProtectionPriority = *req.ProtectionPriority
+	}
 	m.LastInspectedAt = req.LastInspectedAt
 	m.NextInspectionDue = req.NextInspectionDue
 	m.Notes = req.Notes

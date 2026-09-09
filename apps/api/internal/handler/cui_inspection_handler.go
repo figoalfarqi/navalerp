@@ -35,21 +35,50 @@ func (h *CuiInspectionHandler) Get(w http.ResponseWriter, r *http.Request) {
 
 	q := r.URL.Query()
 	page, _ := strconv.Atoi(q.Get("page"))
-	if page < 1 { page = 1 }
+	if page < 1 {
+		page = 1
+	}
 	limit, _ := strconv.Atoi(q.Get("limit"))
-	if limit < 1 { limit = 10 }
+	if limit < 1 {
+		limit = 10
+	}
 	offset := (page - 1) * limit
 	search := q.Get("search")
-	sortBy := q.Get("sort_by")
-	order := q.Get("order")
+	if search == "" {
+		search = q.Get("q")
+	}
+	sortBy := q.Get("order_by")
+	if sortBy == "" {
+		sortBy = q.Get("sort_by")
+	}
+	order := q.Get("sort")
+	if order == "" {
+		order = q.Get("order")
+	}
+
+	excludedParams := map[string]bool{
+		"page":       true,
+		"limit":      true,
+		"offset":     true,
+		"search":     true,
+		"q":          true,
+		"order_by":   true,
+		"sort_by":    true,
+		"order":      true,
+		"sort":       true,
+		"authToken":  true,
+		"auth_token": true,
+		"_":          true,
+	}
+
 	filters := make(map[string]string)
 	for k, v := range q {
-		if k != "page" && k != "limit" && k != "search" && k != "sort_by" && k != "order" && len(v) > 0 {
+		if !excludedParams[k] && len(v) > 0 && v[0] != "" {
 			filters[k] = v[0]
 		}
 	}
 
-	opts := model.ListOptions{Limit: limit, Offset: offset, Search: search, SortBy: sortBy, Order: order, Filters: filters}
+	opts := model.ListOptions{Limit: limit, Offset: offset, Search: search, SortBy: sortBy, Order: order, Sort: order, Filters: filters}
 	items, total, err := h.Svc.List(r.Context(), opts)
 	if err != nil {
 		response.JSON(w, http.StatusInternalServerError, err.Error(), nil, nil)

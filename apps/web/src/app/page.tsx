@@ -16,8 +16,14 @@ import {
   DashboardIcon,
   CheckIcon,
 } from "@/components/icons";
+import { useAuth } from "@/context/AuthContext";
+import { isAdminRoleId } from "@/components/admin/adminNavigation";
 
 export default function NavalErpLandingPage() {
+  const { adminToken, adminPayload, tokenLoaded } = useAuth();
+  const isAdmin = tokenLoaded && !!adminToken && isAdminRoleId(adminPayload?.app_role_id ?? 0);
+  const portalHref = isAdmin ? "/admin" : "/admin/login";
+
   const [activeVessel, setActiveVessel] = useState<number>(0);
   const [activeMroStep, setActiveMroStep] = useState<number>(1);
   const [activeProcStep, setActiveProcStep] = useState<number>(1);
@@ -130,37 +136,28 @@ export default function NavalErpLandingPage() {
     <div className="min-h-screen bg-[#051428] text-slate-100 font-sans selection:bg-cyan-500 selection:text-white">
       {/* ── Top Navigation Bar ────────────────────────────────────────────── */}
       <header className="sticky top-0 z-50 bg-[#051428]/95 backdrop-blur-md border-b border-blue-900/50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-3.5 group">
-            <div className="relative w-11 h-11 rounded-xl bg-gradient-to-br from-[#0b2447] to-[#040e1c] border border-cyan-500/40 flex items-center justify-center shadow-lg shadow-cyan-950/50 group-hover:border-cyan-400 transition">
-              <Image src="/logo.png" alt="Naval ERP" width={32} height={32} className="object-contain" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-3 group">
+            <div className="relative w-9 h-9 rounded-lg bg-gradient-to-br from-[#0b2447] to-[#040e1c] border border-cyan-500/40 flex items-center justify-center shadow-md group-hover:border-cyan-400 transition">
+              <Image src="/logo.png" alt="Naval ERP" width={24} height={24} className="object-contain" />
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="text-lg font-black tracking-wider text-white font-mono">NAVAL ERP™</span>
-                <span className="px-1.5 py-0.5 text-[10px] font-bold bg-cyan-950 text-cyan-400 border border-cyan-800 rounded font-mono">
-                  MIL-STD
-                </span>
-              </div>
-              <p className="text-[11px] text-cyan-300/80 font-mono tracking-wider uppercase">
-                Integrated Maritime Enterprise Platform
-              </p>
+            <div className="flex items-center gap-2">
+              <span className="text-base font-black tracking-wider text-white font-mono">NAVAL ERP™</span>
+              <span className="px-1.5 py-0.5 text-[9px] font-bold bg-cyan-950/80 text-cyan-400 border border-cyan-800/80 rounded font-mono">
+                TNI AL
+              </span>
             </div>
           </Link>
 
           {/* Nav menu links */}
-          <nav className="hidden lg:flex items-center gap-6 text-xs font-semibold text-slate-300 tracking-wide uppercase">
+          <nav className="hidden lg:flex items-center gap-7 text-xs font-semibold text-slate-300 tracking-wider uppercase">
             <a href="#platform" className="hover:text-cyan-400 transition">Platform</a>
-            <a href="#fleet" className="hover:text-cyan-400 transition">Armada KRI</a>
-            <a href="#maintenance" className="hover:text-cyan-400 transition">MRO & Galangan</a>
+            <a href="#fleet" className="hover:text-cyan-400 transition">Armada & MRO</a>
             <a href="#logistics" className="hover:text-cyan-400 transition">Rantai Pasok</a>
-            <a href="#procurement" className="hover:text-cyan-400 transition">Pengadaan</a>
-            <a href="#personnel" className="hover:text-cyan-400 transition">SDM Tempur</a>
-            <a href="#cui" className="hover:text-cyan-400 transition text-cyan-400 flex items-center gap-1">
+            <a href="#cui" className="hover:text-cyan-400 transition text-cyan-400 flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
               CUI Bawah Laut
             </a>
-            <a href="#ai-command" className="hover:text-cyan-400 transition">AI Eksekutif</a>
             <a href="#security" className="hover:text-cyan-400 transition">Keamanan</a>
           </nav>
 
@@ -168,13 +165,13 @@ export default function NavalErpLandingPage() {
           <div className="flex items-center gap-3">
             <button
               onClick={() => setDemoModalOpen(true)}
-              className="hidden sm:inline-flex items-center px-4 py-2 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold tracking-wider uppercase transition shadow-lg shadow-cyan-900/30"
+              className="hidden sm:inline-flex items-center px-3.5 py-2 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold tracking-wider uppercase transition shadow-md shadow-cyan-950/50"
             >
               Request Demo
             </button>
             <Link
-              href="/admin"
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#0b2447] hover:bg-[#12366b] border border-blue-700/60 text-cyan-200 text-xs font-bold tracking-wider uppercase transition"
+              href={portalHref}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-[#0b2447] hover:bg-[#12366b] border border-blue-700/60 text-cyan-200 text-xs font-bold tracking-wider uppercase transition"
             >
               Portal Komando →
             </Link>
@@ -183,26 +180,26 @@ export default function NavalErpLandingPage() {
       </header>
 
       {/* ── 1. HOME / HERO SECTION ─────────────────────────────────────────── */}
-      <section className="relative pt-16 pb-24 overflow-hidden border-b border-blue-900/40">
+      <section className="relative pt-12 pb-20 overflow-hidden border-b border-blue-900/40">
         {/* Ambient Glows */}
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[350px] bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-          <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-[#081d38] border border-cyan-500/30 text-cyan-300 text-xs font-mono tracking-widest uppercase mb-8 shadow-inner">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#081d38] border border-cyan-500/30 text-cyan-300 text-xs font-mono tracking-widest uppercase mb-6 shadow-inner">
             <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
-            TNI ANGKATAN LAUT • THE DIGITAL BACKBONE OF MARITIME OPERATIONS
+            TNI ANGKATAN LAUT • MARITIME DEFENSE PLATFORM
           </div>
 
-          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white leading-tight">
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-tight">
             NAVAL ERP™ <br />
             <span className="bg-gradient-to-r from-cyan-400 via-sky-300 to-blue-400 bg-clip-text text-transparent">
-              Integrated Naval & Maritime Enterprise Management
+              The Digital Backbone of Maritime Operations
             </span>
           </h1>
 
-          <p className="mt-6 max-w-3xl mx-auto text-base sm:text-lg text-slate-300 leading-relaxed">
-            One integrated platform connecting fleet management, maintenance, logistics, procurement, personnel, finance and critical underwater maritime infrastructure (CUI).
+          <p className="mt-4 max-w-2xl mx-auto text-sm sm:text-base text-slate-300 leading-relaxed">
+            Platform terintegrasi kesiapan armada, rantai pasok pertahanan, dan pengamanan infrastruktur bawah laut nasional.
           </p>
 
           {/* Hero CTAs */}

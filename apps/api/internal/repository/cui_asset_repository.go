@@ -19,11 +19,20 @@ func NewCuiAssetRepository(db *pgxpool.Pool) *CuiAssetRepository {
 
 // Get retrieves a single cui_asset by ID
 func (r *CuiAssetRepository) Get(ctx context.Context, id string) (*model.CuiAsset, error) {
-	query := `SELECT cui_asset_id, asset_code, asset_name, asset_type, operator_name, theater_id, depth_meters, length_km, latitude, longitude, start_coordinates, end_coordinates, status, health_score, protection_priority, last_inspected_at, next_inspection_due, notes, created_by, updated_by, deleted_by, created_at, updated_at, deleted_at FROM cui_assets WHERE cui_asset_id = $1 AND deleted_at IS NULL`
+	query := `SELECT 
+		c.cui_asset_id, c.asset_code, c.asset_name, c.asset_type, c.operator_name, 
+		c.theater_id, c.depth_meters, c.length_km, c.latitude, c.longitude, 
+		c.start_coordinates, c.end_coordinates, c.status, c.health_score, c.protection_priority, 
+		c.last_inspected_at, c.next_inspection_due, c.notes, c.created_by, c.updated_by, 
+		c.deleted_by, c.created_at, c.updated_at, c.deleted_at,
+		t.theater_name, t.theater_code
+	FROM cui_assets c
+	LEFT JOIN ops_theaters t ON t.theater_id = c.theater_id
+	WHERE c.cui_asset_id = $1 AND c.deleted_at IS NULL`
 
 	row := r.DB.QueryRow(ctx, query, id)
 	var m model.CuiAsset
-	err := row.Scan(&m.CuiAssetId, &m.AssetCode, &m.AssetName, &m.AssetType, &m.OperatorName, &m.TheaterId, &m.DepthMeters, &m.LengthKm, &m.Latitude, &m.Longitude, &m.StartCoordinates, &m.EndCoordinates, &m.Status, &m.HealthScore, &m.ProtectionPriority, &m.LastInspectedAt, &m.NextInspectionDue, &m.Notes, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt)
+	err := row.Scan(&m.CuiAssetId, &m.AssetCode, &m.AssetName, &m.AssetType, &m.OperatorName, &m.TheaterId, &m.DepthMeters, &m.LengthKm, &m.Latitude, &m.Longitude, &m.StartCoordinates, &m.EndCoordinates, &m.Status, &m.HealthScore, &m.ProtectionPriority, &m.LastInspectedAt, &m.NextInspectionDue, &m.Notes, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt, &m.TheaterName, &m.TheaterCode)
 	if err != nil {
 		return nil, err
 	}
@@ -69,21 +78,44 @@ func (r *CuiAssetRepository) Get(ctx context.Context, id string) (*model.CuiAsse
 
 // List retrieves cui_asset records with search, filter, and pagination
 func (r *CuiAssetRepository) List(ctx context.Context, opts model.ListOptions) ([]model.CuiAsset, int, error) {
-	baseQuery := `FROM cui_assets WHERE 1=1`
-	baseQuery += ` AND deleted_at IS NULL`
+	whereQuery := `FROM cui_assets c
+	LEFT JOIN ops_theaters t ON t.theater_id = c.theater_id
+	WHERE 1=1 AND c.deleted_at IS NULL`
 	var args []interface{}
 	argIndex := 1
 
 	if opts.Search != "" {
-		baseQuery += fmt.Sprintf(" AND (asset_code ILIKE $%d OR asset_name ILIKE $%d OR operator_name ILIKE $%d OR start_coordinates ILIKE $%d OR end_coordinates ILIKE $%d OR notes ILIKE $%d)", argIndex, argIndex, argIndex, argIndex, argIndex, argIndex)
+		whereQuery += fmt.Sprintf(" AND (c.asset_code ILIKE $%d OR c.asset_name ILIKE $%d OR c.operator_name ILIKE $%d OR c.start_coordinates ILIKE $%d OR c.end_coordinates ILIKE $%d OR c.notes ILIKE $%d OR t.theater_name ILIKE $%d)", argIndex, argIndex, argIndex, argIndex, argIndex, argIndex, argIndex)
 		args = append(args, "%"+opts.Search+"%")
 		argIndex++
 	}
 
-	// Generic filter support
+	allowedCols := map[string]bool{
+		"cui_asset_id":        true,
+		"asset_code":          true,
+		"asset_name":          true,
+		"asset_type":          true,
+		"operator_name":       true,
+		"theater_id":          true,
+		"depth_meters":        true,
+		"length_km":           true,
+		"latitude":            true,
+		"longitude":           true,
+		"start_coordinates":   true,
+		"end_coordinates":     true,
+		"status":              true,
+		"health_score":        true,
+		"protection_priority": true,
+		"last_inspected_at":   true,
+		"next_inspection_due": true,
+		"created_at":          true,
+		"updated_at":          true,
+	}
+
+	// Generic filter support with column whitelisting
 	for k, v := range opts.Filters {
-		if v != "" {
-			baseQuery += fmt.Sprintf(" AND %s = $%d", k, argIndex)
+		if v != "" && allowedCols[k] {
+			whereQuery += fmt.Sprintf(" AND c.%s = $%d", k, argIndex)
 			args = append(args, v)
 			argIndex++
 		}
@@ -91,29 +123,35 @@ func (r *CuiAssetRepository) List(ctx context.Context, opts model.ListOptions) (
 
 	// Count total
 	var total int
-	countQuery := "SELECT COUNT(*) " + baseQuery
+	countQuery := "SELECT COUNT(*) " + whereQuery
 	err := r.DB.QueryRow(ctx, countQuery, args...).Scan(&total)
 	if err != nil {
 		return nil, 0, err
 	}
 
 	// Sorting and Pagination
-	sortCol := "cui_asset_id"
-	if opts.SortBy != "" {
+	sortCol := "created_at"
+	if opts.SortBy != "" && allowedCols[opts.SortBy] {
 		sortCol = opts.SortBy
 	}
 	order := "DESC"
-	if strings.ToUpper(opts.Order) == "ASC" {
+	if strings.ToUpper(opts.Order) == "ASC" || strings.ToUpper(opts.Sort) == "ASC" {
 		order = "ASC"
 	}
-	baseQuery += fmt.Sprintf(" ORDER BY %s %s", sortCol, order)
+	whereQuery += fmt.Sprintf(" ORDER BY c.%s %s", sortCol, order)
 
 	if opts.Limit > 0 {
-		baseQuery += fmt.Sprintf(" LIMIT $%d OFFSET $%d", argIndex, argIndex+1)
+		whereQuery += fmt.Sprintf(" LIMIT $%d OFFSET $%d", argIndex, argIndex+1)
 		args = append(args, opts.Limit, opts.Offset)
 	}
 
-	selectQuery := "SELECT cui_asset_id, asset_code, asset_name, asset_type, operator_name, theater_id, depth_meters, length_km, latitude, longitude, start_coordinates, end_coordinates, status, health_score, protection_priority, last_inspected_at, next_inspection_due, notes, created_by, updated_by, deleted_by, created_at, updated_at, deleted_at " + baseQuery
+	selectQuery := `SELECT 
+		c.cui_asset_id, c.asset_code, c.asset_name, c.asset_type, c.operator_name, 
+		c.theater_id, c.depth_meters, c.length_km, c.latitude, c.longitude, 
+		c.start_coordinates, c.end_coordinates, c.status, c.health_score, c.protection_priority, 
+		c.last_inspected_at, c.next_inspection_due, c.notes, c.created_by, c.updated_by, 
+		c.deleted_by, c.created_at, c.updated_at, c.deleted_at,
+		t.theater_name, t.theater_code ` + whereQuery
 	rows, err := r.DB.Query(ctx, selectQuery, args...)
 	if err != nil {
 		return nil, 0, err
@@ -123,7 +161,7 @@ func (r *CuiAssetRepository) List(ctx context.Context, opts model.ListOptions) (
 	var items []model.CuiAsset
 	for rows.Next() {
 		var m model.CuiAsset
-		if err := rows.Scan(&m.CuiAssetId, &m.AssetCode, &m.AssetName, &m.AssetType, &m.OperatorName, &m.TheaterId, &m.DepthMeters, &m.LengthKm, &m.Latitude, &m.Longitude, &m.StartCoordinates, &m.EndCoordinates, &m.Status, &m.HealthScore, &m.ProtectionPriority, &m.LastInspectedAt, &m.NextInspectionDue, &m.Notes, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt); err != nil {
+		if err := rows.Scan(&m.CuiAssetId, &m.AssetCode, &m.AssetName, &m.AssetType, &m.OperatorName, &m.TheaterId, &m.DepthMeters, &m.LengthKm, &m.Latitude, &m.Longitude, &m.StartCoordinates, &m.EndCoordinates, &m.Status, &m.HealthScore, &m.ProtectionPriority, &m.LastInspectedAt, &m.NextInspectionDue, &m.Notes, &m.CreatedBy, &m.UpdatedBy, &m.DeletedBy, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt, &m.TheaterName, &m.TheaterCode); err != nil {
 			return nil, 0, err
 		}
 		items = append(items, m)

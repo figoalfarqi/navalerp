@@ -29,14 +29,32 @@ func (s *CuiAlertService) List(ctx context.Context, opts model.ListOptions) ([]m
 
 func (s *CuiAlertService) Create(ctx context.Context, loginID string, req *model.CuiAlertRequest) (*model.CuiAlert, error, map[string]string) {
 	m := &model.CuiAlert{}
-	if req.AlertCode != nil { m.AlertCode = *req.AlertCode }
-	if req.CuiAssetId != nil { m.CuiAssetId = *req.CuiAssetId }
-	if req.AlertType != nil { m.AlertType = *req.AlertType }
-	if req.Severity != nil { m.Severity = *req.Severity }
-	if req.DetectedAt != nil { m.DetectedAt = *req.DetectedAt }
-	m.AssignedShipId = req.AssignedShipId
-	if req.Status != nil { m.Status = *req.Status }
-	if req.AiConfidence != nil { m.AiConfidence = *req.AiConfidence }
+	if req.AlertCode != nil {
+		m.AlertCode = *req.AlertCode
+	}
+	if req.CuiAssetId != nil {
+		m.CuiAssetId = *req.CuiAssetId
+	}
+	if req.AlertType != nil {
+		m.AlertType = *req.AlertType
+	}
+	if req.Severity != nil {
+		m.Severity = *req.Severity
+	}
+	if req.DetectedAt != nil {
+		m.DetectedAt = *req.DetectedAt
+	}
+	if req.AssignedShipId != nil && *req.AssignedShipId != "" {
+		m.AssignedShipId = req.AssignedShipId
+	} else {
+		m.AssignedShipId = nil
+	}
+	if req.Status != nil {
+		m.Status = *req.Status
+	}
+	if req.AiConfidence != nil {
+		m.AiConfidence = *req.AiConfidence
+	}
 	m.RecommendedAction = req.RecommendedAction
 	m.ResolutionNotes = req.ResolutionNotes
 	m.ResolvedAt = req.ResolvedAt
@@ -50,14 +68,32 @@ func (s *CuiAlertService) Create(ctx context.Context, loginID string, req *model
 
 func (s *CuiAlertService) Update(ctx context.Context, loginID string, id string, req *model.CuiAlertRequest) (*model.CuiAlert, error, map[string]string) {
 	m := &model.CuiAlert{}
-	if req.AlertCode != nil { m.AlertCode = *req.AlertCode }
-	if req.CuiAssetId != nil { m.CuiAssetId = *req.CuiAssetId }
-	if req.AlertType != nil { m.AlertType = *req.AlertType }
-	if req.Severity != nil { m.Severity = *req.Severity }
-	if req.DetectedAt != nil { m.DetectedAt = *req.DetectedAt }
-	m.AssignedShipId = req.AssignedShipId
-	if req.Status != nil { m.Status = *req.Status }
-	if req.AiConfidence != nil { m.AiConfidence = *req.AiConfidence }
+	if req.AlertCode != nil {
+		m.AlertCode = *req.AlertCode
+	}
+	if req.CuiAssetId != nil {
+		m.CuiAssetId = *req.CuiAssetId
+	}
+	if req.AlertType != nil {
+		m.AlertType = *req.AlertType
+	}
+	if req.Severity != nil {
+		m.Severity = *req.Severity
+	}
+	if req.DetectedAt != nil {
+		m.DetectedAt = *req.DetectedAt
+	}
+	if req.AssignedShipId != nil && *req.AssignedShipId != "" {
+		m.AssignedShipId = req.AssignedShipId
+	} else {
+		m.AssignedShipId = nil
+	}
+	if req.Status != nil {
+		m.Status = *req.Status
+	}
+	if req.AiConfidence != nil {
+		m.AiConfidence = *req.AiConfidence
+	}
 	m.RecommendedAction = req.RecommendedAction
 	m.ResolutionNotes = req.ResolutionNotes
 	m.ResolvedAt = req.ResolvedAt

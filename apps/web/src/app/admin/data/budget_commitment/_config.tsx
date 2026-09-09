@@ -10,7 +10,6 @@ export const primaryKey = "commitment_id";
 
 export const columns: ColumnField[] = [
   { key: "commitment_number", label: "Commitment Number" },
-  { key: "allocation_id", label: "Allocation Id" },
   { key: "contract_number", label: "No. Kontrak" },
   { key: "po_number", label: "No. PO" },
   { key: "work_order_number", label: "Perintah Kerja (WO)" },
