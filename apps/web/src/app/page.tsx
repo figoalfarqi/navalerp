@@ -139,7 +139,7 @@ export default function NavalErpLandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-3 group">
             <div className="relative w-9 h-9 rounded-lg bg-gradient-to-br from-[#0b2447] to-[#040e1c] border border-cyan-500/40 flex items-center justify-center shadow-md group-hover:border-cyan-400 transition">
-              <Image src="/logo.png" alt="Naval ERP" width={24} height={24} className="object-contain" />
+              <Image src="/logo.webp" alt="Naval ERP" width={24} height={24} className="object-contain" />
             </div>
             <div className="flex items-center gap-2">
               <span className="text-base font-black tracking-wider text-white font-mono">NAVAL ERP™</span>
@@ -852,7 +852,7 @@ export default function NavalErpLandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-3">
-              <Image src="/logo.png" alt="Naval ERP" width={36} height={36} className="object-contain" />
+              <Image src="/logo.webp" alt="Naval ERP" width={36} height={36} className="object-contain" />
               <div>
                 <span className="font-bold font-mono text-white text-sm">NAVAL ERP™</span>
                 <p className="text-[11px] text-cyan-400">TNI Angkatan Laut • Jalesveva Jayamahe</p>

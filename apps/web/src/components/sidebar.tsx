@@ -69,7 +69,7 @@ export default function Sidebar({
           title={desktopCollapsed ? "Naval ERP - TNI Angkatan Laut" : undefined}
         >
           <Image
-            src="/logo.png"
+            src="/logo.webp"
             alt="Naval ERP"
             width={32}
             height={32}

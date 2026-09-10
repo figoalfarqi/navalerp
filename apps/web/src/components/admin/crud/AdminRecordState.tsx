@@ -37,7 +37,7 @@ export default function AdminRecordState({
           <div className="absolute inset-1 rounded-full border-2 border-transparent border-t-cyan-400 border-r-sky-400 animate-[spin_1.5s_linear_infinite]" />
           <div className="w-10 h-10 rounded-full bg-[#030b14] border border-cyan-500/50 flex items-center justify-center shadow p-2">
             <Image
-              src="/logo.png"
+              src="/logo.webp"
               alt="Naval ERP"
               width={26}
               height={26}

@@ -41,7 +41,7 @@ const DesktopPageLoader: React.FC<DesktopPageLoaderProps> = ({
           {/* Center Logo Hub */}
           <div className="relative w-14 h-14 rounded-full bg-[#030b14] border border-cyan-500/50 flex items-center justify-center shadow-lg p-2.5">
             <Image
-              src="/logo.png"
+              src="/logo.webp"
               alt="Naval ERP"
               width={40}
               height={40}

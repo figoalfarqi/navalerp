@@ -22,7 +22,7 @@ export default function MobilePageLoader() {
           <div className="absolute inset-1 rounded-full border-2 border-transparent border-t-cyan-400 border-r-sky-400 animate-[spin_1.5s_linear_infinite]" />
           <div className="relative w-12 h-12 rounded-full bg-[#030b14] border border-cyan-500/50 flex items-center justify-center shadow-lg p-2">
             <Image
-              src="/logo.png"
+              src="/logo.webp"
               alt="Naval ERP"
               width={34}
               height={34}

@@ -14,7 +14,7 @@ go build -o app ./cmd/navalerp
 chmod +x /var/www/project-be/appnavalerp/app
 
 sudo systemctl restart navalerpapp
-sudo systemctl status navalerpapiapp
+sudo systemctl status navalerpapp
 chmod +x /var/www/project-be/appnavalerp/.env
 
 

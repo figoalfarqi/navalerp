@@ -67,7 +67,7 @@ export default function Login({
 
           <div className="flex justify-center mb-4">
             <Image
-              src="/logo.png"
+              src="/logo.webp"
               alt="Naval ERP"
               width={isMobile ? 100 : 120}
               height={isMobile ? 100 : 120}

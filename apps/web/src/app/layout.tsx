@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: "Naval ERP - TNI Angkatan Laut",
   description: "Sistem Informasi & Manajemen Operasi Alutsista Matra Laut",
   icons: {
-    icon: "/logo.png",
+    icon: "/logo.webp",
   },
 };
 
